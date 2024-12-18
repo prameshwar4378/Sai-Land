@@ -164,8 +164,32 @@ def logout(request):
     DeleteSession(request)
     return redirect('/login')
 
+
 def dashboard(request):
-    return render(request, "admin_dashboard.html")
+    # Count users based on roles
+    admin_count = CustomUser.objects.filter(is_admin=True).count()
+    account_count = CustomUser.objects.filter(is_account=True).count()
+    workshop_count = CustomUser.objects.filter(is_workshop=True).count()
+    driver_count = CustomUser.objects.filter(is_driver=True).count()
+
+    # Prepare data for the pie chart
+    roles = ['Admin', 'Account', 'Workshop', 'Driver']
+    counts = [admin_count, account_count, workshop_count, driver_count]
+    user_count = CustomUser.objects.filter(
+        Q(is_admin=True) | Q(is_account=True) | Q(is_workshop=True) | Q(is_driver=True)
+    ).count()
+    product_count=Product.objects.all().count()
+    vehicle_count=Vehicle.objects.all().count()
+    # Pass data to the template
+    context = {
+        'roles': roles,
+        'counts': counts,
+        'user_count': user_count,
+        'product_count':product_count,
+        'vehicle_count':vehicle_count
+    }
+    return render(request, "admin_dashboard.html", context)
+
 
 def notifications(request):
     return render(request, "admin_notifications.html")
