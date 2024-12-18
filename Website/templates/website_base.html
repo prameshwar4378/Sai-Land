@@ -1,0 +1,466 @@
+{% load static %}
+<html class="no-js" lang="zxx">
+
+<head>
+	<!-- Meta Tags -->
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="keywords" content="Site keywords here">
+	<meta name="description" content="">
+	<meta name='copyright' content=''>
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<!-- Title -->
+	<title>Sai Land Developers</title>
+
+	<!-- Favicon -->
+	<link rel="icon" href="{% static 'img/sld-logo.png' %}">
+
+	<!-- Google Fonts -->
+	<link
+		href="https://fonts.googleapis.com/css?family=Poppins:200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap"
+		rel="stylesheet">
+
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+	<!-- Nice Select CSS -->
+	<link rel="stylesheet" href="{% static 'css/nice-select.css' %}">
+	<!-- Font Awesome CSS -->
+	<link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+	<!-- icofont CSS -->
+	<link rel="stylesheet" href="{% static 'css/icofont.css' %}">
+	<!-- Slicknav -->
+	<link rel="stylesheet" href="{% static 'css/slicknav.min.css' %}">
+	<!-- Owl Carousel CSS -->
+	<link rel="stylesheet" href="{% static 'css/owl-carousel.css' %}">
+	<!-- Datepicker CSS -->
+	<link rel="stylesheet" href="{% static 'css/datepicker.css' %}">
+	<!-- Animate CSS -->
+	<link rel="stylesheet" href="{% static 'css/animate.min.css' %}">
+	<!-- Magnific Popup CSS -->
+	<link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}">
+
+	<!-- Medipro CSS -->
+	<link rel="stylesheet" href="{% static 'css/normalize.css' %}">
+	<link rel="stylesheet" href="{% static 'css/style.css' %}">
+	<link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+
+	{% block links %}
+	{% endblock links %}
+
+</head>
+
+<style>
+ 
+.gallery-carousel .item {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 10px; /* Adjust padding if necessary */
+  }
+
+  .gallery-carousel .item img {
+	display: block;
+	width: 100%;
+	border-radius: 20px;
+	height: auto;
+	border-radius: 10px; /* Optional: adds rounded corners to images */
+  }
+  
+  @media (min-width: 768px) {
+	.gallery-carousel .item {
+	  padding: 20px; /* Adjust padding for larger screens */
+	}
+  }
+
+  @media (max-width: 767px) {
+	.gallery-carousel .item {
+	  padding: 5px; /* Adjust padding for smaller screens */
+	}
+  }
+
+  
+.gallery-carousel .owl-dots {
+    margin-top: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.gallery-carousel .owl-dot {
+    position: relative;
+    display: inline-block;
+    margin: 0 5px;
+    width: 15px;
+    height: 15px;
+    background: #afafaf;
+    border: 5px solid var(--light);
+    border-radius: 50%;
+    transition: background-color 0.5s;
+}
+
+.gallery-carousel .owl-dot.active {
+    background-color: #4ae403;
+    border-color: var(--primary);
+}
+
+.gallery-carousel .owl-dot:hover {
+    background-color: #7ff17f;
+}
+
+
+.services .row > [class*="col-"] {
+        padding: 15px; /* Adds spacing between columns */
+    }
+
+
+
+
+
+
+
+
+	
+
+    /* Clients Section Styling */
+    .clients-section {
+        background-color: #f9f9f9;
+        /* Subtle background */
+        padding: 5px 0;
+    }
+
+    .clients-slider .client-logo {
+        text-align: center;
+        /* Center align logos */
+        padding: 15px;
+        margin: 5px;
+        /* Adds space between items */
+        background: #ffffff;
+        /* White background for each logo */
+        border-radius: 10px;
+        /* Smooth border radius */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        /* Subtle shadow */
+        transition: transform 0.3s, box-shadow 0.3s;
+        /* Smooth animation */
+    }
+
+    .clients-slider .client-logo img {
+        max-width: 80%;
+        /* Resizes the logo for consistency */
+        height: auto;
+    }
+
+    .clients-slider .client-logo:hover {
+        transform: scale(1.05);
+        /* Slight zoom on hover */
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        /* Enhanced shadow on hover */
+    }
+
+    /* Carousel Navigation Arrows */
+    .clients-slider .owl-nav button {
+        background: #007bff;
+        /* Bootstrap primary color */
+        color: #ffffff;
+        border-radius: 50%;
+        /* Circular button */
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        /* Shadow for buttons */
+        transition: background 0.3s;
+    }
+
+    .clients-slider .owl-nav button:hover {
+        background: #0056b3;
+        /* Darker shade on hover */
+    }
+
+    .clients-slider .owl-dots {
+        text-align: center;
+        margin-top: 15px;
+    }
+
+    .clients-slider .owl-dot {
+        width: 12px;
+        height: 12px;
+        margin: 0 5px;
+        border-radius: 50%;
+        background: #dcdcdc;
+        /* Inactive dot color */
+        transition: background 0.3s;
+    }
+
+    .clients-slider .owl-dot.active {
+        background: #007bff;
+        /* Active dot color */
+    }
+
+
+{% block style %}
+
+{% endblock style %}
+
+</style>
+<body>
+
+	<!-- Get Pro Button -->
+	<!--<ul class="pro-features">
+		<a class="get-pro" href="#"> 
+			*
+		</a>
+		<li class="big-title">Advanced Solutions for Industrial Needs</li>
+		<li class="title">Our Key Offerings</li>
+		<li>Customized Material Handling Solutions</li>
+		<li>Heavy Equipment Rentals</li>
+		<li>State-of-the-Art Crushing Units</li>
+		<li>Sustainability Initiatives with Electric Vehicles</li>
+		<li>Comprehensive Safety and Training Programs</li>
+		<div class="button">
+			<a href="#" target="_blank" class="btn">Learn More</a>
+			<a href="#" target="_blank" class="btn">Get in Touch</a>
+		</div>
+	</ul>
+	-->
+
+	<!-- Header Area -->
+	<header class="header">
+		<!-- Topbar -->
+		<div class="topbar">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-6 col-md-5 col-12">
+						<!-- Contact -->
+						<ul class="top-link">
+							<li><a href="{% url "login" %}" class="btn " style="padding:2px 20px; color:white;">Login</a></li> 
+						</ul>
+						<!-- End Contact -->
+					</div>
+					<div class="col-lg-6 col-md-7 col-12">
+						<!-- Top Contact -->
+						<ul class="top-contact">
+							<li><i class="fa fa-phone"></i>+91 8888888888</li>
+							<li><i class="fa fa-envelope"></i><a
+									href="mailto:support@yourmail.com">support@gmail.com</a></li>
+						</ul>
+						<!-- End Top Contact -->
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End Topbar -->
+		<!-- Header Inner -->
+		<div class="header-inner">
+			<div class="container">
+				<div class="inner">
+					<div class="row">
+						<div class="col-lg-2 col-md-2 col-12">
+							<!-- Start Logo -->
+							<div class="logo">
+								<a href="{% url "index" %}"><img src="{% static 'img/sld-logo.png' %}" alt="#" style="height: 60px;"></a>
+							</div>
+							<!-- End Logo -->
+							<!-- Mobile Nav -->
+							<div class="mobile-nav"></div>
+							<!-- End Mobile Nav -->
+						</div>
+						<div class="col-lg-8 col-md-9 col-12">
+							<!-- Main Menu -->
+							<div class="main-menu">
+								<nav class="navigation">
+									<ul class="nav menu">
+										<li><a href="{% url "index" %}">Home </a></li>
+										<li><a href="{% url "website_about_us" %}">About Us </a></li>
+										<li class=""><a href="#">Services <i class="icofont-rounded-down"></i></a>
+											<ul class="dropdown">
+												<li><a href="{% url "material_handling" %}">Material Handling</a></li>
+												<li><a href="{% url "crushing_services" %}">Crushing Services</a></li> 
+											</ul>
+										</li>
+										<li><a href="{% url "equipment" %}">Equipment </a></li>
+										<li><a href="{% url "clients" %}">Clients  </a></li> 
+										<li class=""><a href="#">Gallery <i class="icofont-rounded-down"></i></a>
+											<ul class="dropdown">
+												<li><a href="{% url "photo_gallery" %}">Photos</a></li>
+												<li><a href="">Videos</a></li> 
+											</ul>
+										</li>
+										
+									</ul>
+								</nav>
+							</div>
+							<!--/ End Main Menu -->
+						</div>
+						<div class="col-lg-2 col-12">
+							<div class="get-quote">
+								<a href="{% url "contact_us" %}" class="btn">Contact Us</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--/ End Header Inner -->
+	</header>
+	<!-- End Header Area -->
+ 
+
+    {% block content %}{% endblock content %}
+
+
+	<!-- Start Newsletter Area -->
+	 <!--<section class="newsletter section">
+		<div class="container">
+			<div class="row ">
+				<div class="col-lg-6  col-12">
+					<div class="subscribe-text ">
+						<h6>Sign up for newsletter</h6>
+						<p class="">Cu qui soleat partiendo urbanitas. Eum aperiri indoctum eu,<br> homero alterum.</p>
+					</div>
+				</div>
+				<div class="col-lg-6  col-12">
+					<div class="subscribe-form ">
+						<form action="mail/mail.php" method="get" target="_blank" class="newsletter-inner">
+							<input name="EMAIL" placeholder="Your email address" class="common-input"
+								onfocus="this.placeholder = ''" onblur="this.placeholder = 'Your email address'"
+								required="" type="email">
+							<button class="btn">Subscribe</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section> -->
+	<!-- /End Newsletter Area -->
+
+	<!-- Footer Area -->
+	<footer id="footer" class="footer">
+		<!-- Footer Top -->
+		<div class="footer-top">
+			<div class="container">
+				<div class="row">
+					<!-- About Us Section -->
+					<div class="col-lg-4 col-md-6 col-12">
+						<div class="single-footer">
+							<h2>About Us</h2>
+							<p style="text-align: justify;">Founded in 2013, Sai Land Developers specializes in material handling, crushing, transportation, and mining services. We are committed to innovation, sustainability, and customer satisfaction.</p>
+							<!-- Social Media Links -->
+							<ul class="social">
+								<li><a href="#"><i class="icofont-facebook"></i></a></li>
+								<li><a href="#"><i class="icofont-google-plus"></i></a></li>
+								<li><a href="#"><i class="icofont-twitter"></i></a></li>
+								<li><a href="#"><i class="icofont-vimeo"></i></a></li>
+								<li><a href="#"><i class="icofont-pinterest"></i></a></li>
+							</ul>
+						</div>
+					</div>
+					
+					<!-- Quick Links Section -->
+					<div class="col-lg-5 col-md-6 col-12">
+						<div class="single-footer f-link">
+							<h2>Quick Links</h2>
+							<div class="row">
+								<div class="col-lg-6 col-md-6 col-12">
+									<ul>
+										<li><a href="{% url 'index' %}"><i class="fa fa-caret-right" aria-hidden="true"></i>Home</a></li>
+										<li><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i>About Us</a></li>
+										<li><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i>Services</a></li>
+										<li><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i>Equipment</a></li>
+										<li><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i>Clients</a></li>
+									</ul>
+								</div>
+								<div class="col-lg-6 col-md-6 col-12">
+									<ul>
+										<li><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i>Safety & Compliance</a></li>
+										<li><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i>Testimonials</a></li>
+										<li><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i>FAQ</a></li>
+										<li><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i>Contact Us</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<!-- Open Hours Section -->
+					<div class="col-lg-3 col-md-6 col-12">
+						<div class="single-footer">
+							<h2>Open Hours</h2>
+							<p>Our team is available to support your needs during the following hours:</p>
+							<ul class="time-sidual">
+								<li class="day">Monday - Friday <span>8:00 AM - 8:00 PM</span></li>
+								<li class="day">Saturday <span>9:00 AM - 6:30 PM</span></li>
+								<li class="day">Sunday <span>Closed</span></li>
+							</ul>
+						</div>
+					</div>
+					
+					<!-- Newsletter Subscription -->
+					 
+			</div>
+		</div>
+		
+		<!-- Copyright -->
+		<div class="copyright">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-12 col-md-12 col-12">
+						<div class="copyright-content">
+							<p>&copy; 2024 | All Rights Reserved by <a href="#" target="_blank">Sai Land Developers</a></p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</footer>
+	
+	<!--/ End Footer Area -->
+
+	<script>
+		 
+	</script>
+	<!-- jquery Min JS -->
+	<script src="{% static 'js/jquery.min.js' %}"></script>
+	<!-- jquery Migrate JS -->
+	<script src="{% static 'js/jquery-migrate-3.0.0.js' %}"></script>
+	<!-- jquery Ui JS -->
+	<script src="{% static 'js/jquery-ui.min.js' %}"></script>
+	<!-- Easing JS -->
+	<script src="{% static 'js/easing.js' %}"></script>
+	<!-- Color JS -->
+	<script src="{% static 'js/colors.js' %}"></script>
+	<!-- Popper JS -->
+	<script src="{% static 'js/popper.min.js' %}"></script>
+	<!-- Bootstrap Datepicker JS -->
+	<script src="{% static 'js/bootstrap-datepicker.js' %}"></script>
+	<!-- Jquery Nav JS -->
+	<script src="{% static 'js/jquery.nav.js' %}"></script>
+	<!-- Slicknav JS -->
+	<script src="{% static 'js/slicknav.min.js' %}"></script>
+	<!-- ScrollUp JS -->
+	<script src="{% static 'js/jquery.scrollUp.min.js' %}"></script>
+	<!-- Niceselect JS -->
+	<script src="{% static 'js/niceselect.js' %}"></script>
+	<!-- Tilt Jquery JS -->
+	<script src="{% static 'js/tilt.jquery.min.js' %}"></script>
+	<!-- Owl Carousel JS -->
+	<script src="{% static 'js/owl-carousel.js' %}"></script>
+	<!-- counterup JS -->
+	<script src="{% static 'js/jquery.counterup.min.js' %}"></script>
+	<!-- Steller JS -->
+	<script src="{% static 'js/steller.js' %}"></script>
+	<!-- Wow JS -->
+	<script src="{% static 'js/wow.min.js' %}"></script>
+	<!-- Magnific Popup JS -->
+	<script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
+	<!-- Counter Up CDN JS -->
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>
+	<!-- Bootstrap JS -->
+	<script src="{% static 'js/bootstrap.min.js' %}"></script>
+	<!-- Main JS -->
+	<script src="{% static 'js/main.js' %}"></script>
+</body>
+
+</html>

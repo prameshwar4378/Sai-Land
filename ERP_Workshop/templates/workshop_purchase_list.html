@@ -1,0 +1,349 @@
+{% extends "workshop_base.html" %}
+{% block title %}Purchase List{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+<style>
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 100px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        border-radius: 10px;
+    }
+
+    .dropdown-content a {
+        color: black;
+        padding: 5px 10px;
+        text-decoration: none;
+        display: block;
+        text-align: left;
+    }
+
+    .dropdown-content a:hover {
+        background-color: #f1f1f1;
+    }
+
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+</style>
+<main id="main" class="main">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="pagetitle">
+                <h1>Purchase List</h1>
+                <nav>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item"><a href="#">Purchase List </a></li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="container" style="max-width:97%;">
+                <div class="text-lg-end text-start">
+                    <!-- Use text-lg-end for right alignment in large screens -->
+                    <a href="#" class="btn btn-primary" data-toggle="modal"
+                        data-target="#model_create_purchase"><i class="mdi mdi-filter"></i> New Bill</a>
+                        
+                        <a href="#" class="btn btn-primary" data-toggle="modal"
+                            data-target="#model_filter"><i class="mdi mdi-filter"></i> Filter</a>
+ 
+                </div>
+            </div>
+        </div>
+    </div>
+        <section class="section dashboard">
+            <hr>
+            <div class="row">
+                <!-- Left side columns -->
+                <div class="col-lg-12">
+                    <div class="row">
+                        <div class="container" style=" overflow:scroll;">
+                            <table id="purchase" class="table table-striped "
+                                style="overflow:scroll; width:100%;min-width: max-content;">
+                                <thead>
+                                    <tr style="background:#9c4b2e;">
+                                        <th scope="col" class="text-center text-white" style="">Sr.No</th>
+                                        <th scope="col" class="text-center text-white" style="">Bill Number</th>
+                                        <th scope="col" class="text-center text-white" style="">Bill Type</th>
+                                        <th scope="col" class="text-center text-white" style="">Supplier Name</th>
+                                        <th scope="col" class="text-center text-white" style="">Billing Date</th>
+                                        <th scope="col" class="text-center text-white" style="">Total Cost</th>
+                                        <th scope="col" class="text-center text-white" style="">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if purchase %}
+                                    {% for r in purchase %}
+                                    <tr>
+                                        <td>{{forloop.counter}}</td>
+                                        <td>{{r.bill_no}}</td>
+                                        <td>{{r.bill_type}}</td>
+                                        <td>{{r.supplier_name}}</td>
+                                        <td>{{r.bill_date}}</td>
+                                        <td>{{r.total_cost}}</td>
+                                        <td>
+                                            <center>
+                                                 
+ 
+                                                <a href="javascript:void(0);" data-url="{% url 'workshop_purchase_item_list' r.id %}" class="btn btn-primary px-2 py-2" onclick="mini_window(this)">Manage</a>
+                                                <a href="javascript:void(0);" data-url="{% url 'workshop_update_purchase' r.id %}" class="btn btn-warning px-2 py-2" onclick="mini_window_2(this)"><i class="bi bi-pencil-square"></i></a>
+
+                                                            <a href="{% url "workshop_delete_purchase" r.id %} "
+                                                                class="btn btn-danger px-2 py-2"><i class="bi bi-trash3"></i></a>
+                                            </center>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% else %}
+                                    {% endif %}
+                                </tbody>
+                            </table>
+
+                            <div class="pagination-container">
+                                <div class="pagination">
+                                    {% if purchase.has_previous %}
+                                        <a href="?page=1&{{ filter_params }}">« First</a>
+                                        <a href="?page={{ purchase.previous_page_number }}&{{ filter_params }}">Previous</a>
+                                    {% endif %}
+                                    
+                                    <span class="current-page">Page {{ purchase.number }} of {{ purchase.paginator.num_pages }}</span>
+                    
+                                    {% if purchase.has_next %}
+                                        <a href="?page={{ purchase.next_page_number }}&{{ filter_params }}">Next</a>
+                                        <a href="?page={{ purchase.paginator.num_pages }}&{{ filter_params }}">Last »</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div><!-- End Left side columns -->
+        </section>
+
+</main><!-- End #main -->
+
+
+<div class="modal fade" id="model_create_purchase" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 700px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#9c4b2e;">
+                <h4 class="modal-title text-white" id="exampleModalLongTitle">Create Purchase</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left">
+                <div class="alert alert-danger d-none" id="createPurchaseError"></div>
+                <form id="createPurchaseForm" method="POST" enctype="multipart/form-data" action="{% url 'workshop_create_purchase' %}">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{form.bill_no|as_crispy_field}}
+                        </div>
+                        <div class="col-md-6">
+                            {{form.bill_date|as_crispy_field}}
+                        </div>
+                        <div class="col-md-6">
+                            {{form.bill_type|as_crispy_field}}
+                        </div>
+                        <div class="col-md-6">
+                            {{form.supplier_name|as_crispy_field}}
+                        </div>
+                        <div class="col-md-12">
+                            {{form.bill_file|as_crispy_field}}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+ 
+
+
+<div class="modal fade" id="model_data_formate" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#9c4b2e;">
+                <h4 class="modal-title text-white" id="exampleModalLongTitle">Data Formate</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left"> 
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col" class="text-center">Purchase Number</th>
+                            <th scope="col" class="text-center">Purchase Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Sample Data Rows -->
+                        <tr>
+                            <td class="text-center">ABC-123</td>
+                            <td class="text-center">Toyota Corolla</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">XYZ-456</td>
+                            <td class="text-center">Honda Civic</td>
+                        </tr>  
+                        <tr>
+                            <td class="text-center">PQR-012</td>
+                            <td class="text-center">Chevrolet Malibu</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">DEF-345</td>
+                            <td class="text-center">Nissan Altima</td>
+                        </tr>
+                    </tbody>
+                </table> 
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="model_filter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#9c4b2e;">
+                <h4 class="modal-title text-white" id="exampleModalLongTitle">Filter Purchase</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left">
+                <form method="GET" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row"> 
+                        <div class="col-sm-6">
+                            {{ filter.form.start_date|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.end_date|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.amount_less_than|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.amount_greater_than|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.bill_type|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.bill_no|as_crispy_field }}
+                        </div>  
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<script>
+    document.getElementById('createPurchaseForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+        const errorAlert = document.getElementById('createPurchaseError');
+        
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message); // Show success alert
+                location.reload();   // Refresh the page or update the list dynamically
+            } else {
+                let errorMessage = '<strong>Error:</strong><br>';
+                for (const [field, errors] of Object.entries(data.errors)) {
+                    errorMessage += `${field}: ${errors.join(', ')}<br>`;
+                }
+                errorAlert.innerHTML = errorMessage;
+                errorAlert.classList.remove('d-none');
+            }
+        })
+        .catch(error => {
+            errorAlert.innerHTML = '<strong>An unexpected error occurred. Please try again later.</strong>';
+            errorAlert.classList.remove('d-none');
+        });
+    });
+    
+    </script>
+
+    
+<script>
+    function mini_window(element) { 
+        const url = element.dataset.url;
+        var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+        var newWidth = screenWidth * 0.9;  // 90% of the screen width
+        var newHeight = screenHeight * 0.9;  // 90% of the screen height
+        var left = (screenWidth - newWidth) / 2;
+        var top = (screenHeight - newHeight) / 2;
+        var windowFeatures = `width=${newWidth},height=${newHeight},scrollbars=yes,resizable=yes,top=${top},left=${left}`;
+        var newWindow = window.open(url, "miniWindow", windowFeatures);
+        newWindow.onload = function() {
+            newWindow.location.replace(url);
+        };
+    }
+
+    
+    function mini_window_2(element) { 
+        const url = element.dataset.url;
+        var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+        var newWidth = screenWidth * 0.5;  // 90% of the screen width
+        var newHeight = screenHeight * 0.6;  // 90% of the screen height
+        var left = (screenWidth - newWidth) / 2;
+        var top = (screenHeight - newHeight) / 2;
+        var windowFeatures = `width=${newWidth},height=${newHeight},scrollbars=yes,resizable=yes,top=${top},left=${left}`;
+        var newWindow = window.open(url, "miniWindow", windowFeatures);
+        newWindow.onload = function() {
+            newWindow.location.replace(url);
+        };
+    }
+
+</script>
+
+ 
+{% endblock content %}

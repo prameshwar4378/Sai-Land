@@ -1,0 +1,251 @@
+{% extends "admin_base.html" %}
+{% block title %}Purchase{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+<style>
+    .dashboard-card {
+      border: none;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+    }
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+    }
+    .card-icon {
+      font-size: 3rem;
+      width: 4rem;
+      height: 4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    .card-content {
+      margin-left: 1rem;
+    }
+    .bg-warning-light {
+      background-color: rgba(255, 193, 7, 0.1);
+    }
+    .bg-success-light {
+      background-color: rgba(25, 135, 84, 0.1);
+    }
+    .bg-info-light {
+      background-color: rgba(13, 202, 240, 0.1);
+    }
+    .bg-primary-light {
+      background-color: rgba(13, 110, 253, 0.1);
+    }
+</style>
+<main id="main" class="main">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="pagetitle">
+                    <h1>Purchase</h1>
+                    <nav>
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                            <li class="breadcrumb-item"><a href="#">Purchase </a></li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="container" style="max-width:97%;">
+                    <div class="text-lg-end text-start"> 
+                        <a href="#" class="btn btn-primary" data-toggle="modal"
+                            data-target="#model_filter"><i class="mdi mdi-filter"></i> Filter</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+   
+    <div class="container">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-sm-12"> <br><br>
+                <div class="row g-4">
+                    <!-- Total Bills -->
+                    <div class="col-lg-6 col-md-12">
+                        <div class="dashboard-card bg-warning-light">
+                            <div class="card-icon bg-warning text-white">
+                                <!-- Perfect icon for bills -->
+                                <i class="bi bi-file-earmark-text-fill"></i>
+                            </div>
+                            <div class="card-content">
+                                <h5 class="card-title">Total Bills</h5>
+                                <p class="card-text fs-4">{{ total_bill_count }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Amount -->
+                    <div class="col-lg-6 col-md-12">
+                        <div class="dashboard-card bg-info-light">
+                            <div class="card-icon bg-info text-white">
+                                <!-- Perfect icon for amount or finance -->
+                                ₹
+                            </div>
+                            <div class="card-content">
+                                <h5 class="card-title">Total Amount</h5>
+                                <p class="card-text fs-4">₹{{ total_amount }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+        <div class="row mt-4">
+                <!-- Left side columns -->
+                <div class="col-lg-12">
+                    <div class="row">
+                        <div class="container" style=" overflow:scroll;">
+                             <table id="purchase" class="table table-striped "
+                                style="overflow:scroll; width:100%;min-width: max-content;">
+                                <thead>
+                                    <tr style="background:#9c4b2e;">
+                                        <th scope="col" class="text-center text-white" style="">Sr.No</th>
+                                        <th scope="col" class="text-center text-white" style="">Bill Number</th>
+                                        <th scope="col" class="text-center text-white" style="">Bill Type</th>
+                                        <th scope="col" class="text-center text-white" style="">Supplier Name</th>
+                                        <th scope="col" class="text-center text-white" style="">Billing Date</th>
+                                        <th scope="col" class="text-center text-white" style="">Total Cost</th>
+                                        <th scope="col" class="text-center text-white" style="">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if purchase %}
+                                    {% for r in purchase %}
+                                    <tr>
+                                        <td>{{forloop.counter}}</td>
+                                        <td>{{r.bill_no}}</td>
+                                        <td>{{r.bill_type}}</td>
+                                        <td>{{r.supplier_name}}</td>
+                                        <td>{{r.bill_date}}</td>
+                                        <td>{{r.total_cost}}</td>
+                                        <td>
+                                            <center>
+                                                <a href="javascript:void(0);" data-url="{% url 'admin_purchase_item_list' r.id %}" class="btn btn-primary px-2 py-2" onclick="mini_window_1(this)">Read More</a>
+                                            </center>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% else %}
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                    
+                            <!-- Pagination controls -->
+                            <div class="pagination-container">
+                                <div class="pagination">
+                                    {% if purchase.has_previous %}
+                                        <a href="?page=1&{{ filter_params }}">« First</a>
+                                        <a href="?page={{ purchase.previous_page_number }}&{{ filter_params }}">Previous</a>
+                                    {% endif %}
+                                    
+                                    <span class="current-page">Page {{ purchase.number }} of {{ purchase.paginator.num_pages }}</span>
+                    
+                                    {% if purchase.has_next %}
+                                        <a href="?page={{ purchase.next_page_number }}&{{ filter_params }}">Next</a>
+                                        <a href="?page={{ purchase.paginator.num_pages }}&{{ filter_params }}">Last »</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+            </div><!-- End Left side columns -->
+        </div><!-- End Left side columns -->
+</main><!-- End #main -->
+ 
+<div class="modal fade" id="model_filter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#9c4b2e;">
+                <h4 class="modal-title text-white" id="exampleModalLongTitle">Filter Job Card</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left">
+                <form method="GET" enctype="multipart/form-data">
+                    {% csrf_token %}
+                     <div class="row"> 
+                        <div class="col-sm-6">
+                            {{ filter.form.start_date|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.end_date|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.amount_less_than|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.amount_greater_than|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.bill_type|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.bill_no|as_crispy_field }}
+                        </div>  
+                    </div>
+                     
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+
+
+<script>
+    function mini_window_1(element) { 
+        const url = element.dataset.url;
+        var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+        var newWidth = screenWidth * 0.9;  // 90% of the screen width
+        var newHeight = screenHeight * 0.9;  // 90% of the screen height
+        var left = (screenWidth - newWidth) / 2;
+        var top = (screenHeight - newHeight) / 2;
+        var windowFeatures = `width=${newWidth},height=${newHeight},scrollbars=yes,resizable=yes,top=${top},left=${left}`;
+        var newWindow = window.open(url, "miniWindow", windowFeatures);
+        newWindow.onload = function() {
+            newWindow.location.replace(url);
+        };
+    }
+
+    
+    function mini_window_2(element) { 
+        const url = element.dataset.url;
+        var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+        var newWidth = screenWidth * 0.5;  // 90% of the screen width
+        var newHeight = screenHeight * 0.8;  // 90% of the screen height
+        var left = (screenWidth - newWidth) / 2;
+        var top = (screenHeight - newHeight) / 2;
+        var windowFeatures = `width=${newWidth},height=${newHeight},scrollbars=yes,resizable=yes,top=${top},left=${left}`;
+        var newWindow = window.open(url, "miniWindow", windowFeatures);
+        newWindow.onload = function() {
+            newWindow.location.replace(url);
+        };
+    }
+</script>
+
+{% endblock content %}

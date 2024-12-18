@@ -1,0 +1,351 @@
+{% extends "workshop_base.html" %}
+{% block title %}Job Card List{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+<style>
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 100px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        border-radius: 10px;
+    }
+
+    .dropdown-content a {
+        color: black;
+        padding: 5px 10px;
+        text-decoration: none;
+        display: block;
+        text-align: left;
+    }
+
+    .dropdown-content a:hover {
+        background-color: #f1f1f1;
+    }
+
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+
+
+
+     
+
+</style>
+<main id="main" class="main">
+
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="pagetitle">
+                    <h1>Job Card List</h1>
+                    <nav>
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                            <li class="breadcrumb-item"><a href="#">Job Card List </a></li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="container" style="max-width:97%;">
+                    <div class="text-lg-end text-start">
+                        <!-- Use text-lg-end for right alignment in large screens -->
+                        <a href="#" class="btn btn-primary" data-toggle="modal"
+                        data-target="#model_create_job_card"><i class="mdi mdi-filter"></i> Add Job Card</a>
+
+                        <a href="#" class="btn btn-primary" data-toggle="modal"
+                            data-target="#model_filter"><i class="mdi mdi-filter"></i> Filter</a>
+ 
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="section dashboard">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="row">
+                        
+                    </div>
+                </div>
+            </div>
+            <hr>
+            
+            <div class="row">
+                <!-- Left side columns -->
+                <div class="col-lg-12">
+                    <div class="row">
+                        <div class="container" style=" overflow:scroll;">
+                            <table id="job_card" class="table table-striped "
+                                style="overflow:scroll; width:100%;min-width: max-content;">
+                                <thead>
+                                    <tr style="background:#9c4b2e;">
+                                        <th scope="col" class="text-center text-white">Sr.No</th>
+                                        <th scope="col" class="text-center text-white">Job Card Number</th>
+                                        <th scope="col" class="text-center text-white">Vehicle Number</th>   
+                                        <th scope="col" class="text-center text-white">Date</th>   
+                                        <th scope="col" class="text-center text-white">Status</th>
+                                        <th scope="col" class="text-center text-white">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if job_card %}
+                                    {% for r in job_card %}
+                                    <tr>
+                                        <td class="text-center">{{ forloop.counter }}</td>
+                                        <td class="text-left">{{ r.job_card_number }}</td>
+                                        <td class="text-left">{{ r.vehicle.vehicle_number }}</td>
+                                        <td class="text-left">{{ r.date }}</td>
+                                        <td class="text-center">
+                                            {% if r.status == "pending" %}
+                                                <span class="badge bg-danger">Pending</span>
+                                            {% elif r.status == "in_progress" %}
+                                                <span class="badge bg-warning">In Progress</span>
+                                            {% else %}
+                                                <span class="badge bg-success">Completed</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <center> 
+                                                <a href="javascript:void(0);" data-url="{% url 'workshop_job_card_item_list' r.id %}" class="btn btn-primary px-2 py-2" onclick="mini_window_1(this)">Manage</a>
+                                                <a href="javascript:void(0);" data-url="{% url 'workshop_update_job_card' r.id %}" class="btn btn-warning px-2 py-2" onclick="mini_window_2(this)">Update</a>
+                                                <a href="{% url 'workshop_delete_job_card' r.id %}" class="btn btn-danger px-2 py-2">Delete</a>
+                                            </center>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% else %}
+                                    <tr><td colspan="6" class="text-center">No job cards found</td></tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                    
+                            <!-- Pagination controls -->
+                            <div class="pagination-container">
+                                <div class="pagination">
+                                    {% if job_card.has_previous %}
+                                        <a href="?page=1&{{ filter_params }}">« First</a>
+                                        <a href="?page={{ job_card.previous_page_number }}&{{ filter_params }}">Previous</a>
+                                    {% endif %}
+                                    
+                                    <span class="current-page">Page {{ job_card.number }} of {{ job_card.paginator.num_pages }}</span>
+                    
+                                    {% if job_card.has_next %}
+                                        <a href="?page={{ job_card.next_page_number }}&{{ filter_params }}">Next</a>
+                                        <a href="?page={{ job_card.paginator.num_pages }}&{{ filter_params }}">Last »</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+            </div><!-- End Left side columns -->
+        </section>
+ 
+</main><!-- End #main -->
+
+
+<div class="modal fade" id="model_create_job_card" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#9c4b2e;">
+                <h4 class="modal-title text-white" id="exampleModalLongTitle">Create Job Card</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left">
+                <div class="alert alert-danger d-none" id="createJobCardError"></div>
+                <form id="createJobCardForm" method="POST" enctype="multipart/form-data" action="{% url 'workshop_create_job_card' %}">
+                    {% csrf_token %}
+                    <div class="row"> 
+                        <div class="col-sm-4">
+                            {{ form.date|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-4">
+                            {{ form.technician|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-4">
+                            {{ form.driver|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ form.party|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ form.vehicle|as_crispy_field }}
+                        </div>  
+                        <div class="col-sm-12">
+                            {{ form.reported_defect|as_crispy_field }}
+                        </div> 
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+ 
+<div class="modal fade" id="model_filter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#9c4b2e;">
+                <h4 class="modal-title text-white" id="exampleModalLongTitle">Filter Job Card</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left">
+                <form method="GET" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row"> 
+                        <div class="col-sm-6">
+                            {{ filter.form.start_date|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.end_date|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.technician|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.driver|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.party|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.vehicle|as_crispy_field }}
+                        </div> 
+                        <div class="col-sm-6">
+                            {{ filter.form.status|as_crispy_field }}
+                        </div>  
+                        <div class="col-sm-6">
+                            {{ filter.form.job_card_number|as_crispy_field }}
+                        </div>   
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+ 
+<script>
+ $(function(){
+  $("#id_driver").selectize();
+  $("#id_party").selectize();
+  $("#id_technician").selectize();
+  $("#id_vehicle").selectize();
+  $("#filter_technician").selectize();
+  $("#filter_driver").selectize();
+  $("#filter_vehicle").selectize();
+  $("#filter_party").selectize();
+ }); 
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('#job_card').DataTable({
+            "scrollX": true // If you want horizontal scrolling
+        });
+    }); 
+</script>
+
+<script>
+document.getElementById('createJobCardForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+    const errorAlert = document.getElementById('createJobCardError');
+    
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message); // Show success alert
+            location.reload();   // Refresh the page or update the list dynamically
+        } else {
+            let errorMessage = '<strong>Error:</strong><br>';
+            for (const [field, errors] of Object.entries(data.errors)) {
+                errorMessage += `${field}: ${errors.join(', ')}<br>`;
+            }
+            errorAlert.innerHTML = errorMessage;
+            errorAlert.classList.remove('d-none');
+        }
+    })
+    .catch(error => {
+        errorAlert.innerHTML = '<strong>An unexpected error occurred. Please try again later.</strong>';
+        errorAlert.classList.remove('d-none');
+    });
+});
+
+</script>
+
+ 
+
+<script>
+    function mini_window_1(element) { 
+        const url = element.dataset.url;
+        var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+        var newWidth = screenWidth * 0.9;  // 90% of the screen width
+        var newHeight = screenHeight * 0.9;  // 90% of the screen height
+        var left = (screenWidth - newWidth) / 2;
+        var top = (screenHeight - newHeight) / 2;
+        var windowFeatures = `width=${newWidth},height=${newHeight},scrollbars=yes,resizable=yes,top=${top},left=${left}`;
+        var newWindow = window.open(url, "miniWindow", windowFeatures);
+        newWindow.onload = function() {
+            newWindow.location.replace(url);
+        };
+    }
+
+    
+    function mini_window_2(element) { 
+        const url = element.dataset.url;
+        var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+        var newWidth = screenWidth * 0.5;  // 90% of the screen width
+        var newHeight = screenHeight * 0.8;  // 90% of the screen height
+        var left = (screenWidth - newWidth) / 2;
+        var top = (screenHeight - newHeight) / 2;
+        var windowFeatures = `width=${newWidth},height=${newHeight},scrollbars=yes,resizable=yes,top=${top},left=${left}`;
+        var newWindow = window.open(url, "miniWindow", windowFeatures);
+        newWindow.onload = function() {
+            newWindow.location.replace(url);
+        };
+    }
+</script>
+
+{% endblock content %}

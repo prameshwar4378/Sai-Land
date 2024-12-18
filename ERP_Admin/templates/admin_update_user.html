@@ -1,0 +1,69 @@
+{% extends "base_window.html" %}
+{% block title %}Update User{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+<style>
+    legend {
+        display: none;
+    }
+
+    .form-text {
+        display: none;
+    }
+
+    .form-check {
+        display: none;
+    }
+
+    #id_address {
+        height: 100px;
+    }
+
+    #id_username {
+        background-color: #eeeded;
+    }
+</style>
+<main id="main" class="main">
+    <section class="section dashboard">
+        <div class="alert alert-warning text-center mt-2">
+            <h2>Update User </h2>
+        </div>
+        <div class="container-fluid mb-3 form-header p-3">
+                        <div class="row p-1 rounded">
+                            <div class="col-sm-12">
+                                <form method="POST" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div class="row">
+                                <div class="col-sm-6">
+                                    {{ form.first_name|as_crispy_field }}
+                                </div>
+                                <div class="col-sm-6">
+                                    {{ form.last_name|as_crispy_field }}
+                                </div>
+                                <div class="col-sm-12">
+                                    {{ form.username|as_crispy_field }}
+                                </div>
+                                <div class="col-sm-6">
+                                    {{ form.password1|as_crispy_field }}
+                                </div>
+                                <div class="col-sm-6">
+                                    {{ form.password2|as_crispy_field }}
+                                </div> 
+                                <div class="col-sm-12">
+                                    <label for="id_role">Role</label>
+                                    <div>
+                                        {{ form.role }}
+                                    </div>
+                                </div>
+                            </div>
+
+                        <center><button type="submit" class="btn btn-primary mt-1 px-5">Update</button></center>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</main><!-- End #main -->
+
+
+{% endblock content %}

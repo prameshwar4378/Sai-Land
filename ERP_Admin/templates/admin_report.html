@@ -1,0 +1,53 @@
+{% extends "admin_base.html" %}
+{% block title %}Report{% endblock title %}
+
+{% block content %}
+<style>
+ 
+</style>
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h1>Report</h1>
+        <div class="row">
+            <div class="col">
+            </div>
+        </div>
+    </div><!-- End Page Title -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="row">
+                <div class="container" style="max-width:97%;">
+                    <div class="text-lg-end text-start">
+                        <!-- Use text-lg-end for right alignment in large screens -->
+                        <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#model_filter"><i
+                                class="mdi mdi-filter"></i> Filter</a> 
+                                
+                                <div class="dropdown">
+                                    <button class="dropbtn btn btn-primary dropdown-toggle">Export</button>
+                                    <div class="dropdown-content">
+                                        <a href="#">PDF</a>
+                                        <a href="#">CSV</a>
+                                        <a href="#">Excel</a>
+                                    </div>
+                                </div>
+                                 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+
+    <div class="container">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-sm-12"> <br><br>
+                 
+                
+                 
+
+            </div>
+        </div>
+    </div>
+</main><!-- End #main -->
+ 
+{% endblock content %}

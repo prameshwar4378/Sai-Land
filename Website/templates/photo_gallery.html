@@ -1,0 +1,73 @@
+{% extends "website_base.html" %}
+{% load static %}
+{% block title %}Photos - Sai Land Developers{% endblock title %}
+{% load static %}
+{% block links %}
+<link href="https://cdn.jsdelivr.net/npm/lightgallery@2.7.0/css/lightgallery-bundle.min.css" rel="stylesheet">
+
+{% endblock links %}
+ 
+{% block style %}
+ 
+
+.gallery-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 20px;
+}
+
+.gallery-item {
+    flex: 1 1 calc(33.333% - 20px);
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+    .gallery-item {
+        flex: 1 1 calc(50% - 20px);
+    }
+}
+
+@media (max-width: 480px) {
+    .gallery-item {
+        flex: 1 1 100%;
+    }
+}
+{% endblock style %}
+{% block content %} 
+
+<div id="lightgallery" class="gallery-container">
+    <a href="https://via.placeholder.com/800" class="gallery-item">
+        <img src="https://via.placeholder.com/300" alt="Image 1">
+    </a>
+    <a href="https://via.placeholder.com/800" class="gallery-item">
+        <img src="https://via.placeholder.com/300" alt="Image 2">
+    </a>
+    <a href="https://via.placeholder.com/800" class="gallery-item">
+        <img src="https://via.placeholder.com/300" alt="Image 3">
+    </a>
+    <a href="https://via.placeholder.com/800" class="gallery-item">
+        <img src="https://via.placeholder.com/300" alt="Image 4">
+    </a>
+</div>
+ 
+ 
+<script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.0/lightgallery.umd.js"></script>
+    <script>
+        // Initialize LightGallery
+        lightGallery(document.getElementById('lightgallery'), {
+            plugins: [lgZoom, lgThumbnail],
+            speed: 500,
+            download: false,
+            thumbnail: true
+        });
+    </script>
+    
+{% endblock content %}

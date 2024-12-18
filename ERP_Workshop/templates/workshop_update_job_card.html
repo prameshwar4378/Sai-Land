@@ -1,0 +1,71 @@
+{% extends "base_window.html" %}
+{% block title %}Purchase Item{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+<style>
+ 
+     #reported_defect{
+        height:10px;
+     }
+</style>
+<main id="main" class="main">
+
+    
+    <section class="section dashboard">
+        <div class="container-fluid mb-3 form-header p-3">
+            <div class="row p-1 rounded" >
+                <div class="col-sm-12">
+                     
+                     
+                   <form method="POST" > {% csrf_token %} 
+                        <div class="row  mt-1"> 
+                                <div class="row"> 
+                                    <div class="col-sm-4">
+                                        {{ form.date|as_crispy_field }}
+                                    </div>
+                                    <div class="col-sm-4">
+                                        {{ form.technician|as_crispy_field }}
+                                    </div>
+                                    <div class="col-sm-4">
+                                        {{ form.driver|as_crispy_field }}
+                                    </div>
+                                    <div class="col-sm-6">
+                                        {{ form.party|as_crispy_field }}
+                                    </div>
+                                    <div class="col-sm-6">
+                                        {{ form.vehicle|as_crispy_field }}
+                                    </div>  
+                                    <div class="col-sm-12">
+                                        {{ form.reported_defect|as_crispy_field }}
+                                    </div> 
+                                </div> 
+                        </div>
+                        <center><button type="submit" class="btn btn-primary mt-1 px-5">Submit</button></center>
+                    </form>
+
+                </div>  
+            </div>
+        </div>
+
+         
+    </section>
+
+</main><!-- End #main -->
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dropdownIds = ['id_driver', 'id_party', 'id_vehicle', 'id_technician'];
+        dropdownIds.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                new Choices(element, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    noResultsText: 'No matching results',
+                });
+            }
+        });
+    });
+</script>
+
+{% endblock content %}

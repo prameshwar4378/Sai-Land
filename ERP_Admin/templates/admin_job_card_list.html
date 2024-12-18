@@ -1,0 +1,302 @@
+{% extends "admin_base.html" %}
+{% block title %}Job Card{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+<style>
+    .dashboard-card {
+      border: none;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+    }
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+    }
+    .card-icon {
+      font-size: 3rem;
+      width: 4rem;
+      height: 4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    .card-content {
+      margin-left: 1rem;
+    }
+    .bg-warning-light {
+      background-color: rgba(255, 193, 7, 0.1);
+    }
+    .bg-success-light {
+      background-color: rgba(25, 135, 84, 0.1);
+    }
+    .bg-info-light {
+      background-color: rgba(13, 202, 240, 0.1);
+    }
+    .bg-primary-light {
+      background-color: rgba(13, 110, 253, 0.1);
+    }
+</style>
+<main id="main" class="main">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="pagetitle">
+                    <h1>Job Card</h1>
+                    <nav>
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                            <li class="breadcrumb-item"><a href="#">Job Card </a></li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="container" style="max-width:97%;">
+                    <div class="text-lg-end text-start"> 
+                        <a href="#" class="btn btn-primary" data-toggle="modal"
+                            data-target="#model_filter"><i class="mdi mdi-filter"></i> Filter</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+   
+    <div class="container">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-sm-12"> <br><br>
+                    <div class="row g-4">
+                        <!-- Total Pending Records -->
+                        <div class="col-lg-3 col-md-12">
+                            <div class="dashboard-card bg-warning-light">
+                            <div class="card-icon bg-warning text-white">
+                                <i class="bi bi-hourglass-split"></i>
+                            </div>
+                            <div class="card-content">
+                                <h5 class="card-title">Pending</h5>
+                                <p class="card-text fs-4">{{pending_count}}</p>
+                            </div>
+                            </div>
+                        </div>
+
+                        <!-- Total Records -->
+                        <div class="col-lg-3 col-md-12">
+                            <div class="dashboard-card bg-info-light">
+                            <div class="card-icon bg-info text-white">
+                                <i class="bi bi-graph-up-arrow"></i>
+                            </div>
+                            <div class="card-content">
+                                <h5 class="card-title">In Progress</h5>
+                                <p class="card-text fs-4">{{in_progress_count}}</p>
+                            </div>
+                            </div>
+                        </div>
+
+                        <!-- Total Completed Records -->
+                        <div class="col-lg-3 col-md-12">
+                            <div class="dashboard-card bg-success-light">
+                            <div class="card-icon bg-success text-white">
+                                <i class="bi bi-check-circle"></i>
+                            </div>
+                            <div class="card-content">
+                                <h5 class="card-title">Completed</h5>
+                                <p class="card-text fs-4">{{completed_count}}</p>
+                            </div>
+                            </div>
+                        </div>
+
+                        <!-- Total Records -->
+                        <div class="col-lg-3 col-md-12">
+                            <div class="dashboard-card bg-info-light">
+                            <div class="card-icon bg-info text-white">
+                                <i class="bi bi-card-list"></i>
+                            </div>
+                            <div class="card-content">
+                                <h5 class="card-title">Total Records</h5>
+                                <p class="card-text fs-4">{{total_count}}</p>
+                            </div>
+                            </div>
+                        </div>
+
+                       
+                    </div>
+            </div>
+        </div>
+
+
+
+
+
+
+        <div class="row mt-4">
+                <!-- Left side columns -->
+                <div class="col-lg-12">
+                    <div class="row">
+                        <div class="container" style=" overflow:scroll;">
+                            <table id="job_card" class="table table-striped "
+                                style="overflow:scroll; width:100%;min-width: max-content;">
+                                <thead>
+                                    <tr style="background:#9c4b2e;">
+                                        <th scope="col" class="text-center text-white">Sr.No</th>
+                                        <th scope="col" class="text-center text-white">Job Card Number</th>
+                                        <th scope="col" class="text-center text-white">Vehicle Number</th>   
+                                        <th scope="col" class="text-center text-white">Date</th>   
+                                        <th scope="col" class="text-center text-white">Status</th>
+                                        <th scope="col" class="text-center text-white">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if job_card %}
+                                    {% for r in job_card %}
+                                    <tr>
+                                        <td class="text-center">{{ forloop.counter }}</td>
+                                        <td class="text-left">{{ r.job_card_number }}</td>
+                                        <td class="text-left">{{ r.vehicle.vehicle_number }}</td>
+                                        <td class="text-left">{{ r.date }}</td>
+                                        <td class="text-center">
+                                            {% if r.status == "pending" %}
+                                                <span class="badge bg-danger">Pending</span>
+                                            {% elif r.status == "in_progress" %}
+                                                <span class="badge bg-warning">In Progress</span>
+                                            {% else %}
+                                                <span class="badge bg-success">Completed</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <center> 
+                                                <a href="javascript:void(0);" data-url="{% url 'admin_job_card_item_list' r.id %}" class="btn btn-primary px-2 py-2" onclick="mini_window_1(this)">Read More</a>
+                                            </center>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% else %}
+                                    <tr><td colspan="6" class="text-center">No job cards found</td></tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                    
+                            <!-- Pagination controls -->
+                            <div class="pagination-container">
+                                <div class="pagination">
+                                    {% if job_card.has_previous %}
+                                        <a href="?page=1&{{ filter_params }}">« First</a>
+                                        <a href="?page={{ job_card.previous_page_number }}&{{ filter_params }}">Previous</a>
+                                    {% endif %}
+                                    
+                                    <span class="current-page">Page {{ job_card.number }} of {{ job_card.paginator.num_pages }}</span>
+                    
+                                    {% if job_card.has_next %}
+                                        <a href="?page={{ job_card.next_page_number }}&{{ filter_params }}">Next</a>
+                                        <a href="?page={{ job_card.paginator.num_pages }}&{{ filter_params }}">Last »</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+            </div><!-- End Left side columns -->
+        </div><!-- End Left side columns -->
+</main><!-- End #main -->
+ 
+<div class="modal fade" id="model_filter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#9c4b2e;">
+                <h4 class="modal-title text-white" id="exampleModalLongTitle">Filter Job Card</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left">
+                <form method="GET" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row"> 
+                        <div class="col-sm-6">
+                            {{ filter.form.start_date|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.end_date|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.technician|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.driver|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.party|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.vehicle|as_crispy_field }}
+                        </div> 
+                        <div class="col-sm-6">
+                            {{ filter.form.status|as_crispy_field }}
+                        </div>  
+                        <div class="col-sm-6">
+                            {{ filter.form.job_card_number|as_crispy_field }}
+                        </div>   
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+ $(function(){
+  $("#id_driver").selectize();
+  $("#id_party").selectize();
+  $("#id_technician").selectize();
+  $("#id_vehicle").selectize();
+  $("#filter_technician").selectize();
+  $("#filter_driver").selectize();
+  $("#filter_vehicle").selectize();
+  $("#filter_party").selectize();
+ }); 
+</script>
+
+
+
+<script>
+    function mini_window_1(element) { 
+        const url = element.dataset.url;
+        var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+        var newWidth = screenWidth * 0.9;  // 90% of the screen width
+        var newHeight = screenHeight * 0.9;  // 90% of the screen height
+        var left = (screenWidth - newWidth) / 2;
+        var top = (screenHeight - newHeight) / 2;
+        var windowFeatures = `width=${newWidth},height=${newHeight},scrollbars=yes,resizable=yes,top=${top},left=${left}`;
+        var newWindow = window.open(url, "miniWindow", windowFeatures);
+        newWindow.onload = function() {
+            newWindow.location.replace(url);
+        };
+    }
+
+    
+    function mini_window_2(element) { 
+        const url = element.dataset.url;
+        var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+        var newWidth = screenWidth * 0.5;  // 90% of the screen width
+        var newHeight = screenHeight * 0.8;  // 90% of the screen height
+        var left = (screenWidth - newWidth) / 2;
+        var top = (screenHeight - newHeight) / 2;
+        var windowFeatures = `width=${newWidth},height=${newHeight},scrollbars=yes,resizable=yes,top=${top},left=${left}`;
+        var newWindow = window.open(url, "miniWindow", windowFeatures);
+        newWindow.onload = function() {
+            newWindow.location.replace(url);
+        };
+    }
+</script>
+
+{% endblock content %}

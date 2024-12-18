@@ -1,0 +1,694 @@
+{% extends "website_base.html" %}
+{% load static %}
+{% block content %}
+<style>
+       .about-img-1{
+        width: 70%;
+        height: 200px;
+        border: 8px solid white;
+        box-shadow: 0px 0px 10px -5px;
+        border-radius: 30px;
+       }
+       .about-img-2{
+        width: 50%;
+        height: 150px;
+        position: relative;
+        top: -60px;
+        right: -120px; 
+        border: 8px solid white;
+        box-shadow: 0px 0px 10px -5px;
+        border-radius: 30px;
+       }
+       
+       .about-img-3{
+        width: 30%;
+        height: 100px;
+        position: relative;
+        top: -5px;
+        right: 140px; 
+        border: 3px solid white;
+        box-shadow: 0px 0px 10px -5px;
+        border-radius: 30px;
+       }
+
+       
+       .btn-exlore-more{
+            background:#fff;
+            margin-right:20px;
+            font-weight:500;
+            border:1px solid #fff;
+            color:#d11a1a;
+        }
+        .btn-exlore-more{
+            background:#d11a1a;
+        }
+        .btn-exlore-more{
+            background:#d11a1a;
+            color:#fff;
+        }
+
+
+        /* team section start */
+        .team-section {
+            background-color: #f9f9f9;
+            padding: 50px 0;
+        }
+
+        .team-member {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .team-member:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .team-member img {
+            width: 100%;
+            height: auto;
+        }
+
+        /* Moving border effect */
+        .team-member::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 6px;
+            background-color: #d60505;
+            transition: width 0.3s ease;
+        }
+
+        .team-member:hover::after {
+            width: 100%;
+        }
+
+        .team-info {
+            padding: 15px;
+            background-color: #fff;
+            text-align: center;
+            position: relative;
+        }
+
+        .team-info h5 {
+            margin-bottom: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .team-info p {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #777;
+        }
+
+        /* Social media section */
+        .team-social {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            gap: 15px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .team-member:hover .team-social {
+            opacity: 1;
+            visibility: visible;
+        }
+ 
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .team-section {
+                padding: 30px 15px;
+            }
+        }
+
+
+        /* why-choose-us section */
+
+        .why-choose-us-title {
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .why-choose-us-subtitle {
+            font-size: 16px;
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        .feature-card {
+            background: #fdf4f4;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            padding: 30px 20px;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            background: #ffbebe;
+            cursor: pointer;
+        }
+
+        .feature-icon {
+            font-size: 40px;
+            color: #ff6f61;
+            margin-bottom: 30px;
+            
+        }
+        .feature-icon i{
+            padding: 15px;
+            border-radius: 50px;
+            background-color: white;
+
+        }
+        .feature-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .feature-desc {
+            font-size: 14px;
+            color: #777;
+        }
+
+        @media (max-width: 768px) {
+            .why-choose-us-section {
+                padding: 30px 15px;
+            }
+        }
+
+
+ 
+
+.card-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 5px;
+    padding-bottom: 40px;
+}
+
+.card {
+    flex: 1;
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    min-width: 250px;
+    text-align: center;
+    transition: transform 0.3s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+}
+
+.card h4 {
+    color: #fff;
+    font-size: 18px;
+    margin-bottom: 10px;
+    padding: 10px;
+    background: linear-gradient(45deg, #ffa726, #f57c00);
+    border-radius: 5px;
+}
+
+.card p {
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* Expertise Section Styling */
+.expertise-section {
+    background-color: #ffefef;
+    padding: 60px 0;
+}
+
+.timeline {
+    position: relative;
+    padding: 40px 0;
+}
+
+.timeline:before {
+    content: '';
+    position: absolute;
+    width: 4px;
+    background-color: #a80000;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.timeline-item {
+    position: relative;
+    width: 50%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.timeline-item.left {
+    left: 0;
+    text-align: right;
+}
+
+.timeline-item.right {
+    left: 50%;
+    text-align: left;
+}
+
+.timeline-item:before {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: #a80000;
+    border-radius: 50%;
+    top: 20px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+}
+
+.timeline-item .timeline-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 2;
+}
+
+.timeline-item.left .timeline-content {
+    transform: translateX(-20%);
+}
+
+.timeline-item.right .timeline-content {
+    transform: translateX(20%);
+}
+
+.timeline-item:hover .timeline-content {
+    background-color: #fda5a5;
+    color: #fff;
+    transform: translateX(0);
+    transition: all 0.5s ease-in-out;
+}
+
+.timeline-item:hover .timeline-content h4,
+p {
+    color: #fff;
+}
+
+.timeline-item h4 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #333;
+    transition: color 0.3s ease;
+}
+
+.timeline-item p {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+    transition: color 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .timeline:before {
+        left: 20px;
+    }
+
+    .timeline-item {
+        width: 100%;
+        padding-left: 40px;
+    }
+
+    .timeline-item.left {
+        left: 0;
+        text-align: left;
+    }
+
+    .timeline-item.right {
+        left: 0;
+        text-align: left;
+    }
+
+    .timeline-item .timeline-content {
+        transform: none;
+    }
+}
+
+
+
+
+
+</style>
+<!-- Breadcrumbs -->
+<div class="breadcrumbs overlay">
+    <div class="container">
+        <div class="bread-inner">
+            <div class="row">
+                <div class="col-12">
+                    <h2>About Us</h2>
+                    <ul class="bread-list">
+                        <li><a href="index.html">Home</a></li>
+                        <li><i class="icofont-simple-right"></i></li>
+                        <li class="active">About us</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Breadcrumbs -->
+
+<section class="why-choose section">
+    <div class="container"> 
+        <div class="row">
+            <div class="col-lg-4 col-12">
+                  <img src="{% static 'img/about-img-1.jpg' %}" alt="" class="about-img-1">
+                  <img src="{% static 'img/about-img-2.jpg' %}" alt="" class="about-img-2">
+                  <img src="{% static 'img/about-img-3.jpg' %}" alt="" class="about-img-3">
+            </div>
+            <div class="col-lg-8 col-12">
+                <!-- Start Choose Left -->
+                <div class="choose-left">
+                    <h3 class="text-danger">About us</h3>
+                    <p style="margin: 1px 1px 15px; color:rgb(29, 29, 29);">Founded in 2013, Sai Land Developers (SLD) has grown into a leading provider of material handling, transportation, and industrial services across the steel, factory, and mining sectors.</p>
+                    <p style="margin: 1px 1px 15px; color:rgb(29, 29, 29);">Our expertise, combined with a focus on innovation and safety, has allowed us to build long-term relationships with our clients and achieve consistent results.</p>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <ul class="list">
+                                <li><i class="fa fa-caret-right"></i>High standards of safety and compliance</li>
+                                <li><i class="fa fa-caret-right"></i>Customizable equipment solutions</li>
+                                <li><i class="fa fa-caret-right"></i>Commitment to sustainability</li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-6">
+                            <ul class="list">
+                                <li><i class="fa fa-caret-right"></i>Experienced and skilled workforce</li>
+                                <li><i class="fa fa-caret-right"></i>Cutting-edge heavy equipment</li>
+                                <li><i class="fa fa-caret-right"></i>Reliable project execution</li>
+                            </ul>
+                        </div>
+                        <div class="col-sm-12 mt-3">
+							<a href="" class="btn btn-exlore-more text-light">Explore More</a>
+                        </div>
+                        </div>
+                </div>
+                <!-- End Choose Left -->
+            </div>
+             
+        </div>
+    </div>
+</section>
+
+
+
+
+
+<!-- Why Choose Us Section Start -->
+<section class="why-choose " style="padding-bottom:  40px; padding-top: 10px;">
+    <div class="why-choose-us-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="why-choose-us-title">Why Choose <span style="color: #ff6f61;">Us</span>?</h2>
+                    <p class="why-choose-us-subtitle">Delivering exceptional quality, innovation, and value.</p>
+                </div>
+            </div>
+            <div class="row g-4">
+                <!-- Feature 1 -->
+                <div class="col-lg-3 col-md-6 mt-3">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="icofont icofont-mining"></i>
+                        </div>
+                        <h5 class="feature-title">Industry Expertise</h5>
+                        <p class="feature-desc">Over a decade of excellence in material handling, transportation, and crushing services.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="col-lg-3 col-md-6 mt-3">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="icofont icofont-earth"></i>
+                        </div>
+                        <h5 class="feature-title">Sustainability</h5>
+                        <p class="feature-desc">Commitment to eco-friendly practices with initiatives like India's first electric wheel loader.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="col-lg-3 col-md-6 mt-3">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="icofont icofont-worker"></i>
+                        </div>
+                        <h5 class="feature-title">Skilled Workforce</h5>
+                        <p class="feature-desc">Employing over 45 skilled professionals to ensure operational excellence.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="col-lg-3 col-md-6 mt-3">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="icofont icofont-gear"></i>
+                        </div>
+                        <h5 class="feature-title">State-of-the-Art Equipment</h5>
+                        <p class="feature-desc">Utilizing modern machinery like loaders, excavators, and crushers for superior performance.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="col-lg-3 col-md-6 mt-3">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="icofont icofont-shield"></i>
+                        </div>
+                        <h5 class="feature-title">Safety First</h5>
+                        <p class="feature-desc">Ensuring equipment safety, operator training, and adherence to PPE standards.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="col-lg-3 col-md-6 mt-3">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="icofont icofont-light-bulb"></i>
+                        </div>
+                        <h5 class="feature-title">Innovation</h5>
+                        <p class="feature-desc">Staying ahead with advanced technologies and process improvements.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 7 -->
+                <div class="col-lg-3 col-md-6 mt-3">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="icofont icofont-briefcase"></i>
+                        </div>
+                        <h5 class="feature-title">Customer-Centric</h5>
+                        <p class="feature-desc">Delivering value-driven services tailored to customer needs and satisfaction.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 8 -->
+                <div class="col-lg-3 col-md-6 mt-3">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="icofont icofont-chart-growth"></i>
+                        </div>
+                        <h5 class="feature-title">Proven Track Record</h5>
+                        <p class="feature-desc">Achieving annual sales of over ₹50 crore and consistent growth since 2013.</p>
+                    </div>
+                </div>
+
+                 
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Why Choose Us Section End -->
+
+
+
+
+
+
+<!-- expertise-section start -->
+
+<section class="expertise-section">
+    <div class="container">
+        <div class="section-title">
+            <h2>Our Expertise in Action</h2>
+            <img src="{% static 'img/section-line.png' %}" alt="#">
+            <p>Experience the journey of innovation, quality, and sustainability with Sai Land Developers (SLD).</p>
+        </div>
+
+        <div class="timeline">
+            <!-- Timeline Item 1 -->
+            <div class="timeline-item left">
+                <div class="timeline-content">
+                    <h4>2013: The Beginning</h4>
+                    <p class="text-justify">Sai Land Developers (SLD) was founded, embarking on a mission to transform
+                        material handling and transportation with reliability and innovation.</p>
+                </div>
+            </div>
+
+            <!-- Timeline Item 2 -->
+            <div class="timeline-item right">
+                <div class="timeline-content">
+                    <h4>2016: Expanding Horizons</h4>
+                    <p class="text-justify">Introduced advanced crushing units and expanded operations to meet the
+                        growing demands of the steel and mining industries.</p>
+                </div>
+            </div>
+
+            <!-- Timeline Item 3 -->
+            <div class="timeline-item left">
+                <div class="timeline-content">
+                    <h4>2020: Sustainability Goals</h4>
+                    <p class="text-justify">Brought India's first electric wheel loader into our fleet, reinforcing our
+                        commitment to sustainable operations.</p>
+                </div>
+            </div>
+
+            <!-- Timeline Item 4 -->
+            <div class="timeline-item right">
+                <div class="timeline-content">
+                    <h4>Today: A Trusted Partner</h4>
+                    <p class="text-justify">Continuing to lead with innovation, safety, and customer-focused solutions
+                        across multiple industries.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- expertise-section End -->
+
+
+
+
+<!-- Team section start -->
+<div class="team-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="why-choose-us-title">Meet Our <span style="color: #ff6f61;">Team</span></h2>
+                <p class="why-choose-us-subtitle">Our experienced and dedicated team members</p>
+            </div>
+        </div>
+ 
+        <div class="row g-4">
+            <!-- Team Member 1 -->
+            <div class="col-lg-3 col-md-6 mt-4">
+                <div class="team-member">
+                    <img src="https://img.freepik.com/premium-photo/businessman-vector_777576-4177.jpg" alt="Team Member 1">
+                    <div class="team-info">
+                        <h5>Member Name</h5>
+                        <p>Designation</p> 
+                    </div>
+                </div>
+            </div>
+             <!-- Team Member 1 -->
+            <div class="col-lg-3 col-md-6 mt-4">
+                <div class="team-member">
+                    <img src="https://img.freepik.com/premium-photo/businessman-vector_777576-4177.jpg" alt="Team Member 1">
+                    <div class="team-info">
+                        <h5>Member Name</h5>
+                        <p>Designation</p> 
+                    </div>
+                </div>
+            </div>
+             <!-- Team Member 1 -->
+            <div class="col-lg-3 col-md-6 mt-4">
+                <div class="team-member">
+                    <img src="https://img.freepik.com/premium-photo/businessman-vector_777576-4177.jpg" alt="Team Member 1">
+                    <div class="team-info">
+                        <h5>Member Name</h5>
+                        <p>Designation</p> 
+                    </div>
+                </div>
+            </div>
+             <!-- Team Member 1 -->
+            <div class="col-lg-3 col-md-6 mt-4">
+                <div class="team-member">
+                    <img src="https://img.freepik.com/premium-photo/businessman-vector_777576-4177.jpg" alt="Team Member 1">
+                    <div class="team-info">
+                        <h5>Member Name</h5>
+                        <p>Designation</p> 
+                    </div>
+                </div>
+            </div>
+              
+        </div>
+    </div>
+</div>
+<!-- Team section Stop -->
+
+
+<section class="mission-vision-values mt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="why-choose-us-title"><span style="color: #ff6f61;">Purpose</span></h2>
+                <p class="why-choose-us-subtitle">Our commitment to excellence, innovation, and sustainability.</p>
+            </div>
+        </div>
+ 
+        <div class="card-container">
+            <div class="card card-1">
+                <h4>Mission</h4>
+                <img src="{% static 'img/mission.gif' %}" alt="" loading="lazy">
+                <p>To achieve operational excellence through innovation, integrity, and dedication.</p>
+            </div>
+            <div class="card card-2">
+                <h4>Vision</h4>
+                <img src="{% static 'img/vision.gif' %}" alt="" loading="lazy">
+                <p>To lead the industry in delivering sustainable and reliable material handling solutions.</p>
+            </div>
+            <div class="card card-3">
+                <h4>Values</h4>
+                <img src="{% static 'img/value.gif' %}" alt="" loading="lazy">
+                <p>Efficiency, Safety, Sustainability, and Customer Satisfaction are at our core.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}

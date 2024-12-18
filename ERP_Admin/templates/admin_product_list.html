@@ -1,0 +1,210 @@
+{% extends "admin_base.html" %}
+{% block title %}Product List{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+<style>
+    .dashboard-card {
+      border: none;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+    }
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+    }
+    .card-icon {
+      font-size: 3rem;
+      width: 4rem;
+      height: 4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    .card-content {
+      margin-left: 1rem;
+    }
+    .bg-warning-light {
+      background-color: rgba(255, 193, 7, 0.1);
+    }
+    .bg-success-light {
+      background-color: rgba(25, 135, 84, 0.1);
+    }
+    .bg-info-light {
+      background-color: rgba(13, 202, 240, 0.1);
+    }
+    .bg-primary-light {
+      background-color: rgba(13, 110, 253, 0.1);
+    }
+
+     
+
+</style>
+<main id="main" class="main">
+
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="pagetitle">
+                    <h1>Product List</h1>
+                    <nav>
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                            <li class="breadcrumb-item"><a href="#">Product List </a></li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="container" style="max-width:97%;">
+                    <div class="text-lg-end text-start">
+ 
+                        <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#model_filter"><i class="mdi mdi-filter"></i>Filter</a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="section dashboard">
+             <div class="row justify-content-center align-items-center">
+                    <div class="col-sm-12"> <br><br>
+                        <div class="row g-4">
+                            <!-- Total Bills -->
+                            <div class="col-lg-4 col-md-12">
+                                <div class="dashboard-card bg-danger-light">
+                                    <div class="card-icon bg-danger text-white">
+                                        <!-- Perfect icon for bills -->
+                                        <i class="bi bi-file-earmark-text-fill"></i>
+                                    </div>
+                                    <div class="card-content">
+                                        <h5 class="card-title">Out Off Stock</h5>
+                                        <p class="card-text fs-4">{{ out_of_stock }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-12">
+                                <div class="dashboard-card bg-warning-light">
+                                    <div class="card-icon bg-warning text-white">
+                                        <!-- Perfect icon for bills -->
+                                        <i class="bi bi-file-earmark-text-fill"></i>
+                                    </div>
+                                    <div class="card-content">
+                                        <h5 class="card-title">Minimum Stock Alert</h5>
+                                        <p class="card-text fs-4">{{ minimum_stock_alert_count  }}</p>
+                                    </div>
+                                </div>
+                            </div>
+ 
+                            <!-- Total Amount -->
+                            <div class="col-lg-4 col-md-12">
+                                <div class="dashboard-card bg-success-light">
+                                    <div class="card-icon bg-success text-white">
+                                        ₹
+                                    </div>
+                                    <div class="card-content">
+                                        <h5 class="card-title">Total Stock</h5>
+                                        <p class="card-text fs-4">{{ total_available_stock }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+            <hr>
+ 
+            <div class="row">
+                <!-- Left side columns -->
+                <div class="col-lg-12">
+                    <div class="row">
+                        <div class="container" style=" overflow:scroll;">
+                            <table id="product_table" class="table table-striped "
+                                style="overflow:scroll; width:100%;min-width: max-content;">
+                                <thead>
+                                    <tr style="background:#9c4b2e;">
+                                        <th scope="col" class="text-center text-white" style="">Sr.No</th>
+                                        <th scope="col" class="text-center text-white" style="">Product Code</th>
+                                        <th scope="col" class="text-center text-white" style="">Product Name</th>
+                                        <th scope="col" class="text-center text-white" style="">Model</th>
+                                        <th scope="col" class="text-center text-white" style="">Available Stock</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if product %}
+                                    {% for r in product %}
+                                    <tr>
+                                        <td class="text-center">{{forloop.counter}}</td>
+                                        <td class="text-left">{{r.product_code}}</td>
+                                        <td class="text-left">{{r.product_name}}</td>
+                                        <td class="text-left">{{r.model.model_name}}</td>
+                                        <td class="text-center">
+                                            {% if r.available_stock == r.minimum_stock_alert %}
+                                            <span class="badge bg-warning">{{r.available_stock}}</span>
+                                            {% elif r.available_stock < r.minimum_stock_alert %}
+                                            <span class="badge bg-danger">{{r.available_stock}}</span>
+                                            {% else %}
+                                            <span class="badge bg-success">{{r.available_stock}}</span>
+                                            {% endif %}
+                                        </td>
+ 
+                                    </tr>
+                                    {% endfor %}
+                                    {% else %}
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- End Left side columns -->
+        </section>
+ 
+</main><!-- End #main -->
+
+ 
+
+
+<div class="modal fade" id="model_import_product" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#9c4b2e;">
+                <h4 class="modal-title text-white" id="exampleModalLongTitle">Import Product's</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left">
+ 
+                  <!-- Form for file upload -->
+                <form method="POST" enctype="multipart/form-data" action="{% url 'workshop_import_products' %}">
+                    {% csrf_token %}
+ 
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+ 
+
+ 
+<script>
+    $(document).ready(function () {
+        $('#product_table').DataTable({
+            "scrollX": true // If you want horizontal scrolling
+        });
+    }); 
+</script>
+  
+  
+{% endblock content %}

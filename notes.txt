@@ -1,0 +1,8 @@
+  
+driver ID
+
+
+Delete Confirmation for all records
+
+add boxes to display total pendng vehicle, total cinoketed job
+in Admin 

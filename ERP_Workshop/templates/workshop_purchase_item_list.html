@@ -1,0 +1,315 @@
+{% extends "base_window.html" %}
+{% block title %}Purchase Item{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+<style>
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 100px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        border-radius: 10px;
+    }
+
+    .dropdown-content a {
+        color: black;
+        padding: 5px 10px;
+        text-decoration: none;
+        display: block;
+        text-align: left;
+    }
+
+    .dropdown-content a:hover {
+        background-color: #f1f1f1;
+    }
+
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+
+
+
+    .bill-info-header {
+        background-color: #f9f9f9;
+        border-radius: 12px;
+        box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-top: 20px;
+    }
+
+    .info-field {
+        background-color: #f1f1f1;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        font-size: 1rem;
+        color: #555;
+        width: 100%;
+        text-align: left;
+    }
+
+    .info-field strong {
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .col-sm-3 {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .col-sm-4 {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    @media (max-width: 768px) {
+
+        .col-sm-3,
+        .col-sm-4 {
+            margin-bottom: 15px;
+        }
+    }
+
+
+    .form-header {
+        background-color: #f9f9f9;
+        border-radius: 12px;
+        box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-top: 20px;
+    }
+</style>
+<main id="main" class="main">
+
+
+    <section class="section dashboard">
+        <div class="alert alert-warning text-center mt-2 p-1">
+            <h2>Purchase Items </h2>
+        </div>  
+         
+        <div class="container-fluid mb-3 bill-info-header">
+            <div class="row">
+                <!-- Bill No -->
+                <div class="col-sm-4 mb-2">
+                    <div class="info-field">
+                        <strong>Bill No:</strong> {{ purchase.bill_no }}
+                    </div>
+                </div>
+
+                <!-- Supplier Name -->
+                <div class="col-sm-4 mb-2">
+                    <div class="info-field">
+                        <strong>Supplier Name:</strong> {{ purchase.supplier_name }}
+                    </div>
+                </div>
+
+                <!-- Bill Type -->
+                <div class="col-sm-4 mb-2">
+                    <div class="info-field">
+                        <strong>Bill Type:</strong> {{ purchase.bill_type }}
+                    </div>
+                </div>
+
+                <!-- Bill Date -->
+                <div class="col-sm-4 mb-2">
+                    <div class="info-field">
+                        <strong>Bill Date:</strong> {{ purchase.bill_date }}
+                    </div>
+                </div>
+
+                <!-- Total Cost -->
+                <div class="col-sm-4 mb-2">
+                    <div class="info-field">
+                        <strong>Total Cost:</strong> {{ purchase.total_cost }}
+                    </div>
+                </div>
+
+                <!-- Total Cost -->
+                <div class="col-sm-4 mb-2">
+                    <div class="info-field">
+                        {% if purchase.bill_file %}
+                        <a href="{{purchase.bill_file.url}}" class="btn btn-success" download>Download Biil</a>
+                        {% else %}
+                        <a href="" class="btn btn-secondary" >Bill Not Available</a>
+
+                        {% endif %}
+                    </div>
+                </div>
+                <!-- Bill File -->
+
+            </div>
+        </div>
+
+        <div class="container-fluid mb-3 form-header">
+            <div class="row">
+                <div class="col-sm-9">
+
+                    <form action="#" method="get" class="position-relative">{% csrf_token %}
+                        <select name="search_product" id="search_product" class="form-control" onchange="get_details()" required>
+                            <option value="">Search Product...</option>
+                            {% for r in product_data %}
+                            <option value="{{ r.product_code }}">{{ r.product_name }}</option>
+                            {% endfor %}
+                        </select> 
+                    </form>
+                     
+                   <form method="POST"> {% csrf_token %} 
+                        <div class="row  mt-1">
+                            <div class="col-md-2">
+                                <input type="text" class="form-control" id="id_product_code" name="product_code" placeholder="Product Code" readonly />
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="id_product_name" name="product_name" placeholder="Product Name" readonly />
+                            </div>
+                            <div class="col-md-2">
+                                {{ form.quantity|as_crispy_field }}
+                            </div>
+                            <div class="col-md-2">
+                                {{ form.cost_per_unit|as_crispy_field }}
+                            </div>
+                            <div class="col-md-2">
+                                {{ form.total_amount|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <input type="hidden" class="form-control" id="product_id" name="product_id" required />
+                        
+                        <center><button type="submit" class="btn btn-primary mt-1 px-5">Submit</button></center>
+                    </form>
+
+                </div> 
+                <div class="col-sm-3">
+                    <img src="" alt="" name="product_image" id="product_image" style=" width: 150px; height: 150px;">
+                </div>
+
+            </div>
+        </div>
+
+        <div class="container mt-3" style=" overflow:scroll;">
+            <table id="example" class="table table-striped "
+                style="overflow:scroll; width:100%;min-width: max-content;">
+                <thead class="bg-danger">
+                    <tr class="bg-gradient-primary text-light ">
+                        <th scope="col" class="text-center text-white" style="">Sr.No</th>
+                        <th scope="col" class="text-center text-white" style="">Product Code</th>
+                        <th scope="col" class="text-center text-white" style="">Product Name</th>
+                        <th scope="col" class="text-center text-white" style="">Quantity</th>
+                        <th scope="col" class="text-center text-white" style="">Rate</th>
+                        <th scope="col" class="text-center text-white" style="">Total Amount</th>
+                        <th scope="col" class="text-center text-white" style="">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="purchase_table_body">
+                    {% if item %}
+                    {% for r in item %}
+                    <tr>
+                        <td class="text-center">{{forloop.counter}}</td>
+                        <td>{{r.product.product_code}}</td>
+                        <td class="text-center">{{r.product.product_name}}</td>
+                        <td class="text-center">{{r.quantity}}</td>
+                        <td class="text-center">{{r.cost_per_unit}}</td>
+                        <td class="text-center">&#8377; {{r.total_amount}}</td>
+                        <td>
+                            <center>
+                                <a href="{% url 'workshop_delete_purchase_item' r.id %}" class="btn btn-danger px-3">Delete</a>
+                            </center>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td class="text-center"></td>
+                        <td class="text-center"></td>
+                        <td class="text-center"><b>Total</b></td>
+                        <td class="text-center"><b>&#8377; {{total_amount}}</b></td>
+                        <td> </td>
+                    </tr>
+                    {% else %}
+
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</main><!-- End #main -->
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+ 
+
+<script>
+    function get_details() {
+        var productCode = $('#search_product').val(); // Obtain the selected product code
+
+        if (productCode) {
+            $.ajax({
+                url: '/workshop/get_product_details/',  // Update with your actual endpoint
+                data: { 'product_code': productCode },
+                type: 'GET',
+                success: function(data) {
+                    if (!data.error) {
+                        // Populate form fields with product details
+                        $('#id_product_code').val(data.product_code);
+                        $('#id_product_name').val(data.product_name);
+                        $('#id_cost_per_unit').val(data.product_rate);
+                        $('#id_total_amount').val(data.product_rate);
+                        $('#product_id').val(data.id);
+                        $('#id_quantity').val(1);
+                        if (data.product_image_url) {
+                            $('#product_image').attr('src', data.product_image_url);  // Set the image URL dynamically
+                        } else {
+                            $('#product_image').attr('src', 'default-image.jpg');  // Set a default image if not available
+                        }
+                        // var qty = $('#id_quantity').val(1);  // Default quantity
+                        // var rate = parseFloat(data.sale_amount);
+                        
+
+                    } else {
+                        console.error(data.error);
+                    }
+                },
+                error: function(error) {
+                    console.error('Error fetching product details:', error);
+                    alert('Failed to fetch product details. Please try again.');
+                }
+            });
+        } else {
+            alert('Please select a valid product.');
+        }
+    }
+
+
+
+    function calculate_amount(){
+        var qty = $('#id_quantity').val();
+        var rate = $('#id_cost_per_unit').val();
+        $('#id_total_amount').val(qty*rate);
+    }
+</script>
+
+ 
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const element = document.getElementById('search_product');
+        const choices = new Choices(element, {
+            searchEnabled: true,
+            itemSelectText: '',
+            noResultsText: 'No matching results',
+        });
+    });
+</script>
+
+{% endblock content %}
