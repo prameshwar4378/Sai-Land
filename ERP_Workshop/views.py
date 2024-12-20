@@ -8,22 +8,25 @@ from django.core.cache import cache
 from django.db.models import Sum
 from .filters import *
 from django.db.models import Count
+from django.db.models import F
 
 def dashboard(request):
-    # Count users based on roles
-    admin_count = CustomUser.objects.filter(is_admin=True).count()
-    account_count = CustomUser.objects.filter(is_account=True).count()
-    workshop_count = CustomUser.objects.filter(is_workshop=True).count()
-    driver_count = CustomUser.objects.filter(is_driver=True).count()
+    total_products = Product.objects.count()
 
-    # Prepare data for the pie chart
-    roles = ['Admin', 'Account', 'Workshop', 'Driver']
-    counts = [admin_count, account_count, workshop_count, driver_count]
+    out_of_stock_count = Product.objects.filter(available_stock__lt=F('minimum_stock_alert')).count()
+
+    # Count of Running Job Cards (Job cards where status is 'running')
+    running_job_cards_count = JobCard.objects.exclude(status='completed').count()
+
+    # Count of Completed Job Cards (Job cards where status is 'completed')
+    completed_job_card_count = JobCard.objects.filter(status='completed').count()
 
     # Pass data to the template
     context = {
-        'roles': roles,
-        'counts': counts,
+        'out_of_stock_count': out_of_stock_count,
+        'running_job_cards_count': running_job_cards_count,
+        'completed_job_card_count': completed_job_card_count,
+        'total_products':total_products,
     }
     return render(request, "workshop_dashboard.html", context)
 
@@ -220,6 +223,7 @@ def maintenance_schedule(request):
     return render(request, "workshop_maintenance_schedule.html")
 
 def product_list(request):
+    # products = Product.objects.all().delete()
     form = ProductForm()
     products = cache.get('cache_products')
     if not products: 

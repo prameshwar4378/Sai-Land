@@ -28,21 +28,7 @@ class CustomUser(AbstractUser):
         related_name='customuser_permissions',  # Custom reverse relation name
         blank=True
     )
-    
-    def save(self, *args, **kwargs):
-        if not self.id:  # Only execute this logic when creating a new driver instance
-            last_emp_id = EMP_ID.objects.order_by('-id').first()
-            if last_emp_id:
-                last_number = int(last_emp_id.emp_id.split('-')[1])
-                # Create a new EMP_ID instance or fetch it if necessary
-                new_emp_id = EMP_ID.objects.create(emp_id=f"SLD-{last_number + 1}")
-                self.emp_id = new_emp_id  # Assign the EMP_ID instance to emp_id
-            else:
-                # Create the first EMP_ID instance
-                new_emp_id = EMP_ID.objects.create(emp_id="SLD-1")
-                self.emp_id = new_emp_id  # Assign the EMP_ID instance to emp_id
-        super().save(*args, **kwargs)
-
+     
     def __str__(self):
         return self.username
  
@@ -56,15 +42,14 @@ class Vehicle(models.Model):
 
 class Driver(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, null=True)
-    emp_id = models.ForeignKey(EMP_ID, on_delete=models.CASCADE, null=True)
     driver_name = models.CharField(max_length=20, null=False, blank=False)
-    license_number = models.CharField(max_length=20, unique=True, null=False, blank=False)
-    adhaar_number = models.CharField(max_length=20, unique=True, null=True, blank=False)
-    mobile_number = models.CharField(max_length=15, null=False, blank=False)
+    license_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
+    adhaar_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
+    mobile_number = models.CharField(max_length=15, null=True, blank=True)
     alternate_mobile_number = models.CharField(max_length=15, blank=True, null=True)
     address = models.TextField(null=True, blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
-    date_joined = models.DateField(auto_now_add=False)
+    date_joined = models.DateField(auto_now_add=False, null=True, blank=True)
     adhaar_card_photo=models.FileField(upload_to="Documents", max_length=None, null=True, blank=True)
     pan_card_photo=models.FileField(upload_to="Documents", max_length=None, null=True, blank=True)
     driving_license_photo=models.FileField(upload_to="Documents", max_length=None, null=True, blank=True)

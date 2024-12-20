@@ -11,7 +11,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib import messages
 from django.db.models import Sum, Count, Q, F
-
+from django.contrib.auth.hashers import make_password
 
 from django.core.cache import cache
 
@@ -43,48 +43,58 @@ def update_cache_on_delete(sender, instance, **kwargs):
 
 
 
+
 @receiver(post_save, sender=Driver)
 def update_driver_cache_on_save(sender, instance, **kwargs):
-    # Use select_related to fetch the related CustomUser data in one query
-    drivers = Driver.objects.select_related('user').all().values(
-        'id', 'profile_photo','driver_name', 'license_number','profile_photo',  'mobile_number','alternate_mobile_number', 'adhaar_number', 'address', 'date_of_birth', 'date_joined',
-        'user__username', 'user__email', 'user__first_name', 'user__last_name', 'emp_id__emp_id'    # Add related fields from CustomUser
-    )
-    # Update the cache with the latest driver data, including CustomUser related fields
-    cache.set('cache_drivers', list(drivers), timeout=None)
+    # Retrieve all drivers and include all fields
+    drivers = Driver.objects.select_related('user').all()
+    
+    # Use model_to_dict to serialize the driver model and its related data
+    from django.forms.models import model_to_dict
+    driver_data = [model_to_dict(driver) for driver in drivers]
+
+    # Update the cache with all driver data, including related CustomUser fields
+    cache.set('cache_drivers', driver_data, timeout=None)
     print("Driver cache updated on save")
 
 @receiver(post_delete, sender=Driver)
 def update_driver_cache_on_delete(sender, instance, **kwargs):
-    # Use select_related to fetch related CustomUser data after a delete
-    drivers = Driver.objects.select_related('user').all().values(
-        'id','profile_photo', 'driver_name', 'license_number','profile_photo',  'mobile_number','alternate_mobile_number', 'adhaar_number', 'address', 'date_of_birth', 'date_joined',
-        'user__username', 'user__email', 'user__first_name', 'user__last_name', 'emp_id__emp_id'   
-    )
+    # Retrieve all drivers and include all fields
+    drivers = Driver.objects.select_related('user').all()
+
+    # Serialize the driver model data into dictionary format
+    from django.forms.models import model_to_dict
+    driver_data = [model_to_dict(driver) for driver in drivers]
+
     # Update the cache to reflect the deletion
-    # Update the cache to reflect the deletion
-    cache.set('cache_drivers', list(drivers), timeout=None)
+    cache.set('cache_drivers', driver_data, timeout=None)
     print("Driver cache updated on delete")
 
- 
+
 @receiver(post_save, sender=Technician)
 def update_technician_cache_on_save(sender, instance, **kwargs):
-    # Retrieve all technicians data and serialize it if needed
-    technicians = Technician.objects.all().values(
-        'id', 'technician_name', 'adhaar_number', 'mobile_number','alternate_mobile_number', 'email', 'address', 'date_of_birth', 'date_joined'
-    )
-    # Update cache with the latest technicians data
-    cache.set('cache_technicians', list(technicians), timeout=None)
+    # Retrieve all technicians and include all fields
+    technicians = Technician.objects.all()
+    
+    # Use model_to_dict to serialize the technician model
+    from django.forms.models import model_to_dict
+    technician_data = [model_to_dict(technician) for technician in technicians]
+
+    # Update cache with the latest technician data
+    cache.set('cache_technicians', technician_data, timeout=None)
     print("Technician cache updated on save")
 
 @receiver(post_delete, sender=Technician)
 def update_technician_cache_on_delete(sender, instance, **kwargs):
-    # Retrieve all technicians data after delete
-    technicians = Technician.objects.all().values(
-        'id', 'technician_name', 'adhaar_number', 'mobile_number','alternate_mobile_number', 'email', 'address', 'date_of_birth', 'date_joined'
-    )
+    # Retrieve all technicians and include all fields
+    technicians = Technician.objects.all()
+
+    # Serialize the technician model data into dictionary format
+    from django.forms.models import model_to_dict
+    technician_data = [model_to_dict(technician) for technician in technicians]
+
     # Update the cache to reflect the deletion
-    cache.set('cache_technicians', list(technicians), timeout=None)
+    cache.set('cache_technicians', technician_data, timeout=None)
     print("Technician cache updated on delete")
 
 
@@ -93,23 +103,66 @@ def update_technician_cache_on_delete(sender, instance, **kwargs):
 @receiver(post_save, sender=Party)
 def update_party_cache_on_save(sender, instance, **kwargs):
     # Retrieve all partys data and serialize it if needed
-    partys = Party.objects.all() 
-    # Update cache with the latest partys data
-    cache.set('cache_partys', list(partys), timeout=None)
+    party = Party.objects.all()
+    # Serialize the technician model data into dictionary format
+    from django.forms.models import model_to_dict
+    party_data = [model_to_dict(party) for party in party]
+
+
     print("Party cache updated on save")
 
 @receiver(post_delete, sender=Party)
 def update_party_cache_on_delete(sender, instance, **kwargs):
     # Retrieve all partys data after delete
-    partys = Party.objects.all() 
-    # Update the cache to reflect the deletion
-    cache.set('cache_partys', list(partys), timeout=None)
-    print("Party cache updated on delete")
+    partys = []
+    for partys in Technician.objects.all():
+        party_data = model_to_dict(partys)  # Convert technician to dictionary
+        partys.append(party_data)
+    cache.set('cache_technicians', partys, timeout=None)
+
+
+
+def reload_all_caches(request):
+    # Reload Product cache (storing all data as dictionaries)
+    products = []
+    for product in Product.objects.all().order_by('-id'):
+        product_data = model_to_dict(product)  # Convert product to dictionary
+        products.append(product_data)
+    cache.set('cache_products', products, timeout=None)
+    print("Product cache reloaded")
+
+    # Reload Driver cache (storing all data as dictionaries)
+    drivers = []
+    for driver in Driver.objects.select_related('user').all():  # Add related fields
+        driver_data = model_to_dict(driver)  # Convert driver to dictionary
+        # If you want to include related fields more explicitly, you can manually add them here
+        driver_data['user'] = model_to_dict(driver.user)  # Include related user data
+        drivers.append(driver_data)
+    cache.set('cache_drivers', drivers, timeout=None)
+    print("Driver cache reloaded")
+
+    # Reload Technician cache (storing all data as dictionaries)
+    technicians = []
+    for technician in Technician.objects.all():
+        technician_data = model_to_dict(technician)  # Convert technician to dictionary
+        technicians.append(technician_data)
+    cache.set('cache_technicians', technicians, timeout=None)
+    print("Technician cache reloaded")
+
+    # Reload Party cache (storing all data as dictionaries)
+    partys = []
+    for party in Party.objects.all():
+        party_data = model_to_dict(party)  # Convert party to dictionary
+        partys.append(party_data)
+    cache.set('cache_partys', partys, timeout=None)
+    print("Party cache reloaded")
+    return redirect('/admin/dashboard')
+
+
 
 
 def login(request): 
     if request.user.is_authenticated:
-        print(type(request.user))  # Debug print to check the model being used
         return redirect_user_based_on_role(request, request.user)
 
     if request.method == 'POST': 
@@ -153,6 +206,9 @@ def redirect_user_based_on_role(request, user):
     elif user.is_account:
         print('Redirecting to Account Dashboard')  # Debug print
         return redirect('/account/dashboard')
+    elif user.is_driver:
+        print('Redirecting to Account Dashboard')  # Debug print
+        return redirect('/driver/dashboard')
     else:
         print('Unauthorized user role')  # Debug print
         messages.error(request, 'Unauthorized user role.')
@@ -317,8 +373,6 @@ def report(request):
 def user_management(request):
     form=UserRegistrationForm()
     users=CustomUser.objects.filter(is_driver=False,is_superuser=False)
-    for i in users:
-        print(i.emp_id)
     return render(request, "admin_user_management.html",{'form':form,'users':users})
 
 def create_user(request):
@@ -326,7 +380,17 @@ def create_user(request):
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             try:
-                form.save()
+                fm=form.save(commit=False)
+                last_emp_id = EMP_ID.objects.order_by('-id').first()
+
+                if last_emp_id:
+                    last_number = int(last_emp_id.emp_id.split('-')[1])
+                    new_emp_id = EMP_ID.objects.create(emp_id=f"SLD-{last_number + 1}")
+                else:
+                    new_emp_id = EMP_ID.objects.create(emp_id="SLD-1")
+                fm.emp_id=new_emp_id
+                fm.save()
+
                 return JsonResponse({'success': True, 'message': 'User created successfully!'})
             except ValidationError as e:
                 # Handle explicit model-level validation errors
@@ -355,48 +419,41 @@ def update_user(request, id):
 def delete_user(request, id):
     user = get_object_or_404(CustomUser, id=id)
     if user:
-        print(user.username)
         user.delete()
         messages.success(request, 'User deleted successfully.')
 
-
 def drivers_list(request):
-    drivers = cache.get('cache_drivers')
-    if not drivers:
-        drivers = Driver.objects.select_related('user').all().values(
-            'id', 'driver_name','emp_id__emp_id', 'license_number', 'mobile_number', 'profile_photo', 'adhaar_number', 'address', 'date_of_birth', 'date_joined',
-            'user__username', 'user__email', 'user__first_name', 'user__last_name' 
-        )
-        print("Cache Set Successfully...")
-        print("Cache Set Successfully...")
-        print("Cache Set Successfully...")
-        cache.set('cache_drivers', list(drivers), timeout=None)
-    for i in drivers:
-        print(i)
-    form=DriverRegistrationForm()
-    incomplete_profile = CustomUser.objects.filter(driver__isnull=True,is_driver=True).delete()[0]
-    return render(request, "admin_drivers_list.html",{'form':form,'drivers':drivers})
+    drivers = Driver.objects.select_related('user').all()
+    form = DriverRegistrationForm()
+    incomplete_profile = CustomUser.objects.filter(driver__isnull=True, is_driver=True).delete()[0]
+    return render(request, "admin_drivers_list.html", {'form': form, 'drivers': drivers})
 
 
 def create_driver(request):
     if request.method == 'POST':
         form = DriverRegistrationForm(request.POST, request.FILES)
+        
         if form.is_valid():
             try:
-                print("Form data is valid")
-                print(form.cleaned_data)
-                form.save()
-                return JsonResponse({'success': True, 'message': 'Driver created successfully!'})
+                with transaction.atomic():
+
+                    form.save()
+                    return JsonResponse({'success': True, 'message': 'Driver created successfully!'})
             except ValidationError as e:
                 # Handle explicit model-level validation errors
                 return JsonResponse({'success': False, 'errors': {'non_field_errors': str(e)}}, status=400)
+            except Exception as e:
+                # Catch any unexpected errors and return a 500 response
+                return JsonResponse({'success': False, 'message': str(e)}, status=500)
         else:
-            # Handle form errors, including unique constraint violations
+            # Handle form errors
             errors = {
                 field: [str(error) for error in error_list]
                 for field, error_list in form.errors.items()
             }
             return JsonResponse({'success': False, 'errors': errors}, status=400)
+    
+    # If the request method is not POST, return a method not allowed response
     return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=405)
 
 
@@ -420,6 +477,95 @@ def delete_driver(request, id):
         driver.delete()
         messages.success(request, 'Driver deleted successfully.')
     return redirect('/admin/drivers-list')
+
+
+def import_drivers(request):
+    if request.method == "POST":
+        excel_file = request.FILES.get('Driver_file')
+        password=make_password('Pass@123')
+        if excel_file:
+            try:
+                # Load the Excel file
+                workbook = openpyxl.load_workbook(excel_file)
+                worksheet = workbook.active
+                
+                # List to hold the data to insert into the database
+                data_to_insert = []
+                
+                # Iterate over each row in the Excel sheet (skipping header row)
+                for row in worksheet.iter_rows(min_row=2, values_only=True):
+                    driver_name = row[1]  # Assuming driver_name is in the first column
+                    adhaar_number = row[2] if row[2] else None  # Assuming adhaar_number is in the second column
+                    license_number = row[3] if row[3] else None  # Assuming license_number is in the third column
+                    date_of_birth = row[4] if row[4] else None  # Assuming date_of_birth is in the fourth column
+                    mobile_number = row[5] if row[5] else None  # Assuming mobile_number is in the fifth column
+                    date_joined = row[6] if row[6] else None  # Assuming date_joined is in the seventh column
+                 
+                    # Check if the Aadhaar number is already used as a username in CustomUser
+                    if adhaar_number:
+                        if CustomUser.objects.filter(username=adhaar_number).exists():
+                            print(f"Aadhaar number {adhaar_number} is already registered.")  # Print the error
+                            messages.error(request, f"Aadhaar number {adhaar_number} is already registered.")
+                            continue  # Skip to the next row if Aadhaar number exists
+                        username = adhaar_number  # Use Aadhaar number as the username
+                    else:
+                        # If Aadhaar number is not available, use mobile number as the username
+                        if CustomUser.objects.filter(username=mobile_number).exists():
+                            print(f"Mobile number {mobile_number} is already registered.")  # Print the error
+                            messages.error(request, f"Mobile number {mobile_number} is already registered.")
+                            continue  # Skip to the next row if mobile number exists
+                        username = mobile_number  # Use mobile number as the username
+
+                    # Create the EMP_ID instance if it doesn't exist
+                    last_emp_id = EMP_ID.objects.order_by('-id').first()
+                    if last_emp_id:
+                        last_number = int(last_emp_id.emp_id.split('-')[1])
+                        new_emp_id = EMP_ID.objects.create(emp_id=f"SLD-{last_number + 1}")
+                    else:
+                        new_emp_id = EMP_ID.objects.create(emp_id="SLD-1")
+
+
+                    # Create or update the user (CustomUser)
+                    user, created = CustomUser.objects.get_or_create(
+                        username=username,  # Set the username to Aadhaar number or mobile number
+                        # defaults={'is_driver': True, 'password': make_password('Pass@123')}  # Mark as driver if creating a new user
+                        is_driver=True,
+                        password=password,
+                        emp_id=new_emp_id
+                    )
+                    
+                    if not created:  # If user already exists, update is_driver to True
+                        user.is_driver = True
+                        user.save()
+
+                    # Create the Driver instance
+                    driver = Driver(
+                        user=user,  # Set the user
+                        driver_name=driver_name,  # Set driver name
+                        license_number=license_number,  # Set driving license number
+                        adhaar_number=adhaar_number,  # Set Adhaar number
+                        mobile_number=mobile_number,  # Set mobile number
+                        date_of_birth=date_of_birth,  # Set date of birth
+                        date_joined=date_joined  # Set date joined
+                    )
+                    data_to_insert.append(driver)
+ 
+                if data_to_insert:
+                    Driver.objects.bulk_create(data_to_insert)
+                    messages.success(request, 'Drivers data imported and updated successfully.')
+                else:
+                    messages.error(request, 'No data to import.')
+
+            except Exception as e:
+                print(f"Error occurred during import: {str(e)}")  # Print the exception error
+                messages.error(request, f'Error occurred during import: {str(e)}')
+        else:
+            print("No file selected.")  # Print error if no file selected
+            messages.error(request, 'No file selected.')
+
+        return redirect('/admin/drivers-list')  # Redirect to the admin driver list page
+    return redirect('/admin/drivers-list')  # Redirect if not a POST request
+
 
 
 # vehical data start
@@ -501,12 +647,7 @@ def delete_vehicle(request, id):
 
 
 def technician_list(request):
-    technicians=cache.get('cache_technicians')
-    if not technicians:
-        technicians = Technician.objects.all().values(
-            'id', 'technician_name', 'adhaar_number', 'mobile_number', 'email', 'address', 'date_of_birth', 'date_joined'
-        )
-        cache.set('cache_technicians', list(technicians), timeout=None)
+    technicians=Technician.objects.select_related('emp_id')
     form = TechnicianRegistrationForm()
     return render(request, "admin_technician_list.html",{'form':form,'technicians':technicians})
 
@@ -515,7 +656,17 @@ def create_technician(request):
         form = TechnicianRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
             try:
-                fm=form.save()
+                fm=form.save(commit=False)
+                last_emp_id = EMP_ID.objects.order_by('-id').first()
+
+                if last_emp_id:
+                    last_number = int(last_emp_id.emp_id.split('-')[1])
+                    new_emp_id = EMP_ID.objects.create(emp_id=f"SLD-{last_number + 1}")
+                else:
+                    new_emp_id = EMP_ID.objects.create(emp_id="SLD-1")
+                fm.emp_id=new_emp_id
+                fm.save()
+                
                 messages.success(request,"Technician created successfully!")
                 return JsonResponse({'success': True, 'message': 'Technician created successfully!'})
             except ValidationError as e:
@@ -556,10 +707,7 @@ def delete_technician(request, id):
 
 
 def party_list(request):
-    partys=cache.get('cache_partys')
-    if not partys:
-        partys = Party.objects.all() 
-        cache.set('cache_partys', list(partys), timeout=None)
+    partys=Party.objects.all()
     form = PartyForm()
     return render(request, "admin_party_list.html",{'form':form,'partys':partys})
 

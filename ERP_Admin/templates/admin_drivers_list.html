@@ -43,6 +43,9 @@
                     <!-- Use text-lg-end for right alignment in large screens -->
                     <a href="#" class="btn btn-primary" data-toggle="modal"
                         data-target="#model_create_driver"><i class="mdi mdi-filter"></i> Add Drivers</a>
+                        
+                    <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#model_import_drivers"><i class="mdi mdi-filter"></i> Import
+                        Drivers</a>
                 </div>
             </div>
         </div>
@@ -64,12 +67,10 @@
                                         <tr style="background:#9c4b2e;"> 
                                             <th scope="col" class="text-center text-white">Sr. No</th>
                                             <th scope="col" class="text-center text-white">Profile Photo</th>
+                                            <th scope="col" class="text-center text-white">Username</th>
                                             <th scope="col" class="text-center text-white">EMP ID</th>
                                             <th scope="col" class="text-center text-white">Driver Name</th>
-                                            <th scope="col" class="text-center text-white">Aadhaar Number</th>
-                                            <th scope="col" class="text-center text-white">License Number</th>
                                             <th scope="col" class="text-center text-white">Mobile Number</th>
-                                            <th scope="col" class="text-center text-white">Date Joined</th>
                                             <th scope="col" class="text-center text-white">Action</th>
                                         </tr>
                                     </thead>
@@ -81,12 +82,10 @@
                                         <tr>
                                             <td class="text-center">{{ forloop.counter }}</td>
                                             <td class="text-left"><img src="/media/{{ driver.profile_photo }}" alt="" style="width: 50px; height: 50px;"></td>
-                                            <td class="text-left">{{ driver.emp_id__emp_id }}</td>
+                                            <td class="text-left">{{ driver.user.username }}</td>
+                                            <td class="text-left">{{ driver.user.emp_id }}</td>
                                             <td class="text-left">{{ driver.driver_name }}</td>
-                                            <td class="text-center">{{ driver.adhaar_number }}</td>
-                                            <td class="text-center">{{ driver.license_number }}</td>
                                             <td class="text-center">{{ driver.mobile_number }}</td>
-                                            <td class="text-center">{{ driver.date_joined }}</td>
                                             <td>
                                                 <center>
                                                 <a href="javascript:void(0);" data-url="{% url 'admin_update_driver' driver.id %}" class="btn btn-warning px-2 py-2" onclick="mini_window_1(this)">Update</a>
@@ -179,6 +178,109 @@
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="model_import_drivers" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#9c4b2e;">
+                <h4 class="modal-title text-white" id="exampleModalLongTitle">Import Driver's</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left">
+                <!-- Note section if needed -->
+                <div class="alert alert-warning">
+                    <strong>Note:</strong> Please upload a file in CSV or Excel format containing Drivers data. <a href="#"  data-toggle="modal" data-target="#model_data_formate">Data Formate</a>
+                </div>
+                  <!-- Form for file upload -->
+                <form method="POST" enctype="multipart/form-data" action="{% url 'admin_import_drivers' %}">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="Driver_file" class="control-label">Select Driver Import File</label>
+                        <input type="file" class="form-control" id="Driver_file" name="Driver_file" accept=".csv, .xlsx, .xls" required>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="model_data_formate" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#9c4b2e;">
+                <h4 class="modal-title text-white" id="exampleModalLongTitle">Driver Data Format</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left"> 
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col" class="text-center">Driver Name</th>
+                            <th scope="col" class="text-center">Adhar No</th>
+                            <th scope="col" class="text-center">Driving License No</th>
+                            <th scope="col" class="text-center">Date of Birth</th>
+                            <th scope="col" class="text-center">Mobile No</th>
+                            <th scope="col" class="text-center">Date of Joining</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Sample Data Rows -->
+                        <tr>
+                            <td class="text-center">John Doe</td>
+                            <td class="text-center">1234 5678 9012</td>
+                            <td class="text-center">DL-123456789</td>
+                            <td class="text-center">1990-05-15</td>
+                            <td class="text-center">9876543210</td>
+                            <td class="text-center">2020-01-10</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">Jane Smith</td>
+                            <td class="text-center">2345 6789 0123</td>
+                            <td class="text-center">DL-987654321</td>
+                            <td class="text-center">1985-08-20</td>
+                            <td class="text-center">9123456789</td>
+                            <td class="text-center">2019-03-05</td>
+                        </tr>  
+                        <tr>
+                            <td class="text-center">Carlos Mendez</td>
+                            <td class="text-center">3456 7890 1234</td>
+                            <td class="text-center">DL-112233445</td>
+                            <td class="text-center">1988-12-30</td>
+                            <td class="text-center">9456781230</td>
+                            <td class="text-center">2021-07-22</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">Samantha Lee</td>
+                            <td class="text-center">4567 8901 2345</td>
+                            <td class="text-center">DL-554433221</td>
+                            <td class="text-center">1992-04-10</td>
+                            <td class="text-center">9876123456</td>
+                            <td class="text-center">2022-09-18</td>
+                        </tr>
+                    </tbody>
+                </table> 
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                    </div>
             </div>
         </div>
     </div>

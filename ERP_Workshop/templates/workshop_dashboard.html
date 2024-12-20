@@ -1,62 +1,255 @@
-{% extends "workshop_base.html" %}
-{% block title %}Dashboard{% endblock title %}
+{% extends 'workshop_base.html' %}
+{% block title %}
+Dashboard
+{% endblock title %}
+{% load static %}
 {% block content %}
 <style>
- 
+  .radius-10 {
+    border-radius: 10px !important;
+  }
+
+  .border-info {
+    border-left: 5px solid #0dcaf0 !important;
+  }
+
+  .border-danger {
+    border-left: 5px solid #fd3550 !important;
+  }
+
+  .border-success {
+    border-left: 5px solid #15ca20 !important;
+  }
+
+  .border-warning {
+    border-left: 5px solid #ffc107 !important;
+  }
+
+
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 0px solid rgba(0, 0, 0, 0);
+    border-radius: .25rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 6px 0 rgb(218 218 253 / 65%), 0 2px 6px 0 rgb(206 206 238 / 54%);
+  }
+
+  .bg-gradient-scooter {
+    background: #17ead9;
+    background: -webkit-linear-gradient(45deg, #17ead9, #6078ea) !important;
+    background: linear-gradient(45deg, #17ead9, #6078ea) !important;
+  }
+
+  .widgets-icons-2 {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ededed;
+    font-size: 27px;
+    border-radius: 10px;
+  }
+
+  .rounded-circle {
+    border-radius: 50% !important;
+  }
+
+  .text-white {
+    color: #fff !important;
+  }
+
+  .ms-auto {
+    margin-left: auto !important;
+  }
+
+  .bg-gradient-bloody {
+    background: #f54ea2;
+    background: -webkit-linear-gradient(45deg, #f54ea2, #ff7676) !important;
+    background: linear-gradient(45deg, #f54ea2, #ff7676) !important;
+  }
+
+  .bg-gradient-ohhappiness {
+    background: #00b09b;
+    background: -webkit-linear-gradient(45deg, #00b09b, #96c93d) !important;
+    background: linear-gradient(45deg, #00b09b, #96c93d) !important;
+  }
+
+  .bg-gradient-blooker {
+    background: #ffdf40;
+    background: -webkit-linear-gradient(45deg, #ffdf40, #ff8359) !important;
+    background: linear-gradient(45deg, #ffdf40, #ff8359) !important;
+  }
 </style>
 <main id="main" class="main">
-    <div class="pagetitle">
-        <h1>Dashboard</h1>
-        <div class="row">
-            <div class="col">
+
+
+      <div class="row">
+        <div class="col-sm-6">
+            <div class="pagetitle">
+                <h1>Dashboard </h1>
+                <nav>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item"><a href="#">Dashboard </a></li>
+                    </ol>
+                </nav>
             </div>
         </div>
-    </div><!-- End Page Title -->
-   
-    <div class="container">
-        <div class="row justify-content-center align-items-center">
-            <div class="col-sm-4"> <br><br>
-                                  
-                <canvas id="roleChart" width="400" height="400"></canvas> 
-                
+        <div class="col-sm-6">
+            <div class="container" style="max-width:97%;">
+                <div class="text-lg-end text-start">
+
+                </div>
             </div>
         </div>
     </div>
+
+
+
+  <!-- End Page Title -->
+
+  <section class="section dashboard">
+    <div class="row">
+      <div class="container">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3">
+          <div class="col">
+            <div class="card radius-10 border-start border-0 border-3 border-info">
+              <div class="card-body " style="padding-top: 20px;">
+                <div class="d-flex align-items-center">
+                  <div>
+                    <p class="mb-0 text-secondary">Out of Stock Items</p>
+                    <h4 class="my-1 text-info">{{out_of_stock_count}}</h4>
+                  </div>
+                  <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                    <i class="bi bi-book"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card radius-10 border-start border-0 border-3 border-danger">
+              <div class="card-body"  style="padding-top: 20px;">
+                <div class="d-flex align-items-center">
+                  <div>
+                    <p class="mb-0 text-secondary">Running Job Cards</p>
+                    <h4 class="my-1 text-danger">{{running_job_cards_count}}</h4>
+                  </div>
+                  <div class="widgets-icons-2 rounded-circle bg-gradient-bloody text-white ms-auto">
+                    <i class="bi bi-book"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card radius-10 border-start border-0 border-3 border-success">
+              <div class="card-body"  style="padding-top: 20px;">
+                <div class="d-flex align-items-center">
+                  <div>
+                    <p class="mb-0 text-secondary">Completed Job Cards</p>
+                    <h4 class="my-1 text-success">{{completed_job_card_count}}</h4>
+                  </div>
+                  <div class="widgets-icons-2 rounded-circle bg-gradient-ohhappiness text-white ms-auto">
+                    <i class="bi bi-book"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+        <div class="row">
+
+          <!-- Card Start -->
+          <div class="col-sm-6 mt-3">
+            <div class="card recent-sales overflow-auto"  style="height: 100%;">
+                <div class="mt-4" style="height: 100%;">
+                    <canvas id="productChart" width="400" height="200"></canvas>
+
+                </div>
+            </div>
+          </div><!-- End Card -->
+
+          <div class="col-sm-6 mt-3">
+            <div class="card recent-sales overflow-auto" style="height: 100%; background-color: #f8f9fa;">
+                <div class="mt-2 p-3">
+                    <h3>Notifications and Alerts</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Example Alert Card -->
+                    <div class="alert alert-info d-flex justify-content-between align-items-center" role="alert" style="background-color: #e9f7fe;">
+                        <div>
+                            <strong>Vehicle: </strong> ABC123 <br>
+                            <strong>Name: </strong> Ford Mustang <br>
+                            <strong>Time: </strong> 10:30 AM
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="trackDetails('ABC123')">Track</button>
+                    </div>
+        
+                    <!-- Another Sample Alert -->
+                    <div class="alert alert-warning d-flex justify-content-between align-items-center" role="alert" style="background-color: #fff3cd;">
+                        <div>
+                            <strong>Vehicle: </strong> XYZ456 <br>
+                            <strong>Name: </strong> Toyota Corolla <br>
+                            <strong>Time: </strong> 12:15 PM
+                        </div>
+                        <button class="btn btn-warning btn-sm" onclick="trackDetails('XYZ456')">Track</button>
+                    </div>
+        
+                    <!-- Add more alerts as needed -->
+                </div>
+            </div>
+        </div>
+        
+        </div>
+      </div>
+    </div>
+    </div><!-- End Left side columns -->
+  </section>
+
+
 </main><!-- End #main -->
+
  
 
- <script>
-    var ctx = document.getElementById('roleChart').getContext('2d');
-    var roleChart = new Chart(ctx, {
-        type: 'pie',
+<script>
+    // Data passed from Django context
+    var totalProducts = {{ total_products }};
+    var outOfStockCount = {{ out_of_stock_count }};
+
+    // Prepare the data for the chart
+    var ctx = document.getElementById('productChart').getContext('2d');
+    var productChart = new Chart(ctx, {
+        type: 'bar',  // Bar chart type
         data: {
-            labels: {{ roles|safe }},
+            labels: ['Total Products', 'Out of Stock Products'],  // Labels for the x-axis
             datasets: [{
-                label: 'Role Distribution',
-                data: {{ counts|safe }},
-                backgroundColor: [
-                    'rgb(255, 99, 133)',
-                    'rgb(54, 163, 235)',
-                    'rgb(255, 207, 86)',
-                    'rgb(75, 192, 192)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)'
-                ],
+                label: 'Product Count',
+                data: [totalProducts, outOfStockCount],  // Data for Total Products and Out of Stock Products
+                backgroundColor: ['#36a2eb', '#ff6384'],  // Color for each bar
+                borderColor: ['#36a2eb', '#ff6384'],  // Border color for each bar
                 borderWidth: 1
             }]
         },
         options: {
             responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                },
+            scales: {
+                y: {
+                    beginAtZero: true  // Start the y-axis at 0
+                }
             }
         }
     });
 </script>
+ 
 {% endblock content %}

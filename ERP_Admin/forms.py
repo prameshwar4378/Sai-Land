@@ -153,13 +153,20 @@ class DriverRegistrationForm(UserCreationForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
+        last_emp_id = EMP_ID.objects.order_by('-id').first()
+        if last_emp_id:
+            last_number = int(last_emp_id.emp_id.split('-')[1])
+            new_emp_id = EMP_ID.objects.create(emp_id=f"SLD-{last_number + 1}")
+        else:
+            new_emp_id = EMP_ID.objects.create(emp_id="SLD-1")
+ 
         if commit:
             fm=user
             fm.is_driver=True
+            fm.emp_id=new_emp_id
             fm.save()
             Driver.objects.create(
                 user=user, 
-                emp_id=fm.emp_id, 
                 driver_name=self.cleaned_data['driver_name'],
                 adhaar_number=self.cleaned_data['adhaar_number'],
                 license_number=self.cleaned_data['license_number'],
@@ -285,6 +292,7 @@ class TechnicianRegistrationForm(forms.ModelForm):
             'profile_photo',
             'additional_docs',
         ]  
+        
     def clean_adhaar_number(self):
         adhaar_number = self.cleaned_data.get('adhaar_number')
         if not re.match(r"^\d{12}$", adhaar_number):  # Aadhaar must be 12 digits

@@ -89,15 +89,32 @@ Dashboard
 </style>
 <main id="main" class="main">
 
-  <div class="pagetitle">
-    <h1>Dashboard</h1>
-    <nav>
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="#">Home</a></li>
-        <li class="breadcrumb-item"><a href="#">Dashboard </a></li>
-      </ol>
-    </nav>
-  </div>
+
+      <div class="row">
+        <div class="col-sm-6">
+            <div class="pagetitle">
+                <h1>Dashboard</h1>
+                <nav>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item"><a href="#">Dashboard </a></li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="container" style="max-width:97%;">
+                <div class="text-lg-end text-start">
+                    <!-- Use text-lg-end for right alignment in large screens -->
+                    <a href="{% url "admin_reload_all_caches" %}" class="btn btn-primary" > Reload Data</a>
+                         
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
   <!-- End Page Title -->
 
   <section class="section dashboard">
@@ -150,6 +167,8 @@ Dashboard
             </div>
           </div>
         </div>
+      </div>
+    </div>
 
         <div class="row">
 

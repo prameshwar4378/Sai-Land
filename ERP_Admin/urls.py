@@ -7,6 +7,8 @@ from django.conf.urls.static import static
 urlpatterns = [
     # path('login-token', CustomAuthToken.as_view(), name='api_token_auth'),
     path('dashboard/', views.dashboard, name='admin_dashboard'),
+    path('reload_all_caches/', views.reload_all_caches, name='admin_reload_all_caches'),
+
     path('notifications/', views.notifications, name='admin_notifications'),
     path('financial-management/', views.financial_management, name='admin_financial_management'),
     path('live-status/', views.live_status, name='admin_live_status'),
@@ -27,6 +29,7 @@ urlpatterns = [
 
     path('drivers-list/', views.drivers_list, name='admin_drivers_list'),
     path('create-driver/', views.create_driver, name='admin_create_driver'),
+    path('import_drivers/', views.import_drivers, name='admin_import_drivers'),
     path('update-driver/<int:id>', views.update_driver, name='admin_update_driver'),
     path('update_driver_password/<int:id>', views.update_driver_password, name='admin_update_driver_password'),
     path('delete-driver/<int:id>/', views.delete_driver, name='admin_delete_driver'),
