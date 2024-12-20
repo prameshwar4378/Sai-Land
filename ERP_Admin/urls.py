@@ -3,6 +3,7 @@ from . import views
 
 from django.conf import settings
 from django.conf.urls.static import static 
+
 urlpatterns = [
     # path('login-token', CustomAuthToken.as_view(), name='api_token_auth'),
     path('dashboard/', views.dashboard, name='admin_dashboard'),
@@ -48,3 +49,4 @@ urlpatterns = [
     path('delete-party/<int:id>/', views.delete_party, name='admin_delete_party'),
 
 ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+

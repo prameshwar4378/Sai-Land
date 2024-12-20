@@ -1,7 +1,6 @@
 {% extends "admin_base.html" %}
 {% block title %}Drivers List{% endblock title %}
 {% load crispy_forms_tags %}
-
 {% block content %}
 <style>
     legend {
@@ -81,7 +80,7 @@
                                         {% for driver in drivers %}
                                         <tr>
                                             <td class="text-center">{{ forloop.counter }}</td>
-                                            <td class="text-left">{{ driver.profile_photo }}</td>
+                                            <td class="text-left"><img src="/media/{{ driver.profile_photo }}" alt="" style="width: 50px; height: 50px;"></td>
                                             <td class="text-left">{{ driver.emp_id__emp_id }}</td>
                                             <td class="text-left">{{ driver.driver_name }}</td>
                                             <td class="text-center">{{ driver.adhaar_number }}</td>

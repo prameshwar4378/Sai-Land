@@ -47,8 +47,8 @@ def update_cache_on_delete(sender, instance, **kwargs):
 def update_driver_cache_on_save(sender, instance, **kwargs):
     # Use select_related to fetch the related CustomUser data in one query
     drivers = Driver.objects.select_related('user').all().values(
-        'id', 'profile_photo','driver_name', 'license_number', 'mobile_number','alternate_mobile_number', 'adhaar_number', 'address', 'date_of_birth', 'date_joined',
-        'user__username', 'user__email', 'user__first_name', 'user__last_name', 'user__emp_id'    # Add related fields from CustomUser
+        'id', 'profile_photo','driver_name', 'license_number','profile_photo',  'mobile_number','alternate_mobile_number', 'adhaar_number', 'address', 'date_of_birth', 'date_joined',
+        'user__username', 'user__email', 'user__first_name', 'user__last_name', 'emp_id__emp_id'    # Add related fields from CustomUser
     )
     # Update the cache with the latest driver data, including CustomUser related fields
     cache.set('cache_drivers', list(drivers), timeout=None)
@@ -58,16 +58,14 @@ def update_driver_cache_on_save(sender, instance, **kwargs):
 def update_driver_cache_on_delete(sender, instance, **kwargs):
     # Use select_related to fetch related CustomUser data after a delete
     drivers = Driver.objects.select_related('user').all().values(
-        'id','profile_photo', 'driver_name', 'license_number', 'mobile_number','alternate_mobile_number', 'adhaar_number', 'address', 'date_of_birth', 'date_joined',
-        'user__username', 'user__email', 'user__first_name', 'user__last_name', 'user__emp_id'   
+        'id','profile_photo', 'driver_name', 'license_number','profile_photo',  'mobile_number','alternate_mobile_number', 'adhaar_number', 'address', 'date_of_birth', 'date_joined',
+        'user__username', 'user__email', 'user__first_name', 'user__last_name', 'emp_id__emp_id'   
     )
+    # Update the cache to reflect the deletion
     # Update the cache to reflect the deletion
     cache.set('cache_drivers', list(drivers), timeout=None)
     print("Driver cache updated on delete")
 
-
-
-    
  
 @receiver(post_save, sender=Technician)
 def update_technician_cache_on_save(sender, instance, **kwargs):
@@ -366,13 +364,17 @@ def drivers_list(request):
     drivers = cache.get('cache_drivers')
     if not drivers:
         drivers = Driver.objects.select_related('user').all().values(
-            'id', 'driver_name','emp_id__emp_id', 'license_number', 'mobile_number', 'adhaar_number', 'address', 'date_of_birth', 'date_joined',
-            'user__username', 'user__email', 'user__first_name', 'user__last_name'
+            'id', 'driver_name','emp_id__emp_id', 'license_number', 'mobile_number', 'profile_photo', 'adhaar_number', 'address', 'date_of_birth', 'date_joined',
+            'user__username', 'user__email', 'user__first_name', 'user__last_name' 
         )
+        print("Cache Set Successfully...")
+        print("Cache Set Successfully...")
+        print("Cache Set Successfully...")
         cache.set('cache_drivers', list(drivers), timeout=None)
+    for i in drivers:
+        print(i)
     form=DriverRegistrationForm()
-    incomplete_profile = CustomUser.objects.filter(driver__isnull=True,is_driver=True)
-    deleted_count = incomplete_profile.delete()[0]
+    incomplete_profile = CustomUser.objects.filter(driver__isnull=True,is_driver=True).delete()[0]
     return render(request, "admin_drivers_list.html",{'form':form,'drivers':drivers})
 
 
