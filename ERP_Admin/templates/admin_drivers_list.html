@@ -64,6 +64,7 @@
                                     <thead>
                                         <tr style="background:#9c4b2e;"> 
                                             <th scope="col" class="text-center text-white">Sr. No</th>
+                                            <th scope="col" class="text-center text-white">Profile Photo</th>
                                             <th scope="col" class="text-center text-white">EMP ID</th>
                                             <th scope="col" class="text-center text-white">Driver Name</th>
                                             <th scope="col" class="text-center text-white">Aadhaar Number</th>
@@ -80,6 +81,7 @@
                                         {% for driver in drivers %}
                                         <tr>
                                             <td class="text-center">{{ forloop.counter }}</td>
+                                            <td class="text-left">{{ driver.profile_photo }}</td>
                                             <td class="text-left">{{ driver.emp_id__emp_id }}</td>
                                             <td class="text-left">{{ driver.driver_name }}</td>
                                             <td class="text-center">{{ driver.adhaar_number }}</td>

@@ -68,7 +68,7 @@ class Driver(models.Model):
     adhaar_card_photo=models.FileField(upload_to="Documents", max_length=None, null=True, blank=True)
     pan_card_photo=models.FileField(upload_to="Documents", max_length=None, null=True, blank=True)
     driving_license_photo=models.FileField(upload_to="Documents", max_length=None, null=True, blank=True)
-    profile_photo=models.FileField(upload_to="Documents", max_length=None, null=True, blank=True)
+    profile_photo=models.ImageField(upload_to="Documents", max_length=None, null=True, blank=True)
     
     def __str__(self):
         return f"{self.driver_name} - {self.user.username}"

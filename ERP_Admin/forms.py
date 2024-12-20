@@ -102,7 +102,7 @@ class DriverRegistrationForm(UserCreationForm):
     adhaar_card_photo=forms.FileField(required=False, label="Upload Adhaar Card")
     pan_card_photo=forms.FileField(required=False, label="Upload Pan Card")
     driving_license_photo=forms.FileField(required=False, label="Upload Driving License")
-    profile_photo=forms.FileField(required=False, label="Upload Profile Photo")
+    profile_photo=forms.ImageField(required=False, label="Upload Profile Photo")
     address = forms.CharField(widget=forms.Textarea, required=False, label="Address")
     date_of_birth = forms.DateField(
         widget=forms.DateInput(attrs={'type': 'date'}),

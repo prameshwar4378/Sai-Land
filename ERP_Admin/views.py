@@ -47,8 +47,8 @@ def update_cache_on_delete(sender, instance, **kwargs):
 def update_driver_cache_on_save(sender, instance, **kwargs):
     # Use select_related to fetch the related CustomUser data in one query
     drivers = Driver.objects.select_related('user').all().values(
-        'id', 'driver_name', 'license_number', 'mobile_number','alternate_mobile_number', 'adhaar_number', 'address', 'date_of_birth', 'date_joined',
-        'user__username', 'user__email', 'user__first_name', 'user__last_name'  # Add related fields from CustomUser
+        'id', 'profile_photo','driver_name', 'license_number', 'mobile_number','alternate_mobile_number', 'adhaar_number', 'address', 'date_of_birth', 'date_joined',
+        'user__username', 'user__email', 'user__first_name', 'user__last_name', 'user__emp_id'    # Add related fields from CustomUser
     )
     # Update the cache with the latest driver data, including CustomUser related fields
     cache.set('cache_drivers', list(drivers), timeout=None)
@@ -58,8 +58,8 @@ def update_driver_cache_on_save(sender, instance, **kwargs):
 def update_driver_cache_on_delete(sender, instance, **kwargs):
     # Use select_related to fetch related CustomUser data after a delete
     drivers = Driver.objects.select_related('user').all().values(
-        'id', 'driver_name', 'license_number', 'mobile_number','alternate_mobile_number', 'adhaar_number', 'address', 'date_of_birth', 'date_joined',
-        'user__username', 'user__email', 'user__first_name', 'user__last_name'   
+        'id','profile_photo', 'driver_name', 'license_number', 'mobile_number','alternate_mobile_number', 'adhaar_number', 'address', 'date_of_birth', 'date_joined',
+        'user__username', 'user__email', 'user__first_name', 'user__last_name', 'user__emp_id'   
     )
     # Update the cache to reflect the deletion
     cache.set('cache_drivers', list(drivers), timeout=None)
@@ -373,7 +373,6 @@ def drivers_list(request):
     form=DriverRegistrationForm()
     incomplete_profile = CustomUser.objects.filter(driver__isnull=True,is_driver=True)
     deleted_count = incomplete_profile.delete()[0]
-    print(drivers)
     return render(request, "admin_drivers_list.html",{'form':form,'drivers':drivers})
 
 

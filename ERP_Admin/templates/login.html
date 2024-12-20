@@ -190,7 +190,7 @@
         }
 
         .username,
-        .the-form [type="password"] {
+        #password {
             padding: 15px;
             font-size: 16px;
             background: rgba(0, 0, 0, 0.2);
@@ -202,17 +202,17 @@
         }
 
         .username::placeholder,
-        .the-form [type="password"]::placeholder {
+        #password::placeholder {
             color: rgba(255, 255, 255, 0.3);
         }
 
         .username:hover,
-        .the-form [type="password"]:hover {
+        #password:hover {
             background: rgba(0, 0, 0, 0.1);
         }
 
         .username:focus,
-        .the-form [type="password"]:focus {
+        #password:focus {
             background: #ffffff;
             box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
             border-color: #4a304d;
@@ -220,7 +220,7 @@
         }
 
         .username:focus::placeholder,
-        .the-form [type="password"]:focus::placeholder {
+        #password:focus::placeholder {
             color: #666666;
         }
 
@@ -455,7 +455,7 @@
         }
 
         .username,
-        .the-form [type="password"] {
+        #password {
             padding: 15px;
             font-size: 16px;
             background: rgba(0, 0, 0, 0.2);
@@ -468,37 +468,37 @@
         }
 
         .username::-webkit-input-placeholder,
-        .the-form [type="password"]::-webkit-input-placeholder {
+        #password::-webkit-input-placeholder {
             color: rgba(255, 255, 255, 0.3);
         }
 
         .username::-moz-placeholder,
-        .the-form [type="password"]::-moz-placeholder {
+        #password::-moz-placeholder {
             color: rgba(255, 255, 255, 0.3);
         }
 
         .username:-ms-input-placeholder,
-        .form-container .form-body .the-form [type="password"]:-ms-input-placeholder {
+        .form-container .form-body #password:-ms-input-placeholder {
             color: rgba(255, 255, 255, 0.3);
         }
 
         .username::-ms-input-placeholder,
-        .form-container .form-body .the-form [type="password"]::-ms-input-placeholder {
+        .form-container .form-body #password::-ms-input-placeholder {
             color: rgba(255, 255, 255, 0.3);
         }
 
         .username::placeholder,
-        .form-container .form-body .the-form [type="password"]::placeholder {
+        .form-container .form-body #password::placeholder {
             color: rgba(255, 255, 255, 0.3);
         }
 
         .username:hover,
-        .the-form [type="password"]:hover {
+        #password:hover {
             background: rgba(0, 0, 0, 0.1);
         }
 
         .username:focus,
-        .the-form [type="password"]:focus {
+        #password:focus {
             background: #ffffff;
             -webkit-box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
             box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
@@ -507,27 +507,27 @@
         }
 
         .username:focus::-webkit-input-placeholder,
-        .form-container .form-body .the-form [type="password"]:focus::-webkit-input-placeholder {
+        .form-container .form-body #password:focus::-webkit-input-placeholder {
             color: #666666;
         }
 
         .username:focus::-moz-placeholder,
-        .the-form [type="password"]:focus::-moz-placeholder {
+        #password:focus::-moz-placeholder {
             color: #666666;
         }
 
         .username:focus:-ms-input-placeholder,
-        .the-form [type="password"]:focus:-ms-input-placeholder {
+        #password:focus:-ms-input-placeholder {
             color: #666666;
         }
 
         .username:focus::-ms-input-placeholder,
-        .the-form [type="password"]:focus::-ms-input-placeholder {
+        #password:focus::-ms-input-placeholder {
             color: #666666;
         }
 
         .username:focus::placeholder,
-        .the-form [type="password"]:focus::placeholder {
+        #password:focus::placeholder {
             color: #666666;
         }
 
@@ -590,7 +590,9 @@
 
                     <label for="password">Password *</label>
                     <input type="password" name="password" id="password" placeholder="Enter your password" required>
-
+                    <div class=" " style="width: 100%; text-align: center;">
+                        <a href="#" id="toggle-password" onclick="togglePasswordVisibility()">Show Password</a>
+                    </div>
                     <input type="submit" value="Log In">
                 </form>
             {% else %}
@@ -653,4 +655,20 @@
     {% endfor %}
 </script>
 
+
+<script>
+function togglePasswordVisibility() {
+    const passwordField = document.getElementById('password');
+    const toggleLink = document.getElementById('toggle-password');
+
+    if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        toggleLink.textContent = 'Hide Password';
+    } else {
+        passwordField.type = 'password';
+        toggleLink.textContent = 'Show Password';
+    }
+}
+
+    </script>
 </html>
