@@ -197,7 +197,7 @@ def update_driver_password(request, id):
 
 
 def redirect_user_based_on_role(request, user):
-    if user.is_superuser:
+    if user.is_superuser or user.is_admin:
         print('Redirecting to Admin Dashboard')  # Debug print
         return redirect('/admin/dashboard')
     elif user.is_workshop:

@@ -202,8 +202,8 @@ def print_job_card(request, id):
     total_taxable_amount = total_cost
 
     # Labour cost and grand total
-    labour_cost = int(job_card.labour_cost)
-    grand_total_cost = int(total_cost + labour_cost)
+    labour_cost = int(job_card.labour_cost) if job_card.labour_cost else 0
+    grand_total_cost = int(total_cost + labour_cost)  
 
     return render(request, "workshop_print_job_card.html", {
         'job_card': job_card,

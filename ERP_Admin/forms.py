@@ -262,7 +262,12 @@ class TechnicianRegistrationForm(forms.ModelForm):
         max_length=10, 
         required=True, 
         label="Mobile Number", 
-            )
+     )
+    alternate_mobile_number = forms.CharField(
+        max_length=10, 
+        required=False,  # This line makes the field optional
+        label="Alternate Mobile Number",
+    )
     email = forms.EmailField(
         required=False, 
         label="Email Address", 
@@ -307,17 +312,23 @@ class TechnicianRegistrationForm(forms.ModelForm):
 
     def clean_alternate_mobile_number(self):
         alternate_mobile_number = self.cleaned_data.get('alternate_mobile_number')
-        if not re.match(r"^\d{10}$", alternate_mobile_number):  # Validate exactly 10 digits
+        if not alternate_mobile_number:
+            return None
+        elif not re.match(r"^\d{10}$", alternate_mobile_number):  # Validate exactly 10 digits
             raise ValidationError("Alternate mobile number must be 10 digits.")
         return alternate_mobile_number
  
+ 
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if not email:
+            return None 
+
     def save(self, commit=True):
         technician = super().save(commit=False)
         if commit:
             technician.save()
         return technician
-    
-
 
 
 class TechnicianUpdateForm(forms.ModelForm):
