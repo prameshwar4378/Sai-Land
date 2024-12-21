@@ -1,2 +1,4 @@
 work on Admin Driver List 
 show image and emp_id, need to test cache data
+
+Job card photo not loading while uploading data
