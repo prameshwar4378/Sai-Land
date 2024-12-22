@@ -9,10 +9,9 @@ from django.db.models import Sum
 from .filters import *
 from django.db.models import Count
 from django.db.models import F
-
-def demo():
-    pass
-
+ 
+ #Rameshwar Pawar Updated
+ 
 def dashboard(request):
     total_products = Product.objects.count()
 
