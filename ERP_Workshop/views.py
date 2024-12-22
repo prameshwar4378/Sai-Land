@@ -11,6 +11,9 @@ from django.db.models import Count
 from django.db.models import F
  
  #Rameshwar Pawar Updated
+
+
+ #this is my second changes 
  
 def dashboard(request):
     total_products = Product.objects.count()
