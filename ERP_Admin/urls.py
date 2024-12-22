@@ -51,5 +51,8 @@ urlpatterns = [
     path('update_party/<int:id>/', views.update_party, name='admin_update_party'),
     path('delete-party/<int:id>/', views.delete_party, name='admin_delete_party'),
 
+    path('vehicle-dashboard', views.vehicle_data , name="vehicle_data"),
+
+
 ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
 
