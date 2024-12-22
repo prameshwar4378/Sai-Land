@@ -41,9 +41,6 @@ from django.db.models import Sum
 #     update_cache_on_save(sender, instance)  #  
 
 
-
-
-
 @receiver(post_save, sender=Driver)
 def update_driver_cache_on_save(sender, instance, **kwargs):
     # Retrieve all drivers and include all fields
