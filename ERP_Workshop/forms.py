@@ -42,6 +42,7 @@ class UpdatePurchaseForm(forms.ModelForm):
 
  
 class ProductForm(forms.ModelForm):
+
     class Meta:
         model = Product
         fields = [
@@ -57,6 +58,10 @@ class ProductForm(forms.ModelForm):
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4, 'cols': 40}),
         }
+        
+    def __init__(self, *args, **kwargs):
+        super(ProductForm, self).__init__(*args, **kwargs)
+        self.fields['model'].required = False
 
     def clean_product_code(self):
         product_code = self.cleaned_data.get('product_code')

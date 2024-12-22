@@ -2,6 +2,8 @@
 {% block title %}Vehicle List{% endblock title %}
 {% load crispy_forms_tags %}
 {% block content %}
+{% load static %}
+
 <style>
     .dropdown {
         position: relative;
@@ -55,7 +57,7 @@
                         data-target="#model_create_vehicle"><i class="mdi mdi-filter"></i> Add Vehicle</a>
 
                     <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#model_import_vehicle"><i class="mdi mdi-filter"></i> Import
-                        Vehicle</a>
+                        Vehicle Data</a>
 
                 </div>
             </div>
@@ -160,7 +162,9 @@
             <div class="modal-body text-left">
                 <!-- Note section if needed -->
                 <div class="alert alert-warning">
-                    <strong>Note:</strong> Please upload a file in CSV or Excel format containing vehicle data. <a href="#"  data-toggle="modal" data-target="#model_data_formate">Data Formate</a>
+                    <strong>Note:</strong> Please upload a file in Excel format containing vehicle data. 
+                    <a href="{% static 'Excel/Add_Vehicle_Data_Format.xlsx' %}" download>Data Format</a>
+                    
                 </div>
                   <!-- Form for file upload -->
                 <form method="POST" enctype="multipart/form-data" action="{% url 'admin_import_vehicles' %}">
@@ -180,7 +184,6 @@
         </div>
     </div>
 </div>
-
 
 <div class="modal fade" id="model_data_formate" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
     aria-hidden="true">

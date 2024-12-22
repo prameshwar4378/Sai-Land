@@ -25,20 +25,20 @@ from .filters import *
 from django.db.models import Sum
 
 
-@receiver(post_save, sender=Product)
-def update_cache_on_save(sender, instance, **kwargs):
-    products = [] 
-    for product in Product.objects.select_related('model').all().order_by('-id'):
-        product_data = model_to_dict(product)
-        product_data['model'] = {
-            'model_name': product.model.model_name,   
-        }
-        products.append(product_data)
-    cache.set('cache_products', products, timeout=None)
+# @receiver(post_save, sender=Product)
+# def update_cache_on_save(sender, instance, **kwargs):
+#     products = [] 
+#     for product in Product.objects.select_related('model').all().order_by('-id'):
+#         product_data = model_to_dict(product)
+#         product_data['model'] = {
+#             'model_name': product.model.model_name,   
+#         }
+#         products.append(product_data)
+#     cache.set('cache_products', products, timeout=None)
 
-@receiver(post_delete, sender=Product)
-def update_cache_on_delete(sender, instance, **kwargs):
-    update_cache_on_save(sender, instance)  #  
+# @receiver(post_delete, sender=Product)
+# def update_cache_on_delete(sender, instance, **kwargs):
+#     update_cache_on_save(sender, instance)  #  
 
 
 
@@ -340,17 +340,18 @@ def purchase_item_list(request,id):
 
 def product_list(request):
     # Retrieve products from cache
-    products = cache.get('cache_products')
+    products = Product.objects.select_related("model").order_by("-id")
+    # products = cache.get('cache_products')
  
     # Variables for counts
     out_of_stock = 0
     minimum_stock_alert_count = 0
     total_available_stock = 0
 
-    if not products:
-        # Query all products and store in cache
-        products = list(Product.objects.all().order_by('-id').values())
-        cache.set('cache_products', products, timeout=None)
+    # if not products:
+    #     # Query all products and store in cache
+    #     products = list(Product.objects.all().order_by('-id').values())
+    #     # cache.set('cache_products', products, timeout=None)
 
     # Perform calculations
     out_of_stock = Product.objects.filter(available_stock__lte=0).count()  # Count products with no stock

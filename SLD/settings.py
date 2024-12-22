@@ -93,10 +93,23 @@ REST_FRAMEWORK = {
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+# Using Postgresql
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'Sai_Land_DB',        # Replace with your PostgreSQL database name
+        'USER': 'postgres',            # Replace with your PostgreSQL username
+        'PASSWORD': 'root',        # Replace with your PostgreSQL password
+        'HOST': 'localhost',                # Or the IP address of your database server
+        'PORT': '5432',                     # Default PostgreSQL port
     }
 }
 
