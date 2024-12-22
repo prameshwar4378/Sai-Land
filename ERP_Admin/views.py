@@ -764,3 +764,53 @@ class CustomAuthToken(ObtainAuthToken):
         response = super().post(request, *args, **kwargs)
         return response
  
+
+def vehicle_data(request):
+    vehicle_data = Vehicle.objects.all()
+
+    vehicle_number = request.GET.get('vehicle_number', '').strip()
+    vehicle = None
+    job_cards = []
+    total_labour_cost = 0
+    total_item_cost = 0
+    grand_total_cost = 0
+
+    try:
+        if vehicle_number:
+            # Get the vehicle by its vehicle_number
+            vehicle = Vehicle.objects.filter(vehicle_number__iexact=vehicle_number).first()
+            
+            if vehicle:
+                # Query job cards related to this vehicle
+                job_cards = JobCard.objects.filter(vehicle=vehicle)
+                
+                for job_card in job_cards:
+                    # Aggregate total item cost for the current job card
+                    items = JobCardItem.objects.filter(job_card=job_card)
+                    item_cost = items.aggregate(Sum('total_cost'))['total_cost__sum'] or 0
+                    
+                    # Labour cost for the current job card
+                    labour_cost = job_card.labour_cost or 0
+                    
+                    # Update totals
+                    total_labour_cost += labour_cost
+                    total_item_cost += item_cost
+
+                # Grand total cost (labour + items)
+                grand_total_cost = total_labour_cost + total_item_cost
+
+    except Exception as e:
+        # Log the exception if needed (e.g., with logging)
+        return render(request, '404.html', {})
+
+    context = {
+        'vehicle': vehicle,
+        'job_card_count': len(job_cards),
+        'total_labour_cost': int(total_labour_cost),
+        'total_item_cost': int(total_item_cost),
+        'grand_total_cost': int(grand_total_cost),
+        'job_cards': job_cards,
+        'vehicle_data' : vehicle_data,
+        'is_vehicle_data' : vehicle_number
+    }
+    return render(request, 'admin_vehicle_dashboard.html', context)
