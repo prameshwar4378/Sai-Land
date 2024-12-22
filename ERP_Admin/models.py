@@ -135,10 +135,9 @@ class Product(models.Model):
         if not self.product_image:
             self.product_image = 'default_image.jpg'  # Set default image if no image is uploaded
         super(Product, self).save(*args, **kwargs)
-
     
     def __str__(self):
-        return self.product_name
+        return f" #{self.product_code} on {self.product_name}"
 
 
 PURCHASE_GST=(

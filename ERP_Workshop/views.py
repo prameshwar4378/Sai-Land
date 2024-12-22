@@ -10,11 +10,6 @@ from .filters import *
 from django.db.models import Count
 from django.db.models import F
  
- #Rameshwar Pawar Updated
-
-
- #this is my second changes 
- 
 def dashboard(request):
     total_products = Product.objects.count()
 
@@ -47,7 +42,6 @@ def job_card_list(request):
     queryset = JobCard.objects.all().order_by('-id') 
     filter = JobCardFilter(request.GET, queryset=queryset)
     filtered_job_cards = filter.qs  # Filtered queryset
-    
     # Pagination
     paginator = Paginator(filtered_job_cards, 10)  # Show 10 job cards per page.
     page_number = request.GET.get('page')  # Get the page number from the GET request
@@ -425,7 +419,7 @@ def get_product_details(request):
 def delete_purchase(request, id):
     purchase = get_object_or_404(Purchase, id=id)
     if purchase.items.exists():
-        messages.error(request, 'Purchase has associated items. Please remove all items before deleting it.')
+        messages.error(request, 'Please remove all items before deleting it.')
         return redirect('/workshop/purchase-list')
     try:
         with transaction.atomic():

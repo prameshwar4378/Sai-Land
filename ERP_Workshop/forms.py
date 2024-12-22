@@ -105,9 +105,7 @@ class ProductForm(forms.ModelForm):
             # Validate image size (max 500 KB)
             if product_image.size > 500 * 1024:
                 raise ValidationError("Image size must not exceed 500 KB.")
-            # Validate image type (optional)
-            if not product_image.content_type.startswith('image/'):
-                raise ValidationError("Uploaded file is not a valid image.")
+            # Validate image type (optional) 
         return product_image
 
 

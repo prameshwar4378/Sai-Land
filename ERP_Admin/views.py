@@ -41,9 +41,6 @@ from django.db.models import Sum
 #     update_cache_on_save(sender, instance)  #  
 
 
-
-
-
 @receiver(post_save, sender=Driver)
 def update_driver_cache_on_save(sender, instance, **kwargs):
     # Retrieve all drivers and include all fields
@@ -115,11 +112,10 @@ def update_party_cache_on_save(sender, instance, **kwargs):
 def update_party_cache_on_delete(sender, instance, **kwargs):
     # Retrieve all partys data after delete
     partys = []
-    for partys in Technician.objects.all():
+    for partys in Party.objects.all(): 
         party_data = model_to_dict(partys)  # Convert technician to dictionary
         partys.append(party_data)
     cache.set('cache_technicians', partys, timeout=None)
-
 
 
 def reload_all_caches(request):
@@ -291,7 +287,6 @@ def job_card_item_list(request, id):
     total_cost = int(total_cost) if total_cost is not None else 0
     labour_cost=int(job_card.labour_cost) if job_card.labour_cost is not None else 0
     grand_total_cost=int(total_cost+labour_cost)
-
    
     return render(request, "admin_job_card_item_list.html", {
         'items': items,
@@ -391,6 +386,7 @@ def create_user(request):
                     new_emp_id = EMP_ID.objects.create(emp_id="SLD-1")
                 fm.emp_id=new_emp_id
                 fm.save()
+                messages.success(request, "User Added successfully.")
 
                 return JsonResponse({'success': True, 'message': 'User created successfully!'})
             except ValidationError as e:

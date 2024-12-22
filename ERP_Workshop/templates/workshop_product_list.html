@@ -122,9 +122,7 @@
                                         <td>
                                             <center>
                                                 <a href="javascript:void(0);" data-url="{% url 'workshop_update_product' r.id %}" class="btn btn-warning px-2 py-2" onclick="mini_window_2(this)"><i class="bi bi-pencil-square"></i></a>
-
-                                                <a href="{% url 'workshop_delete_product' r.id %}"
-                                                    class="btn btn-danger px-3">Delete</a>
+                                                <a href="{% url 'workshop_delete_product' r.id %}" class="btn btn-danger px-2 py-2" onclick="confirmDelete(this); return false;">Delete</a>
                                             </center>
                                         </td>
                                     </tr>
@@ -301,7 +299,34 @@
 
  
 
+<!-- Modal for Delete Confirmation -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete the <strong id="delete_info"></strong>?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <a id="deleteButton" href="#" class="btn btn-danger">Delete</a>
+      </div>
+    </div>
+  </div>
+</div>
 
+<script>
+    function confirmDelete(button) {
+        var info = button.closest('tr').querySelector('td:nth-child(2)').textContent.trim();
+        var deleteUrl = button.getAttribute('href');  // The delete URL
+        document.getElementById('delete_info').textContent = info;
+        document.getElementById('deleteButton').setAttribute('href', deleteUrl);
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
+</script>
 
 <script>
  $(function(){
