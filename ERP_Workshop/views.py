@@ -10,6 +10,8 @@ from .filters import *
 from django.db.models import Count
 from django.db.models import F
  
+ #Rameshwar Pawar Updated
+ 
 def dashboard(request):
     total_products = Product.objects.count()
 
