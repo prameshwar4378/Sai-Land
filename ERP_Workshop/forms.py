@@ -55,7 +55,7 @@ class ProductForm(forms.ModelForm):
             'product_image',
         ]
         widgets = {
-            'description': forms.Textarea(attrs={'rows': 4, 'cols': 40}),
+            'description': forms.Textarea(attrs={'rows': 4, 'cols': 40}), 
         }
 
     def clean_product_code(self):
