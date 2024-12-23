@@ -68,8 +68,7 @@
                         placeholder="Search by Vehicle Number" id="vehicleSearch">
                     <datalist id="vehicleNumbers">
                         {% for vehicle in vehicle_data %}
-                        <option value="{{ vehicle.vehicle_number }}">{{ vehicle.vehicle_number
-                            }}{{vehicle.vehicle_name}}</option>
+                        <option value="{{ vehicle.vehicle_number }}">{{ vehicle.vehicle_name }} - {{vehicle.vehicle_number}}</option>
                         {% endfor %}
                     </datalist>
                     <button type="submit" class="btn btn-primary ms-2">Search</button>
@@ -84,11 +83,9 @@
             <!-- Job Card and Maintenance -->
             {% if is_vehicle_data %}
 
-            <div class="col-lg-6 col-md-12">
-                <div class="dashboard-card bg-primary-light aos-init aos-animate" data-aos="fade-up">
-                    <div class="card-icon bg-primary text-white">
-                        <i class="bi bi-card-list"></i>
-                    </div>
+            <div class="col-lg-6 col-md-12" >
+                <div class="dashboard-card bg-primary-light aos-init aos-animate" data-aos="fade-up" style="height:100%">
+   
                     <div class="card-content">
                         <h5 class="card-title">Vehicle Job Card Details</h5>
                         {% if vehicle %}
@@ -106,10 +103,8 @@
 
             <!-- EMIs Details -->
             <div class="col-lg-6 col-md-12">
-                <div class="dashboard-card bg-warning-light aos-init aos-animate" data-aos="fade-up">
-                    <div class="card-icon bg-warning text-white">
-                        <i class="bi bi-wallet2"></i>
-                    </div>
+                <div class="dashboard-card bg-warning-light aos-init aos-animate" data-aos="fade-up" style="height:100%">
+ 
                     <div class="card-content">
                         <h5 class="card-title">EMI Details</h5>
 
@@ -126,10 +121,8 @@
 
             <!-- Insurance Details -->
             <div class="col-lg-6 col-md-12">
-                <div class="dashboard-card bg-info-light aos-init aos-animate" data-aos="fade-up">
-                    <div class="card-icon bg-info text-white">
-                        <i class="bi bi-shield-check"></i>
-                    </div>
+                <div class="dashboard-card bg-info-light aos-init aos-animate" data-aos="fade-up" style="height:100%">
+ 
                     <div class="card-content">
                         <h5 class="card-title">Insurance Details</h5>
                         <p class="card-text">Insurance Status: <strong>{{ insurance_status }}</strong></p>
@@ -141,10 +134,7 @@
 
             <!-- Breakdown Alerts -->
             <div class="col-lg-6 col-md-12">
-                <div class="dashboard-card bg-success-light aos-init aos-animate" data-aos="fade-up">
-                    <div class="card-icon bg-success text-white">
-                        <i class="bi bi-tools"></i>
-                    </div>
+                <div class="dashboard-card bg-success-light aos-init aos-animate" data-aos="fade-up" style="height:100%">
                     <div class="card-content">
                         <h5 class="card-title">Driver Details</h5>
                         <p class="card-text">Active Driver Name: <strong>{{ active_breakdown_alerts }}</strong></p>

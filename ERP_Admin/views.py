@@ -812,3 +812,6 @@ def vehicle_data(request):
         'is_vehicle_data' : vehicle_number
     }
     return render(request, 'admin_vehicle_dashboard.html', context)
+
+
+

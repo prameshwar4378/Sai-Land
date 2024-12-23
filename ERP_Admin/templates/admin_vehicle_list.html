@@ -289,7 +289,7 @@ document.getElementById('createVehicleForm').addEventListener('submit', function
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert(data.message); // Show success alert
+            // alert(data.message); // Show success alert// Show success alert
             location.reload();   // Refresh the page or update the list dynamically
         } else {
             let errorMessage = '<strong>Error:</strong><br>';
