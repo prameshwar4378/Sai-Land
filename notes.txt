@@ -7,3 +7,9 @@ Job card photo not loading while uploading data
 port: 5432
 password : rood
 
+
+Need to Update status on User Management is_active  field
+
+Export Functionality
+
+Delete JS alert

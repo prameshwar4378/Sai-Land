@@ -1,0 +1,179 @@
+{% extends "admin_base.html" %}
+{% block title %}Vehicle | Dashboard{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+<style>
+    .dashboard-card {
+        border: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .card-icon {
+        font-size: 3rem;
+        width: 4rem;
+        height: 4rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+
+    .card-content {
+        margin-left: 1rem;
+    }
+
+    .bg-warning-light {
+        background-color: rgba(255, 193, 7, 0.1);
+    }
+
+    .bg-success-light {
+        background-color: rgba(25, 135, 84, 0.1);
+    }
+
+    .bg-info-light {
+        background-color: rgba(13, 202, 240, 0.1);
+    }
+
+    .bg-primary-light {
+        background-color: rgba(13, 110, 253, 0.1);
+    }
+</style>
+
+<main id="main" class="main">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="pagetitle">
+                <h1>Vehicle Details</h1>
+                <nav>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item">Vehicle Details</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="container" style="max-width:97%;">
+                <form method="GET" action="{% url 'vehicle_data' %}">
+                    <input list="vehicleNumbers" name="vehicle_number" class="form-control d-inline w-75"
+                        placeholder="Search by Vehicle Number" id="vehicleSearch">
+                    <datalist id="vehicleNumbers">
+                        {% for vehicle in vehicle_data %}
+                        <option value="{{ vehicle.vehicle_number }}">{{ vehicle.vehicle_name }} - {{vehicle.vehicle_number}}</option>
+                        {% endfor %}
+                    </datalist>
+                    <button type="submit" class="btn btn-primary ms-2">Search</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="container mt-4">
+        <div class="row g-4">
+            <!-- Job Card and Maintenance -->
+            {% if is_vehicle_data %}
+
+            <div class="col-lg-6 col-md-12" >
+                <div class="dashboard-card bg-primary-light aos-init aos-animate" data-aos="fade-up" style="height:100%">
+   
+                    <div class="card-content">
+                        <h5 class="card-title">Vehicle Job Card Details</h5>
+                        {% if vehicle %}
+                        <p class="card-text">Vehicle: <strong>{{ vehicle.vehicle_name }} - {{ vehicle.vehicle_number}}</strong></p>
+                        <p class="card-text">Total Job Cards: <strong>{{ job_card_count }}</strong></p>
+                        <p class="card-text">Labour Cost: <strong>&#8377;{{ total_labour_cost }}</strong></p>
+                        <p class="card-text">Item Cost: <strong>&#8377;{{ total_item_cost }}</strong></p>
+                        <p class="card-text">Grand Total Maintenance Spend: <strong>&#8377;{{ grand_total_cost}}</strong></p>
+                        {% else %}
+                        <p class="card-text">No vehicle found with the given number.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- EMIs Details -->
+            <div class="col-lg-6 col-md-12">
+                <div class="dashboard-card bg-warning-light aos-init aos-animate" data-aos="fade-up" style="height:100%">
+ 
+                    <div class="card-content">
+                        <h5 class="card-title">EMI Details</h5>
+
+                        <p class="card-text">Upcoming EMI: <strong>{{ upcoming_emi_date }}</strong></p>
+                        <p class="card-text">Upcoming EMI Date: <strong>{{ upcoming_emi_date }}</strong></p>
+                        <p class="card-text">Total Paid EMIs: <strong>{{ total_paid_emis }}</strong></p>
+                        <p class="card-text">Remaining EMIs: <strong>{{ total_paid_emis }}</strong></p>
+                        <p class="card-text">Total Amount Paid: <strong>{{ total_emi_paid }}</strong></p>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Insurance Details -->
+            <div class="col-lg-6 col-md-12">
+                <div class="dashboard-card bg-info-light aos-init aos-animate" data-aos="fade-up" style="height:100%">
+ 
+                    <div class="card-content">
+                        <h5 class="card-title">Insurance Details</h5>
+                        <p class="card-text">Insurance Status: <strong>{{ insurance_status }}</strong></p>
+                        <p class="card-text">Policy Expiry: <strong>{{ policy_expiry_date }}</strong></p>
+                        <p class="card-text">Insurance Company: <strong>{{ insurance_company }}</strong></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Breakdown Alerts -->
+            <div class="col-lg-6 col-md-12">
+                <div class="dashboard-card bg-success-light aos-init aos-animate" data-aos="fade-up" style="height:100%">
+                    <div class="card-content">
+                        <h5 class="card-title">Driver Details</h5>
+                        <p class="card-text">Active Driver Name: <strong>{{ active_breakdown_alerts }}</strong></p>
+                        <p class="card-text">Driver Contact No: <strong>{{ last_breakdown_date }}</strong></p>
+                        <p class="card-text">Login Date & Time: <strong>{{ last_breakdown_date }}</strong></p>
+
+                    </div>
+                </div>
+            </div>
+            {% else %}
+
+            <div class="col-sm-3"></div>
+
+            <div class="col-lg-6 col-md-12">
+                <div class="dashboard-card bg-danger-light aos-init aos-animate" data-aos="fade-up">
+                    <div class="card-icon bg-danger text-white ">
+                        <i class="bi bi-car-front"></i>
+                    </div>
+                    <div class="card-content">
+                        <h5 class="card-title">No Vehicle Details Found</h5>
+                        <p class="card-text"><strong>No vehicle found with the given number.</strong></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-3"></div>
+
+            {% endif %}
+
+        </div>
+    </div>
+</main>
+
+<script>
+    document.getElementById('vehicleSearch').addEventListener('input', function (e) {
+        let value = e.target.value.toLowerCase();
+        // Perform search logic here
+        console.log("Searching for: ", value);
+    });
+</script>
+
+{% endblock content %}

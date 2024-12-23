@@ -132,12 +132,12 @@ class Product(models.Model):
     product_image=models.ImageField(upload_to="Product Images", height_field=None, width_field=None, max_length=500, null=True, blank=True)
 
     def save(self, *args, **kwargs):
-        if self.product_image and not os.path.exists(os.path.join(settings.MEDIA_ROOT, self.product_image.name)):
-            self.product_image = 'default_image.jpg'  # Set default image if file is missing
+        if not self.product_image:
+            self.product_image = 'default_image.jpg'  # Set default image if no image is uploaded
         super(Product, self).save(*args, **kwargs)
     
     def __str__(self):
-        return self.product_name
+        return f" #{self.product_code} on {self.product_name}"
 
 
 PURCHASE_GST=(

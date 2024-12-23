@@ -25,23 +25,20 @@ from .filters import *
 from django.db.models import Sum
 
 
-@receiver(post_save, sender=Product)
-def update_cache_on_save(sender, instance, **kwargs):
-    products = [] 
-    for product in Product.objects.select_related('model').all().order_by('-id'):
-        product_data = model_to_dict(product)
-        product_data['model'] = {
-            'model_name': product.model.model_name,   
-        }
-        products.append(product_data)
-    cache.set('cache_products', products, timeout=None)
+# @receiver(post_save, sender=Product)
+# def update_cache_on_save(sender, instance, **kwargs):
+#     products = [] 
+#     for product in Product.objects.select_related('model').all().order_by('-id'):
+#         product_data = model_to_dict(product)
+#         product_data['model'] = {
+#             'model_name': product.model.model_name,   
+#         }
+#         products.append(product_data)
+#     cache.set('cache_products', products, timeout=None)
 
-@receiver(post_delete, sender=Product)
-def update_cache_on_delete(sender, instance, **kwargs):
-    update_cache_on_save(sender, instance)  #  
-
-
-
+# @receiver(post_delete, sender=Product)
+# def update_cache_on_delete(sender, instance, **kwargs):
+#     update_cache_on_save(sender, instance)  #  
 
 
 @receiver(post_save, sender=Driver)
@@ -115,11 +112,10 @@ def update_party_cache_on_save(sender, instance, **kwargs):
 def update_party_cache_on_delete(sender, instance, **kwargs):
     # Retrieve all partys data after delete
     partys = []
-    for partys in Technician.objects.all():
+    for partys in Party.objects.all(): 
         party_data = model_to_dict(partys)  # Convert technician to dictionary
         partys.append(party_data)
     cache.set('cache_technicians', partys, timeout=None)
-
 
 
 def reload_all_caches(request):
@@ -291,7 +287,6 @@ def job_card_item_list(request, id):
     total_cost = int(total_cost) if total_cost is not None else 0
     labour_cost=int(job_card.labour_cost) if job_card.labour_cost is not None else 0
     grand_total_cost=int(total_cost+labour_cost)
-
    
     return render(request, "admin_job_card_item_list.html", {
         'items': items,
@@ -340,17 +335,18 @@ def purchase_item_list(request,id):
 
 def product_list(request):
     # Retrieve products from cache
-    products = cache.get('cache_products')
+    products = Product.objects.select_related("model").order_by("-id")
+    # products = cache.get('cache_products')
  
     # Variables for counts
     out_of_stock = 0
     minimum_stock_alert_count = 0
     total_available_stock = 0
 
-    if not products:
-        # Query all products and store in cache
-        products = list(Product.objects.all().order_by('-id').values())
-        cache.set('cache_products', products, timeout=None)
+    # if not products:
+    #     # Query all products and store in cache
+    #     products = list(Product.objects.all().order_by('-id').values())
+    #     # cache.set('cache_products', products, timeout=None)
 
     # Perform calculations
     out_of_stock = Product.objects.filter(available_stock__lte=0).count()  # Count products with no stock
@@ -390,7 +386,7 @@ def create_user(request):
                     new_emp_id = EMP_ID.objects.create(emp_id="SLD-1")
                 fm.emp_id=new_emp_id
                 fm.save()
-
+                messages.success(request, "User Added successfully.")
                 return JsonResponse({'success': True, 'message': 'User created successfully!'})
             except ValidationError as e:
                 # Handle explicit model-level validation errors
@@ -766,3 +762,56 @@ class CustomAuthToken(ObtainAuthToken):
         response = super().post(request, *args, **kwargs)
         return response
  
+
+def vehicle_data(request):
+    vehicle_data = Vehicle.objects.all()
+
+    vehicle_number = request.GET.get('vehicle_number', '').strip()
+    vehicle = None
+    job_cards = []
+    total_labour_cost = 0
+    total_item_cost = 0
+    grand_total_cost = 0
+
+    try:
+        if vehicle_number:
+            # Get the vehicle by its vehicle_number
+            vehicle = Vehicle.objects.filter(vehicle_number__iexact=vehicle_number).first()
+            
+            if vehicle:
+                # Query job cards related to this vehicle
+                job_cards = JobCard.objects.filter(vehicle=vehicle)
+                
+                for job_card in job_cards:
+                    # Aggregate total item cost for the current job card
+                    items = JobCardItem.objects.filter(job_card=job_card)
+                    item_cost = items.aggregate(Sum('total_cost'))['total_cost__sum'] or 0
+                    
+                    # Labour cost for the current job card
+                    labour_cost = job_card.labour_cost or 0
+                    
+                    # Update totals
+                    total_labour_cost += labour_cost
+                    total_item_cost += item_cost
+
+                # Grand total cost (labour + items)
+                grand_total_cost = total_labour_cost + total_item_cost
+
+    except Exception as e:
+        # Log the exception if needed (e.g., with logging)
+        return render(request, '404.html', {})
+
+    context = {
+        'vehicle': vehicle,
+        'job_card_count': len(job_cards),
+        'total_labour_cost': int(total_labour_cost),
+        'total_item_cost': int(total_item_cost),
+        'grand_total_cost': int(grand_total_cost),
+        'job_cards': job_cards,
+        'vehicle_data' : vehicle_data,
+        'is_vehicle_data' : vehicle_number
+    }
+    return render(request, 'admin_vehicle_dashboard.html', context)
+
+
+

@@ -27,7 +27,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -45,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'crispy_bootstrap5',
     'crispy_forms',
+    'import_export',
 ]
 
 MIDDLEWARE = [
@@ -110,6 +110,19 @@ DATABASES = {
 #         'PORT': '5432'
 #     }
 # }
+# Using Postgresql
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'Sai_Land_DB',        # Replace with your PostgreSQL database name
+#         'USER': 'postgres',            # Replace with your PostgreSQL username
+#         'PASSWORD': 'root',        # Replace with your PostgreSQL password
+#         'HOST': 'localhost',                # Or the IP address of your database server
+#         'PORT': '5432',                     # Default PostgreSQL port
+#     }
+# }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

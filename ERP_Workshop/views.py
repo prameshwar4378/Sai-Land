@@ -9,6 +9,7 @@ from django.db.models import Sum
 from .filters import *
 from django.db.models import Count
 from django.db.models import F
+ 
 
 def dashboard(request):
     total_products = Product.objects.count()
@@ -42,7 +43,6 @@ def job_card_list(request):
     queryset = JobCard.objects.all().order_by('-id') 
     filter = JobCardFilter(request.GET, queryset=queryset)
     filtered_job_cards = filter.qs  # Filtered queryset
-    
     # Pagination
     paginator = Paginator(filtered_job_cards, 10)  # Show 10 job cards per page.
     page_number = request.GET.get('page')  # Get the page number from the GET request
@@ -225,10 +225,13 @@ def maintenance_schedule(request):
 def product_list(request):
     # products = Product.objects.all().delete()
     form = ProductForm()
-    products = cache.get('cache_products')
-    if not products: 
-        products = list(Product.objects.all().order_by('-id').values())
-        cache.set('cache_products', products, timeout=None)
+    # products = cache.get('cache_products')
+    products = Product.objects.select_related("model").order_by("-id")
+
+    # if not products: 
+    #     products = list(Product.objects.all().order_by('-id').values())
+    #     cache.set('cache_products', products, timeout=None)
+    
     return render(request, "workshop_product_list.html", {'form': form, 'product': products})
 
 
@@ -237,7 +240,11 @@ def create_product(request):
         form = ProductForm(request.POST,request.FILES)
         if form.is_valid():
             try:
-                form.save()
+                product_instance = form.save()
+                if product_instance.product_image:
+                    file_path = product_instance.product_image.path
+                    print(f"Received file path: {file_path}")
+                    
                 return JsonResponse({'success': True, 'message': 'Product created successfully!'})
             except ValidationError as e:
                 # Handle explicit model-level validation errors
@@ -413,7 +420,7 @@ def get_product_details(request):
 def delete_purchase(request, id):
     purchase = get_object_or_404(Purchase, id=id)
     if purchase.items.exists():
-        messages.error(request, 'Purchase has associated items. Please remove all items before deleting it.')
+        messages.error(request, 'Please remove all items before deleting it.')
         return redirect('/workshop/purchase-list')
     try:
         with transaction.atomic():

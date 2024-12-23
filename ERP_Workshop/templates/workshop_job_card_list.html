@@ -117,7 +117,7 @@
                                             <center> 
                                                 <a href="javascript:void(0);" data-url="{% url 'workshop_job_card_item_list' r.id %}" class="btn btn-primary px-2 py-2" onclick="mini_window_1(this)">Manage</a>
                                                 <a href="javascript:void(0);" data-url="{% url 'workshop_update_job_card' r.id %}" class="btn btn-warning px-2 py-2" onclick="mini_window_2(this)">Update</a>
-                                                <a href="{% url 'workshop_delete_job_card' r.id %}" class="btn btn-danger px-2 py-2">Delete</a>
+                                                <a href="{% url 'workshop_delete_job_card' r.id %}" class="btn btn-danger px-2 py-2" onclick="confirmDelete(this); return false;">Delete</a>
                                             </center>
                                         </td>
                                     </tr>
@@ -255,7 +255,26 @@ aria-hidden="true">
 
 
 
- 
+ <!-- Modal for Delete Confirmation -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete the job card <strong id="jobCardNumber"></strong>?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <a id="deleteButton" href="#" class="btn btn-danger">Delete</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <script>
  $(function(){
   $("#id_driver").selectize();
@@ -277,6 +296,26 @@ aria-hidden="true">
     }); 
 </script>
 
+
+
+<script>
+    function confirmDelete(button) {
+        // Get the Job Card Number from the data-url attribute
+        var jobCardNumber = button.closest('tr').querySelector('td:nth-child(2)').textContent.trim();
+        var deleteUrl = button.getAttribute('href');  // The delete URL
+        
+        // Set the Job Card Number in the modal
+        document.getElementById('jobCardNumber').textContent = jobCardNumber;
+        
+        // Set the delete URL in the modal's delete button
+        document.getElementById('deleteButton').setAttribute('href', deleteUrl);
+        
+        // Show the modal
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
+</script>
+
+
 <script>
 document.getElementById('createJobCardForm').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -294,7 +333,7 @@ document.getElementById('createJobCardForm').addEventListener('submit', function
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert(data.message); // Show success alert
+            // alert(data.message); // Show success alert// Show success alert
             location.reload();   // Refresh the page or update the list dynamically
         } else {
             let errorMessage = '<strong>Error:</strong><br>';

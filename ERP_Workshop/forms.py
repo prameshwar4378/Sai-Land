@@ -42,6 +42,7 @@ class UpdatePurchaseForm(forms.ModelForm):
 
  
 class ProductForm(forms.ModelForm):
+
     class Meta:
         model = Product
         fields = [
@@ -57,6 +58,10 @@ class ProductForm(forms.ModelForm):
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4, 'cols': 40}), 
         }
+        
+    def __init__(self, *args, **kwargs):
+        super(ProductForm, self).__init__(*args, **kwargs)
+        self.fields['model'].required = False
 
     def clean_product_code(self):
         product_code = self.cleaned_data.get('product_code')
@@ -100,9 +105,7 @@ class ProductForm(forms.ModelForm):
             # Validate image size (max 500 KB)
             if product_image.size > 500 * 1024:
                 raise ValidationError("Image size must not exceed 500 KB.")
-            # Validate image type (optional)
-            if not product_image.content_type.startswith('image/'):
-                raise ValidationError("Uploaded file is not a valid image.")
+            # Validate image type (optional) 
         return product_image
 
 

@@ -107,8 +107,8 @@
  
 
 <div class="modal fade" id="model_create_user" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
-aria-hidden="true">
-<div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
     <div class="modal-content">
         <div class="modal-header" style="background:#9c4b2e;">
             <h4 class="modal-title text-white" id="exampleModalLongTitle">Create New User</h4>
@@ -170,7 +170,7 @@ aria-hidden="true">
                 contentType: false,
                 success: function (response) {
                     if (response.success) {
-                        alert(response.message); // Show success message
+                        //alert(response.message); // Show success message
                         $("#model_create_user").modal("hide"); // Close modal
                         location.reload(); // Optionally reload the page
                     }

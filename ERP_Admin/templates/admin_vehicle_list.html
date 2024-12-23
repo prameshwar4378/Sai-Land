@@ -2,6 +2,8 @@
 {% block title %}Vehicle List{% endblock title %}
 {% load crispy_forms_tags %}
 {% block content %}
+{% load static %}
+
 <style>
     .dropdown {
         position: relative;
@@ -55,7 +57,7 @@
                         data-target="#model_create_vehicle"><i class="mdi mdi-filter"></i> Add Vehicle</a>
 
                     <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#model_import_vehicle"><i class="mdi mdi-filter"></i> Import
-                        Vehicle</a>
+                        Vehicle Data</a>
 
                 </div>
             </div>
@@ -99,9 +101,8 @@
                                         <td>
                                             <center>
                                                 <a href="javascript:void(0);" data-url="{% url 'admin_update_vehicle' r.id %}" class="btn btn-warning px-2 py-2" onclick="mini_window_2(this)">Update</a>
-                                                 
-                                                <a href="{% url 'admin_delete_vehicle' r.id %}"
-                                                    class="btn btn-danger px-3">Delete</a>
+                                                <a href="{% url 'admin_delete_vehicle' r.id %}" class="btn btn-danger px-2 py-2" onclick="confirmDelete(this); return false;">Delete</a>
+                                                  
                                             </center>
                                         </td>
                                     </tr>
@@ -160,7 +161,9 @@
             <div class="modal-body text-left">
                 <!-- Note section if needed -->
                 <div class="alert alert-warning">
-                    <strong>Note:</strong> Please upload a file in CSV or Excel format containing vehicle data. <a href="#"  data-toggle="modal" data-target="#model_data_formate">Data Formate</a>
+                    <strong>Note:</strong> Please upload a file in Excel format containing vehicle data. 
+                    <a href="{% static 'Excel/Add_Vehicle_Data_Format.xlsx' %}" download>Data Format</a>
+                    
                 </div>
                   <!-- Form for file upload -->
                 <form method="POST" enctype="multipart/form-data" action="{% url 'admin_import_vehicles' %}">
@@ -180,7 +183,6 @@
         </div>
     </div>
 </div>
-
 
 <div class="modal fade" id="model_data_formate" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
     aria-hidden="true">
@@ -230,6 +232,38 @@
 
 
 
+
+<!-- Modal for Delete Confirmation -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete the <strong id="delete_info"></strong>?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <a id="deleteButton" href="#" class="btn btn-danger">Delete</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    function confirmDelete(button) {
+        var info = button.closest('tr').querySelector('td:nth-child(2)').textContent.trim();
+        var deleteUrl = button.getAttribute('href');  // The delete URL
+        document.getElementById('delete_info').textContent = info;
+        document.getElementById('deleteButton').setAttribute('href', deleteUrl);
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
+</script>
+
+
+
 <script>
     $(document).ready(function () {
         $('#vehicle').DataTable({
@@ -255,7 +289,7 @@ document.getElementById('createVehicleForm').addEventListener('submit', function
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert(data.message); // Show success alert
+            // alert(data.message); // Show success alert// Show success alert
             location.reload();   // Refresh the page or update the list dynamically
         } else {
             let errorMessage = '<strong>Error:</strong><br>';
