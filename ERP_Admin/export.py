@@ -121,14 +121,14 @@ def export_driver_to_excel(request):
 
 def export_filtered_job_cards(request):
     # Apply the same filter as in the job_card_list view
-    queryset = JobCard.objects.all().order_by('-id') 
+    queryset = JobCard.objects.all().order_by('id') 
     filter = JobCardFilter(request.GET, queryset=queryset)
     filtered_job_cards = filter.qs  # Filtered queryset
 
     # Create a new Workbook and add a sheet
     wb = openpyxl.Workbook()
     ws = wb.active
-    ws.title = "Filtered Job Cards"
+    ws.title = "Job Cards"
 
     # Define the header row for the Excel sheet
     headers = ['Job Card Number', 'Technician', 'Driver', 'Date', 'Reported Defect', 'Completed Action', 'Vehicle', 'Status', 'Labour Cost']

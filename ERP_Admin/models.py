@@ -150,7 +150,7 @@ class Purchase(models.Model):
     bill_type = models.CharField(max_length=30, db_index=True, choices=PURCHASE_GST)
     bill_date = models.DateField(auto_now_add=False, db_index=True)
     total_cost = models.DecimalField(max_digits=12, decimal_places=2, default=0.0)
-    bill_file = models.FileField(upload_to="Purchase Bill", null=True, blank=True)
+    bill_file = models.FileField(upload_to="Purchase Bill", null=True, blank=False)
     def __str__(self):
         return f"Purchase #{self.bill_no} on {self.bill_date}"
 

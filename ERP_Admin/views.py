@@ -677,6 +677,8 @@ def create_technician(request):
             return JsonResponse({'success': False, 'errors': errors}, status=400)
     return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=405)
  
+
+ 
  
 def update_technician(request, id):
     data = get_object_or_404(Technician, id=id)

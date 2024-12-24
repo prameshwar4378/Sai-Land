@@ -3,7 +3,7 @@ from . import views
 
 from django.conf import settings
 from django.conf.urls.static import static 
-
+from .export import *
 urlpatterns = [
     # path('login-token', CustomAuthToken.as_view(), name='api_token_auth'),
     path('dashboard/', views.dashboard, name='admin_dashboard'),
@@ -53,6 +53,7 @@ urlpatterns = [
 
     path('vehicle-dashboard', views.vehicle_data , name="vehicle_data"),
 
+    path('export_filtered_job_cards', export_filtered_job_cards , name="export_filtered_job_cards"),
 
 ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
 
