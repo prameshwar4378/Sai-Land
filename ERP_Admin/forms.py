@@ -318,12 +318,7 @@ class TechnicianRegistrationForm(forms.ModelForm):
             raise ValidationError("Alternate mobile number must be 10 digits.")
         return alternate_mobile_number
  
- 
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if not email:
-            return None 
-
+  
     def save(self, commit=True):
         technician = super().save(commit=False)
         if commit:

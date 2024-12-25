@@ -401,6 +401,10 @@ def create_user(request):
 
 def update_user(request, id):
     user = get_object_or_404(CustomUser, id=id)
+    print(user.is_active)
+    print(user.is_active)
+    print(user.is_active)
+    print(user.is_active)
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST, instance=user)  # Pre-populate the form with the user data
         if form.is_valid():
@@ -653,7 +657,7 @@ def create_technician(request):
             try:
                 fm=form.save(commit=False)
                 last_emp_id = EMP_ID.objects.order_by('-id').first()
-
+                print(fm)
                 if last_emp_id:
                     last_number = int(last_emp_id.emp_id.split('-')[1])
                     new_emp_id = EMP_ID.objects.create(emp_id=f"SLD-{last_number + 1}")

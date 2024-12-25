@@ -57,7 +57,9 @@ urlpatterns = [
     path('export_purchase_data', export_purchase_data , name="export_purchase_data"),
     path('export_product_data', export_product_data , name="export_product_data"),
     path('export_vehicle_data', export_vehicle_data , name="export_vehicle_data"),
-    # path('export_party_data', export_party_data , name="export_party_data"),
+    path('export_driver_data', export_driver_data , name="export_driver_data"),
+    path('export_technician_data', export_technician_data , name="export_technician_data"),
+    path('export_party_data', export_party_data , name="export_party_data"),
 
 ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
 

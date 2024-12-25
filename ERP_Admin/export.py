@@ -171,3 +171,145 @@ def export_vehicle_data(request):
     wb.save(response)
 
     return response
+
+
+from django.conf import settings
+def export_driver_data(request):
+    # Fetch all drivers from the database
+    queryset = Driver.objects.all().order_by('id')
+    # Create a new Workbook and add a sheet
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Driver Data"
+
+    # Define the header row for the Excel sheet
+    headers = [
+        'ID','EMP ID', 'Driver Name', 'License Number', 'Adhaar Number', 
+        'Mobile Number', 'Alternate Mobile Number', 'Address', 
+        'Date of Birth', 'Date Joined', 'Adhaar Card Photo', 
+        'PAN Card Photo', 'Driving License Photo', 'Profile Photo'
+    ]
+
+    ws.append(headers)
+    # Add data rows to the Excel sheet for each driver
+    for driver in queryset:
+        row = [
+            driver.id,
+            str(driver.user.emp_id) if str(driver.user.emp_id) else "",
+            driver.driver_name,
+            driver.license_number if driver.license_number else "",
+            driver.adhaar_number if driver.adhaar_number else "",
+            driver.mobile_number if driver.mobile_number else "",
+            driver.alternate_mobile_number if driver.alternate_mobile_number else "",
+            driver.address if driver.address else "",
+            driver.date_of_birth if driver.date_of_birth else "",
+            driver.date_joined if driver.date_joined else "",
+            request.build_absolute_uri(driver.adhaar_card_photo.url) if driver.adhaar_card_photo else "",
+            request.build_absolute_uri(driver.pan_card_photo.url) if driver.pan_card_photo else "",
+            request.build_absolute_uri(driver.driving_license_photo.url) if driver.driving_license_photo else "",
+            request.build_absolute_uri(driver.profile_photo.url) if driver.profile_photo else "",
+        ]
+        ws.append(row)
+
+    # Create an HTTP response with the Excel file content
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=DriverData.xlsx'
+
+    # Save the workbook to the response
+    wb.save(response)
+
+    return response
+
+
+
+
+def export_technician_data(request):
+    # Fetch all technicians from the database
+    queryset = Technician.objects.all().order_by('id')
+
+    # Create a new Workbook and add a sheet
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Technician Data"
+
+    # Define the header row for the Excel sheet
+    headers = [
+        'EMP ID', 'Technician Name', 'Aadhaar Number', 'Mobile Number', 
+        'Alternate Mobile Number', 'Email Address', 'Address', 
+        'Date of Birth', 'Date Joined', 'PAN Card', 'Aadhaar Card', 
+        'Profile Photo', 'Additional Docs'
+    ]
+    ws.append(headers)
+
+    # Add data rows to the Excel sheet for each technician
+    for technician in queryset:
+        row = [
+            str(technician.emp_id)  if str(technician.email) else "",
+            technician.technician_name,
+            technician.adhaar_number,
+            technician.mobile_number,
+            technician.alternate_mobile_number if technician.alternate_mobile_number else "",
+            technician.email if technician.email else "",
+            technician.address if technician.address else "",
+            technician.date_of_birth if technician.date_of_birth else "",
+            technician.date_joined if technician.date_joined else "",
+            request.build_absolute_uri(technician.pan_card.url) if technician.pan_card else "",
+            request.build_absolute_uri(technician.adhaar_card.url) if technician.adhaar_card else "",
+            request.build_absolute_uri(technician.profile_photo.url) if technician.profile_photo else "",
+            request.build_absolute_uri(technician.additional_docs.url) if technician.additional_docs else "",
+        ]
+        ws.append(row)
+
+    # Create an HTTP response with the Excel file content
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=TechnicianData.xlsx'
+
+    # Save the workbook to the response
+    wb.save(response)
+
+    return response
+
+
+
+
+def export_party_data(request):
+    # Fetch all parties from the database
+    queryset = Party.objects.all().order_by('id')
+
+    # Create a new Workbook and add a sheet
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Party Data"
+
+    # Define the header row for the Excel sheet
+    headers = [
+        'ID', 'Business Name', 'Customer Name', 'GST Number', 
+        'Mobile Number', 'Alternate Mobile Number', 'Address', 
+        'Document 1', 'Document 2', 'Document 3'
+    ]
+    ws.append(headers)
+
+    # Add data rows to the Excel sheet for each party
+    for party in queryset:
+        row = [
+            party.id,
+            party.business_name,
+            party.customer_name,
+            party.gst_number if party.gst_number else "",
+            party.mobile_number,
+            party.alternate_mobile_number if party.alternate_mobile_number else "",
+            party.address if party.address else "",
+            request.build_absolute_uri(party.document1.url) if party.document1 else "",
+            request.build_absolute_uri(party.document2.url) if party.document2 else "",
+            request.build_absolute_uri(party.document3.url) if party.document3 else "",
+        ]
+        ws.append(row)
+
+    # Create an HTTP response with the Excel file content
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=PartyData.xlsx'
+
+    # Save the workbook to the response
+    wb.save(response)
+
+    return response
