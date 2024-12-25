@@ -55,16 +55,16 @@
             </div>
             <div class="col-sm-6">
                 <div class="container" style="max-width:97%;">
-                    <div class="text-lg-end text-start">
-                        <!-- Use text-lg-end for right alignment in large screens -->
+                    <div class="text-lg-end text-start"> 
                         <a href="#" class="btn btn-primary" data-toggle="modal"
-                        data-target="#model_create_job_card"><i class="mdi mdi-filter"></i> Add Job Card</a>
+                        data-target="#model_create_job_card"><i class="bi bi-file-earmark-plus-fill"></i> | Add Job Card</a>
 
                         <a href="#" class="btn btn-primary" data-toggle="modal"
-                            data-target="#model_filter"><i class="mdi mdi-filter"></i> Filter</a>
- 
-
+                            data-target="#model_filter"><i class="mdi mdi-filter"></i> <i class="bi bi-funnel"></i> | Filter</a>
+                            <a href="#" class="btn text-light" data-toggle="modal"
+                            data-target="#model_export_excel" style="background: linear-gradient(90deg, rgb(3, 32, 0) 0%,   rgb(31, 141, 0) 100%);"><i class="bi bi-file-earmark-spreadsheet"></i> | Export</a> 
                     </div>
+
                 </div>
             </div>
         </div>
@@ -101,9 +101,9 @@
                                     {% for r in job_card %}
                                     <tr>
                                         <td class="text-center">{{ forloop.counter }}</td>
-                                        <td class="text-left">{{ r.job_card_number }}</td>
-                                        <td class="text-left">{{ r.vehicle.vehicle_number }}</td>
-                                        <td class="text-left">{{ r.date }}</td>
+                                        <td class="text-center">{{ r.job_card_number }}</td>
+                                        <td class="text-center">{{ r.vehicle.vehicle_number }}</td>
+                                        <td class="text-center">{{ r.date }}</td>
                                         <td class="text-center">
                                             {% if r.status == "pending" %}
                                                 <span class="badge bg-danger">Pending</span>
@@ -169,14 +169,11 @@
                 <div class="alert alert-danger d-none" id="createJobCardError"></div>
                 <form id="createJobCardForm" method="POST" enctype="multipart/form-data" action="{% url 'workshop_create_job_card' %}">
                     {% csrf_token %}
-                    <div class="row"> 
-                        <div class="col-sm-4">
-                            {{ form.date|as_crispy_field }}
-                        </div>
-                        <div class="col-sm-4">
+                    <div class="row">  
+                        <div class="col-sm-6">
                             {{ form.technician|as_crispy_field }}
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-6">
                             {{ form.driver|as_crispy_field }}
                         </div>
                         <div class="col-sm-6">
@@ -251,6 +248,57 @@ aria-hidden="true">
         </div>
     </div>
 </div>
+
+
+<div class="modal fade" id="model_export_excel" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#9c4b2e;">
+                <h4 class="modal-title text-white" id="exampleModalLongTitle">Export Job Cards</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left">
+                <form method="GET" enctype="multipart/form-data" action="{% url "export_filtered_job_cards" %}">
+                    {% csrf_token %}
+                    <div class="row"> 
+                        <div class="col-sm-6">
+                            {{ filter.form.start_date|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.end_date|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.technician|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.driver|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.party|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.vehicle|as_crispy_field }}
+                        </div> 
+                        <div class="col-sm-6">
+                            {{ filter.form.status|as_crispy_field }}
+                        </div>  
+                        <div class="col-sm-6">
+                            {{ filter.form.job_card_number|as_crispy_field }}
+                        </div>   
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 

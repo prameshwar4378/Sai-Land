@@ -100,6 +100,16 @@ DATABASES = {
     }
 }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'postgres',
+#         'USER': 'masteruser',
+#         'PASSWORD': 'root',
+#         'HOST': 'w3-django-project.cdxmgq9zqqlr.us-east-1.rds.amazonaws.com',
+#         'PORT': '5432'
+#     }
+# }
 # Using Postgresql
 
 # DATABASES = {
@@ -150,10 +160,9 @@ CACHES = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
-
+TIME_ZONE = 'Asia/Kolkata'  # Indian Standard Time
 USE_I18N = True
-
+USE_L10N = False  # Turn off localization if you want to explicitly format datetime
 USE_TZ = True
 
 LOGIN_URL = '/login'

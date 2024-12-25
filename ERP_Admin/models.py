@@ -150,7 +150,7 @@ class Purchase(models.Model):
     bill_type = models.CharField(max_length=30, db_index=True, choices=PURCHASE_GST)
     bill_date = models.DateField(auto_now_add=False, db_index=True)
     total_cost = models.DecimalField(max_digits=12, decimal_places=2, default=0.0)
-    bill_file = models.FileField(upload_to="Purchase Bill", null=True, blank=True)
+    bill_file = models.FileField(upload_to="Purchase Bill", null=True, blank=False)
     def __str__(self):
         return f"Purchase #{self.bill_no} on {self.bill_date}"
 
@@ -196,22 +196,23 @@ class JobCard(models.Model):
     job_card_number = models.CharField(max_length=20, unique=True, editable=False)
     technician = models.ForeignKey('Technician', related_name='job_cards',  on_delete=models.CASCADE, null=True, blank=True)
     driver= models.ForeignKey('Driver', related_name='job_cards',  on_delete=models.CASCADE, null=True, blank=True)
-    date = models.DateField()
+    date = models.DateTimeField(auto_now_add=True)
     reported_defect = models.TextField()
     completed_action = models.TextField(null=True, blank=True)
+    completed_date = models.DateTimeField(auto_now_add=False,auto_now=False,null=True, blank=True)
     party = models.ForeignKey('Party', related_name='job_cards', on_delete=models.SET_NULL, null=True, blank=True)
     vehicle = models.ForeignKey('Vehicle', related_name='job_cards', on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=JOB_CARD_STATUS, default='pending')
     labour_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(0)])
-
+    
     def save(self, *args, **kwargs):
         if not self.id:
             last_job_card = JobCard.objects.order_by('-id').first()
             if last_job_card:
-                last_number = int(last_job_card.job_card_number.split('-')[1])
-                self.job_card_number = f"JOB-{last_number + 1}"
+                last_number = int(last_job_card.job_card_number)
+                self.job_card_number = int(last_number) + int(1)
             else:
-                self.job_card_number = "JOB-1"
+                self.job_card_number = 1
         super().save(*args, **kwargs)
 
     def __str__(self):

@@ -22,7 +22,6 @@ from django.core.cache import cache
 from .models import *
 from django.core.paginator import Paginator
 from .filters import *
-from django.db.models import Sum
 
 
 # @receiver(post_save, sender=Product)
@@ -676,6 +675,8 @@ def create_technician(request):
             }
             return JsonResponse({'success': False, 'errors': errors}, status=400)
     return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=405)
+ 
+
  
  
 def update_technician(request, id):

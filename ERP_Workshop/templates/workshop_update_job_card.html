@@ -19,14 +19,11 @@
                      
                    <form method="POST" > {% csrf_token %} 
                         <div class="row  mt-1"> 
-                                <div class="row"> 
-                                    <div class="col-sm-4">
-                                        {{ form.date|as_crispy_field }}
-                                    </div>
-                                    <div class="col-sm-4">
+                                <div class="row">  
+                                    <div class="col-sm-6">
                                         {{ form.technician|as_crispy_field }}
                                     </div>
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-6">
                                         {{ form.driver|as_crispy_field }}
                                     </div>
                                     <div class="col-sm-6">
