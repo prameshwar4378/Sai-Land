@@ -148,8 +148,8 @@ def export_filtered_job_cards(request):
             job_card.labour_cost
         ]
         ws.append(row)
-
-    # Create an HTTP response with the Excel file content
+ 
+     # Create an HTTP response with the Excel file content
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename=filtered_job_cards.xlsx'
 
