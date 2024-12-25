@@ -144,11 +144,11 @@ class JobCardForm(forms.ModelForm):
     class Meta:
         model = JobCard
         fields = [
-            'technician', 'date', 'reported_defect', 
+            'technician',  'reported_defect', 
             'party', 'vehicle', 'driver' 
         ]
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'}),
+            # 'date': forms.DateInput(attrs={'type': 'date'}),
             'technician': forms.Select(attrs={'id': 'id_technician'}),
             'driver': forms.Select(attrs={'id': 'id_driver'}),
             'party': forms.Select(attrs={'id': 'id_party'}),
@@ -218,3 +218,9 @@ class CloseJobCardForm(forms.ModelForm):
         fields = [
             'completed_action', 'status', 'labour_cost', 
         ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['completed_action'].required = True
+        self.fields['status'].required = True
+        self.fields['labour_cost'].required = True

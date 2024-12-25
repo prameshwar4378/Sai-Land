@@ -173,14 +173,24 @@ def delete_job_card_item(request, id):
         messages.success(request, 'Item deleted successfully.')
     return redirect(f'/workshop/job_card_item_list/{job_card_id}')
 
+from django.utils.timezone import now
+
+
+# Get the current date (naive)
 
 def close_job_card(request):
     if request.method == 'POST':
         job_card_id=request.POST.get('job_card_id')
         job_card = JobCard.objects.get(id=job_card_id)  # Retrieve the JobCard instance
         form = CloseJobCardForm(request.POST,instance=job_card)
+        current_date = now()
+        print(current_date)
+        print(current_date)
+        print(current_date)
         if form.is_valid():
-                form.save()
+                fm=form.save(commit=False)
+                fm.completed_date=current_date
+                fm.save()
                 messages.success(request, 'Job Card Closed successfully.')
                 return redirect(f'/workshop/job_card_item_list/{job_card_id}')
         else: 

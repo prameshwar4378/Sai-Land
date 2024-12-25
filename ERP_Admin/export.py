@@ -124,7 +124,6 @@ def export_filtered_job_cards(request):
     queryset = JobCard.objects.all().order_by('id') 
     filter = JobCardFilter(request.GET, queryset=queryset)
     filtered_job_cards = filter.qs  # Filtered queryset
-
     # Create a new Workbook and add a sheet
     wb = openpyxl.Workbook()
     ws = wb.active

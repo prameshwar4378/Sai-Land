@@ -289,6 +289,11 @@
             </div>
             <div class="modal-body text-left">
                 <div class="alert alert-danger d-none" id="createJobCardError"></div>
+                <div>
+                    {% if job_card.completed_date %}
+                    <p  class="alert alert-warning"><b>Closing Date : </b> {{ job_card.completed_date }}</p>
+                    {% endif %}
+                </div>
                 <form id="createJobCardForm" method="POST" enctype="multipart/form-data" action="{% url 'workshop_close_job_card' %}">
                     {% csrf_token %}
                     <div class="row"> 
