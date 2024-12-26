@@ -9,7 +9,8 @@ from django.db.models import Sum
 from .filters import *
 from django.db.models import Count
 from django.db.models import F
- 
+from django.core.paginator import Paginator
+
 
 def dashboard(request):
     total_products = Product.objects.count()
@@ -36,7 +37,6 @@ def breakdown_alerts(request):
     return render(request, "workshop_breakdown_alerts.html")
 
 
-from django.core.paginator import Paginator
 
 def job_card_list(request):
     form = JobCardForm()

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'ERP_Admin',
     'ERP_Workshop',
     'ERP_Account',
+    'ERP_Finance',
     'rest_framework',
     'rest_framework.authtoken',
     'crispy_bootstrap5',

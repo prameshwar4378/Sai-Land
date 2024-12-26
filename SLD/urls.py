@@ -21,6 +21,7 @@ from Website import urls as WebUrls
 from ERP_Admin import urls as ERP_Admin_Urls
 from ERP_Account import urls as ERP_Account_Urls
 from ERP_Workshop import urls as ERP_Workshop_Urls
+from ERP_Finance import urls as ERP_Finance_Urls
 from ERP_Admin import views as ERP_Admin_View
 from django.conf import settings
 from django.conf.urls.static import static 
@@ -32,6 +33,7 @@ urlpatterns = [
     path('admin/', include(ERP_Admin_Urls)),  
     path('account/', include(ERP_Account_Urls)),  
     path('workshop/', include(ERP_Workshop_Urls)),
+    path('finance/', include(ERP_Finance_Urls)),
 
     path('login/', ERP_Admin_View.login, name="login"), 
     path('logout/', ERP_Admin_View.logout, name="logout"),  

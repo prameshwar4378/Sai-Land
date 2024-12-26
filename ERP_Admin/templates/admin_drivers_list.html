@@ -22,6 +22,12 @@
     #id_username{
         background-color: #eeeded;
     }
+    
+ #id_is_active {
+    height: 20px;
+    width: 20px;
+}
+
 </style>
 <main id="main" class="main">
 
@@ -35,12 +41,16 @@
                         <li class="breadcrumb-item"><a href="#">Drivers List </a></li>
                     </ol>
                 </nav>
+                
             </div>
         </div>
         <div class="col-sm-6">
             <div class="container" style="max-width:97%;">
                 <div class="text-lg-end text-start">
                     <!-- Use text-lg-end for right alignment in large screens -->
+                    <a href="#" class="btn btn-warning p-2" data-toggle="modal"
+                        data-target="#model_instruction"><i class="bi bi-info-circle"></i></a>
+                        
                     <a href="#" class="btn btn-primary" data-toggle="modal"
                         data-target="#model_create_driver"><i class="mdi mdi-filter"></i> Add Drivers</a>
                         
@@ -72,6 +82,7 @@
                                             <th scope="col" class="text-center text-white">EMP ID</th>
                                             <th scope="col" class="text-center text-white">Driver Name</th>
                                             <th scope="col" class="text-center text-white">Mobile Number</th>
+                                            <th scope="col" class="text-center text-white">Is Active</th>
                                             <th scope="col" class="text-center text-white">Action</th>
                                         </tr>
                                     </thead>
@@ -87,6 +98,13 @@
                                             <td class="text-left">{{ driver.user.emp_id }}</td>
                                             <td class="text-left">{{ driver.driver_name }}</td>
                                             <td class="text-center">{{ driver.mobile_number }}</td>
+                                            <td class="text-center">
+                                                {% if driver.user.is_active %}
+                                                    <span class="badge bg-success">Yes</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">No</span>
+                                                {% endif %}
+                                            </td>
                                             <td>
                                                 <center>
                                                 <a href="javascript:void(0);" data-url="{% url 'admin_update_driver' driver.id %}" class="btn btn-warning px-2 py-2" onclick="mini_window_1(this)">Update</a>
@@ -106,6 +124,7 @@
                     </div>
                 </div>
             </div>
+        </section>
 </main><!-- End #main -->
 
 
@@ -137,11 +156,19 @@
                         <div class="col-sm-3">
                             {{ form.username|as_crispy_field }}
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-4">
                             {{ form.password1|as_crispy_field }}
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-4">
                             {{ form.password2|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-sm-4 ">
+                            <div class="alert"  style="border-radius:30px; background:#c1eff7; border:2px solidrgb(76, 154, 168);">
+                                <label for="id_is_active">Is Active for Login</label>
+                                <br> 
+                                {{ form.is_active }}
+                            </div>
                         </div>
                         <div class="col-sm-4">
                             {{ form.license_number|as_crispy_field }}
@@ -288,6 +315,31 @@
 </div>
 
 
+<div class="modal fade" id="model_instruction" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background: #9c4b2e; color: white;">
+                <h5 class="modal-title" id="exampleModalLongTitle">Driver Record Instructions</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="text-left lead">Here are the important guidelines regarding driver records:</p>
+                <ul>
+                    <li><strong>Driver Leaving the Organization:</strong> If a driver leaves the organization, their record will not be deleted. Instead, we update their record by setting <strong>is_active = False</strong>.</li>
+                    <li><strong>Login Restrictions:</strong> Once the driver's record is updated to <strong>is_active = False</strong>, the user will no longer be able to log in.</li>
+                    <li class="alert alert-danger"><strong>Permanent Deletion:</strong> If the driver is permanently deleted, all their associated data (including activities ex.Job Card.... , personal information and documents) will also be deleted.</li>
+                </ul>
+                <p class="text-left">This helps us maintain the integrity of our records while managing employee status efficiently.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Modal for Delete Confirmation -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">

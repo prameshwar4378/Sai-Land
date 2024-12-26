@@ -20,13 +20,15 @@ class UserRegistrationForm(UserCreationForm):
         ('admin', 'Admin'),
         ('account', 'Account'),
         ('workshop', 'Workshop'),
+        ('finance', 'Finance'),
     ]
     
     role = forms.ChoiceField(choices=ROLE_CHOICES, widget=forms.RadioSelect, label="Role")
 
     class Meta:
         model = CustomUser
-        fields = ['username', 'first_name', 'last_name', 'password1', 'password2', 'role']
+        fields = ['username', 'first_name', 'last_name', 'password1', 'password2', 'role','is_active']
+ 
 
     def clean_username(self):
         username = self.cleaned_data.get('username')
@@ -43,6 +45,7 @@ class UserRegistrationForm(UserCreationForm):
         user.is_admin = False
         user.is_account = False
         user.is_workshop = False
+        user.is_finance = False
 
         # Set the selected role to True
         if role == 'admin':
@@ -51,6 +54,8 @@ class UserRegistrationForm(UserCreationForm):
             user.is_account = True
         elif role == 'workshop':
             user.is_workshop = True
+        elif role == 'finance':
+            user.is_finance = True
 
         if commit:
             user.save()
@@ -117,7 +122,7 @@ class DriverRegistrationForm(UserCreationForm):
 
     class Meta:
         model = CustomUser
-        fields = ['username', 'password1', 'password2']
+        fields = ['username', 'password1', 'password2','is_active']
         widgets={ 
             'username': forms.TextInput(attrs={'readonly': True }), 
         }
@@ -185,6 +190,11 @@ class DriverRegistrationForm(UserCreationForm):
 
 
 class DriverUpdateForm(forms.ModelForm):
+    is_active = forms.BooleanField(
+        required=False,
+        label="Is Active for Login",
+        initial=True  # Set default value
+    )
     class Meta:
         model = Driver
         fields = [
@@ -210,7 +220,8 @@ class DriverUpdateForm(forms.ModelForm):
             'mobile_number': forms.TextInput(attrs={'pattern': '[0-9]{10}', 'maxlength': '15'}),
             'alternate_mobile_number': forms.TextInput(attrs={'pattern': '[0-9]{10}', 'maxlength': '15'}),
         }
-
+     
+        
         # Optional: Add some additional validation
         def clean_license_number(self):
             license_number = self.cleaned_data.get('license_number')
@@ -239,8 +250,7 @@ class DriverUpdateForm(forms.ModelForm):
             if alternate_mobile_number and len(alternate_mobile_number) != 10:
                 raise forms.ValidationError("Alternate mobile number must be exactly 10 digits.")
             return alternate_mobile_number
-    
-
+     
 
 class TechnicianRegistrationForm(forms.ModelForm):
     pan_card=forms.FileField(required=False, label="Upload Pan Card")

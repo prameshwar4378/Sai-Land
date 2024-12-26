@@ -202,8 +202,11 @@ def redirect_user_based_on_role(request, user):
         print('Redirecting to Account Dashboard')  # Debug print
         return redirect('/account/dashboard')
     elif user.is_driver:
-        print('Redirecting to Account Dashboard')  # Debug print
+        print('Redirecting to Driver Dashboard')  # Debug print
         return redirect('/driver/dashboard')
+    elif user.is_finance:
+        print('Redirecting to AccoFinanceunt Dashboard')  # Debug print
+        return redirect('/finance/dashboard')
     else:
         print('Unauthorized user role')  # Debug print
         messages.error(request, 'Unauthorized user role.')
@@ -400,15 +403,12 @@ def create_user(request):
     return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=405)
 
 def update_user(request, id):
-    user = get_object_or_404(CustomUser, id=id)
-    print(user.is_active)
-    print(user.is_active)
-    print(user.is_active)
-    print(user.is_active)
+    user = get_object_or_404(CustomUser, id=id) 
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST, instance=user)  # Pre-populate the form with the user data
         if form.is_valid():
-            form.save()  # Save the updated user data
+            fm=form.save(commit=False)  # Save the updated user data
+            fm.save() 
             messages.success(request, "User details updated successfully.")
     else:
         form = UserRegistrationForm(instance=user)  # Pre-populate the form with existing data for GET request
@@ -420,7 +420,7 @@ def delete_user(request, id):
     if user:
         user.delete()
         messages.success(request, 'User deleted successfully.')
-
+ 
 def drivers_list(request):
     drivers = Driver.objects.select_related('user').all()
     form = DriverRegistrationForm()
@@ -462,12 +462,15 @@ def update_driver(request, id):
     if request.method == 'POST':
         form = DriverUpdateForm(request.POST, request.FILES, instance=driver)  # Populate the form with the instance data
         if form.is_valid():
+            is_active = form.cleaned_data['is_active'] 
             form.save()  # Save the updated driver instance
+            driver.user.is_active=is_active
+            driver.user.save()
             messages.success(request, 'Driver Updated Successfully.')
     else:
         form = DriverUpdateForm(instance=driver)  # Populate the form with the existing driver data on GET request
     
-    return render(request, 'admin_update_driver.html', {'form': form})
+    return render(request, 'admin_update_driver.html', {'form': form,'driver':driver})
 
 
 def delete_driver(request, id):

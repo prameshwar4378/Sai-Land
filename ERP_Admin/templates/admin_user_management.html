@@ -6,6 +6,10 @@
  #id_password1_helptext, #id_password2_helptext{
     display: none;
  }
+radio, checkbox{
+    height:20px;
+    width:20px;
+}
 </style>
 <main id="main" class="main">
     <div class="row">
@@ -48,9 +52,11 @@
                                         <th scope="col" class="text-center text-white">EMP</th>
                                         <th scope="col" class="text-center text-white">Name</th>
                                         <th scope="col" class="text-center text-white">Username</th>
+                                        <th scope="col" class="text-center text-white">Is Active</th>
                                         <th scope="col" class="text-center text-white">Admin</th>
                                         <th scope="col" class="text-center text-white">Workshop</th>
                                         <th scope="col" class="text-center text-white">Account</th>
+                                        <th scope="col" class="text-center text-white">Finance</th>
                                         <th scope="col" class="text-center text-white">Action</th>
                                     </tr>
                                 </thead>
@@ -62,6 +68,13 @@
                                         <td class="text-left">{% if user.emp_id %}{{ user.emp_id }} {% else %} --- {% endif %}</td>
                                         <td class="text-left">{{ user.first_name }} {{ user.last_name }}</td>
                                         <td class="text-center">{{ user.username }}</td>
+                                        <td class="text-center">
+                                            {% if user.is_active %}
+                                                <span class="badge bg-success">Yes</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">No</span>
+                                            {% endif %}
+                                        </td>
                                         <td class="text-center">
                                             {% if user.is_admin %}
                                                 <span class="badge bg-success">Yes</span>
@@ -81,7 +94,15 @@
                                                 <span class="badge bg-success">Yes</span>
                                             {% else %}
                                                 <span class="badge bg-danger">No</span>
-                                            {% endif %}</td> 
+                                            {% endif %}
+                                        </td> 
+                                        <td class="text-center">
+                                            {% if user.is_finance %}
+                                                <span class="badge bg-success">Yes</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">No</span>
+                                            {% endif %}
+                                        </td> 
                                         <td>
                                             <center>
                                                 <a href="javascript:void(0);" data-url="{% url 'admin_update_user' user.id %}" class="btn btn-warning    px-3" onclick="mini_window_2(this)">Update</a>
@@ -138,10 +159,16 @@
                     <div class="col-sm-6">
                         {{ form.password2|as_crispy_field }}
                     </div> 
-                    <div class="col-sm-12">
+                    <div class="col-sm-6">
                         <label for="id_role">Role</label>
                         <div>
                             {{ form.role }}
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <label for="id_is_active">Is Active for Login</label>
+                        <div>
+                            {{ form.is_active }}
                         </div>
                     </div>
                 </div>

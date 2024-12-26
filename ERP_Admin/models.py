@@ -17,6 +17,7 @@ class CustomUser(AbstractUser):
     is_account = models.BooleanField(default=False)
     is_workshop = models.BooleanField(default=False)
     is_driver = models.BooleanField(default=False)
+    is_finance = models.BooleanField(default=False)
     emp_id = models.OneToOneField(EMP_ID, on_delete=models.CASCADE, null=True)
     groups = models.ManyToManyField(
         Group,
@@ -38,7 +39,6 @@ class Vehicle(models.Model):
     def __str__(self):
         return f"{self.vehicle_name} ({self.vehicle_number})"
 
- 
 
 class Driver(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, null=True)
@@ -250,3 +250,13 @@ class JobCardItem(models.Model):
     def __str__(self):
         return f"Job Card {self.job_card_number} for Vehicle ID {self.vehicle.id}"
 
+
+
+
+class Policy(models.Model): 
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='policies')
+    policy_file = models.FileField(upload_to='policies/' )
+    due_date = models.DateField()
+
+    def __str__(self):
+        return f"Policy for {self.vehicle.vehicle_name} - {self.status}"

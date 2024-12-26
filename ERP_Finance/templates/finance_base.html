@@ -14059,18 +14059,33 @@
     <ul class="sidebar-nav" id="sidebar-nav">
 
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'account_dashboard' %}">
+            <a class="nav-link" href="{% url 'finance_dashboard' %}">
                 <i class="bi bi-grid"></i>
                 <span>Dashboard</span>
             </a>
         </li>
-         
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'account_reports' %}">
+            <a class="nav-link" href="{% url 'finance_emi_list' %}">
+                <i class="bi bi-credit-card"></i> <!-- Icon for EMI -->
+                <span>EMI</span>
+            </a>
+        </li>
+
+        <!-- Policy Section -->
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'finance_policy_list' %}">
+                <i class="bi bi-file-earmark-text"></i> <!-- Icon for Policy -->
+                <span>Policy</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'finance_reports_list' %}">
                 <i class="bi bi-bar-chart"></i>
                 <span>Reports</span>
             </a>
         </li>
+
+
 
     </ul>
 </aside><!--  End Sidebar-->

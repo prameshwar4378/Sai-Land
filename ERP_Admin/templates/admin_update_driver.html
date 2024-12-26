@@ -22,6 +22,10 @@
     #id_username{
         background-color: #eeeded;
     }
+     #id_is_active {
+    height: 40px;
+    width: 40px;
+}
 </style>
 <main id="main" class="main">
 
@@ -57,8 +61,15 @@
                             <div class="col-sm-3">
                                 {{ form.date_joined|as_crispy_field }}
                             </div>
-                            <div class="col-sm-12">
+                            <div class="col-sm-8">
                                 {{ form.address|as_crispy_field }}
+                            </div>
+                            <div class="col-sm-4 ">
+                                <div class="alert"  style="border-radius:30px; background:#c1eff7; border:2px solidrgb(76, 154, 168);">
+                                    <label for="id_is_active">Is Active for Login</label>
+                                    <br><br>
+                                    {{ form.is_active }}
+                                </div>
                             </div>
                             <div class="col-sm-3">
                                 {{ form.adhaar_card_photo|as_crispy_field }}
@@ -71,7 +82,7 @@
                             </div>
                             <div class="col-sm-3">
                                 {{ form.pan_card_photo|as_crispy_field }}
-                            </div> 
+                            </div>  
                         </div> 
                         <center><button type="submit" class="btn btn-primary mt-1 px-5">Submit</button></center>
                     </form>
@@ -101,4 +112,16 @@
         });
     });
 </script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Ensure this script runs only after the DOM is fully loaded
+        {% if driver.user.is_active %}
+            document.getElementById("id_is_active").checked = true;
+        {% else %}
+            document.getElementById("id_is_active").checked = false;
+        {% endif %}
+    });
+</script>
+
 {% endblock content %}
