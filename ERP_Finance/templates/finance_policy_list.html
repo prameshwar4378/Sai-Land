@@ -22,9 +22,8 @@
         <div class="col-sm-6">
             <div class="container" style="max-width:97%;">
                 <div class="text-lg-end text-start"> 
-                    <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#model_create_policy"> add </a>
-                    <a href="#" class="btn text-light" data-toggle="modal"
-                        data-target="#model_export_excel" style="background: linear-gradient(90deg, rgb(3, 32, 0) 0%,   rgb(31, 141, 0) 100%);"><i class="bi bi-file-earmark-spreadsheet"></i> | Export</a> 
+                    <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#model_create_policy"> Add Policy </a>
+                    <a href="{% url "export_policy_data" %}" class="btn text-light"  style="background: linear-gradient(90deg, rgb(3, 32, 0) 0%,   rgb(31, 141, 0) 100%);"><i class="bi bi-file-earmark-spreadsheet"></i> | Export</a> 
                 </div>
             </div>
         </div>
@@ -35,29 +34,33 @@
         <thead>
           <tr style="background: #9c4b2e">
             <th scope="col" class="text-center text-white">Sr.No</th>
+            <th scope="col" class="text-center text-white">Policy Number</th>
             <th scope="col" class="text-center text-white">Vehicle Number</th>
             <th scope="col" class="text-center text-white">Due Date</th>
+            <th scope="col" class="text-center text-white">Remaining Days</th>
             <th scope="col" class="text-center text-white">File</th>
             <th scope="col" class="text-center text-white">Action</th>
           </tr>
         </thead>
         <tbody>
-          {% if policy %} {% for r in policy %}
+          {% if policies %} {% for r in policies %}
           <tr>
             <td class="text-center">{{ forloop.counter }}</td>
-            <td class="text-center">{{ r.vehicle.vehicle_number }}</td>
-            <td class="text-center">{{ r.due_date }}</td>
+            <td class="text-center">{{ r.policy.policy_number }}</td>
+            <td class="text-center">{{ r.policy.vehicle.vehicle_number }}</td>
+            <td class="text-center">{{ r.policy.due_date }}</td>
+            <td class="text-center">{{ r.remaining_days }}</td>
             <td class="text-center"> 
-                {% if r.policy_file %}
-                
-                <a href="{{ r.policy_file.url }}" target="_blank" class="btn btn-sm btn-primary"> <i class="bi bi-cloud-arrow-down"></i></a>
+                {% if r.policy.policy_file %}
+                  <a href="{{ r.policy.policy_file.url }}" target="_blank" class="btn btn-sm btn-primary"> <i class="bi bi-cloud-arrow-down"></i></a>
                 {% else %}
                 ---
                 {% endif %}
             </td>
             <td>
               <center>
-                <a href="{% url 'finance_delete_policy' r.id %}" class="btn btn-danger px-2 py-2" onclick="confirmDelete(this); return false;">Delete</a>
+                <a href="javascript:void(0);" data-url="{% url 'finance_update_policy' r.policy.id %}" class="btn btn-primary px-2 py-2" onclick="mini_window_2(this)">Update</a>
+                <a href="{% url 'finance_delete_policy' r.policy.id %}" class="btn btn-danger px-2 py-2" onclick="confirmDelete(this); return false;">Delete</a> 
               </center>
             </td>
           </tr>
@@ -109,6 +112,7 @@
                 <form id="createPolicyForm" method="POST" enctype="multipart/form-data" action="{% url 'finance_create_policy' %}">
                     {% csrf_token %}
                     <div class="row">  
+                        <div class="col-sm-12">{{ form.policy_number|as_crispy_field }}</div>
                         <div class="col-sm-12">{{ form.vehicle|as_crispy_field }}</div>
                         <div class="col-sm-12">{{ form.policy_file|as_crispy_field }}</div>
                         <div class="col-sm-12">{{ form.due_date|as_crispy_field }}</div>
@@ -214,6 +218,43 @@
             $("#createPolicyForm")[0].reset(); // Reset the form
         });
     });
+</script>
+
+
+
+
+
+<script>
+  function mini_window_1(element) { 
+      const url = element.dataset.url;
+      var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+      var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+      var newWidth = screenWidth * 0.9;  // 90% of the screen width
+      var newHeight = screenHeight * 0.9;  // 90% of the screen height
+      var left = (screenWidth - newWidth) / 2;
+      var top = (screenHeight - newHeight) / 2;
+      var windowFeatures = `width=${newWidth},height=${newHeight},scrollbars=yes,resizable=yes,top=${top},left=${left}`;
+      var newWindow = window.open(url, "miniWindow", windowFeatures);
+      newWindow.onload = function() {
+          newWindow.location.replace(url);
+      };
+  }
+
+  
+  function mini_window_2(element) { 
+      const url = element.dataset.url;
+      var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+      var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+      var newWidth = screenWidth * 0.5;  // 90% of the screen width
+      var newHeight = screenHeight * 0.8;  // 90% of the screen height
+      var left = (screenWidth - newWidth) / 2;
+      var top = (screenHeight - newHeight) / 2;
+      var windowFeatures = `width=${newWidth},height=${newHeight},scrollbars=yes,resizable=yes,top=${top},left=${left}`;
+      var newWindow = window.open(url, "miniWindow", windowFeatures);
+      newWindow.onload = function() {
+          newWindow.location.replace(url);
+      };
+  }
 </script>
 
 

@@ -60,6 +60,8 @@ urlpatterns = [
     path('export_driver_data', export_driver_data , name="export_driver_data"),
     path('export_technician_data', export_technician_data , name="export_technician_data"),
     path('export_party_data', export_party_data , name="export_party_data"),
+    path('export_policy_data', export_policy_data , name="export_policy_data"),
+    path('export_emi_data', export_emi_data , name="export_emi_data"),
 
 ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
 

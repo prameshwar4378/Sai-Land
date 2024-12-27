@@ -3,7 +3,8 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from .models import CustomUser, Vehicle, Driver, Technician, Party, Product, Purchase, JobCard
 from .filters import *
- 
+from openpyxl.styles import Font 
+from datetime import date
 
 
 from django.utils.timezone import localtime
@@ -308,6 +309,101 @@ def export_party_data(request):
     # Create an HTTP response with the Excel file content
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename=PartyData.xlsx'
+
+    # Save the workbook to the response
+    wb.save(response)
+
+    return response
+
+
+
+ 
+
+def export_policy_data(request):
+    # Fetch policies and calculate remaining days
+    policies = Policy.objects.select_related('vehicle').order_by('due_date')
+    policy_data = [
+        {
+            'policy_number': policy.policy_number,
+            'vehicle_name': policy.vehicle.vehicle_name,
+            'vehicle_number': policy.vehicle.vehicle_number,
+            'due_date': policy.due_date,
+            'remaining_days': (policy.due_date - date.today()).days
+        }
+        for policy in policies
+    ]
+
+    # Create a new Workbook and add a sheet
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Policy Data"
+
+    # Define the header row for the Excel sheet
+    headers = ['Policy Number', 'Vehicle Name', 'Vehicle Number', 'Due Date', 'Remaining Days']
+    header_font = Font(bold=True)
+    for col_num, header in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col_num, value=header)
+        cell.font = header_font
+
+    # Add data rows to the Excel sheet for each policy
+    for row_num, data in enumerate(policy_data, 2):
+        ws.cell(row=row_num, column=1, value=data['policy_number'])  # Policy Number
+        ws.cell(row=row_num, column=2, value=data['vehicle_name'])  # Vehicle Name
+        ws.cell(row=row_num, column=3, value=data['vehicle_number'])  # Vehicle Number
+        ws.cell(row=row_num, column=4, value=data['due_date'].strftime('%Y-%m-%d'))  # Due Date
+        ws.cell(row=row_num, column=5, value=data['remaining_days'])  # Remaining Days
+
+    # Create an HTTP response with the Excel file content
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=PolicyData.xlsx'
+
+    # Save the workbook to the response
+    wb.save(response)
+
+    return response
+
+
+
+def export_emi_data(request):
+    # Fetch all EMI records from the database
+    queryset = EMI.objects.select_related('vehicle').all().order_by('id')
+    filter = EMIFilter(request.GET, queryset=queryset)
+    filtered_data = filter.qs  # Filtered queryset
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "EMI Data"
+
+    headers = [
+        'Vehicle No', 'Loan Amount', 'Total Installments', 
+        'Paid Installments', 'Remaining Installments', 
+        'Next Due Date', 'Days Remaining for Due', 
+        'Status', 'Frequency'
+    ]
+    ws.append(headers)
+
+    # Add data rows to the Excel sheet for each EMI record
+    for emi in filtered_data:
+        # Calculate remaining installments and days remaining for the next due date
+        remaining_installments = emi.remaining_installments
+        days_remaining = (emi.next_due_date - date.today()).days if emi.next_due_date else None
+
+        row = [
+            emi.vehicle.vehicle_number if emi.vehicle else "N/A",  # Vehicle No
+            emi.loan_amount,  # Loan Amount
+            emi.total_installments,  # Total Installments
+            emi.paid_installments,  # Paid Installments
+            remaining_installments,  # Remaining Installments
+            emi.next_due_date if emi.next_due_date else "N/A",  # Next Due Date
+            days_remaining if days_remaining is not None else "N/A",  # Days Remaining
+            emi.status,  # Status
+            emi.frequency,  # Frequency
+        ]
+        ws.append(row)
+
+    # Create an HTTP response with the Excel file content
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=EMIData.xlsx'
 
     # Save the workbook to the response
     wb.save(response)

@@ -91,3 +91,39 @@ class PurchaseFilter(django_filters.FilterSet):
         model = Purchase
         fields = ['start_date', 'end_date', 'amount_less_than', 'amount_greater_than', 'bill_type', 'bill_no']
 
+
+
+
+
+
+
+
+
+
+
+
+class EMIFilter(django_filters.FilterSet):
+    # Filtering options
+    loan_amount_gte = django_filters.NumberFilter(field_name="loan_amount", lookup_expr="gte", label="Loan Amount (≥)")
+    loan_amount_lte = django_filters.NumberFilter(field_name="loan_amount", lookup_expr="lte", label="Loan Amount (≤)")
+    next_due_date_gte = django_filters.DateFilter(field_name="next_due_date", lookup_expr="gte", label="Next Due Date (From)",widget=DateInput(attrs={'type': 'date'}),)
+    next_due_date_lte = django_filters.DateFilter(field_name="next_due_date", lookup_expr="lte", label="Next Due Date (To)",widget=DateInput(attrs={'type': 'date'}), )
+    frequency = django_filters.ChoiceFilter(field_name="frequency", choices=FREQUENCY_CHOICES, label="Frequency")
+    status = django_filters.ChoiceFilter(field_name="status", choices=EMI_STATUS_CHOICES, label="Status")
+    vehicle = django_filters.CharFilter(field_name="vehicle__vehicle_number", lookup_expr="icontains", label="Vehicle")
+
+
+    def __init__(self, *args, **kwargs):
+        super(EMIFilter, self).__init__(*args, **kwargs)
+        self.filters['loan_amount_gte']
+        self.filters['loan_amount_lte']
+        self.filters['next_due_date_gte']
+        self.filters['next_due_date_lte']
+
+
+    class Meta:
+        model = EMI
+        fields = [
+            "vehicle", "loan_amount", "loan_amount_gte", "loan_amount_lte",
+            "next_due_date_gte", "next_due_date_lte", "frequency", "status"
+        ]

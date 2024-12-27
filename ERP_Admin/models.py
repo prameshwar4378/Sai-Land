@@ -253,10 +253,69 @@ class JobCardItem(models.Model):
 
 
 
-class Policy(models.Model): 
+class Policy(models.Model):
+    policy_number=models.CharField(max_length=50) 
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='policies')
     policy_file = models.FileField(upload_to='policies/' )
     due_date = models.DateField()
 
     def __str__(self):
         return f"Policy for {self.vehicle.vehicle_name} - {self.status}"
+    
+
+FREQUENCY_CHOICES = (
+    ('yearly', 'Yearly'),
+    ('quarterly', 'Quarterly'),
+    ('monthly', 'Monthly'),
+    ('lifetime', 'Lifetime'),
+    ('bi-monthly', 'Bi-Monthly (2 months)'),
+)
+
+
+EMI_STATUS_CHOICES = (
+    ('pending', 'Pending EMI'),
+    ('closed', 'Closed EMI'), 
+) 
+
+class EMI(models.Model):
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='emis')
+    loan_amount=models.BigIntegerField()
+    total_installments = models.PositiveIntegerField()
+    paid_installments = models.PositiveIntegerField(default=0)
+    next_due_date = models.DateField()
+    file=models.FileField(upload_to='emi/', max_length=100)
+    frequency = models.CharField( max_length=20, choices=FREQUENCY_CHOICES,  default='monthly' )
+    status = models.CharField( max_length=20, choices=EMI_STATUS_CHOICES,  default='pending' )
+    
+    @property
+    def remaining_installments(self):
+        return self.total_installments - self.paid_installments
+
+    def __str__(self):
+        return f"EMI for {self.vehicle.vehicle_number} ({self.remaining_installments} remaining)"
+    
+
+class EMI_Item(models.Model):
+    emi = models.ForeignKey('EMI', on_delete=models.CASCADE, related_name='emi_items')
+    installment_amount = models.BigIntegerField()
+    principal = models.BigIntegerField()
+    interest = models.BigIntegerField()
+    outstanding_principal = models.BigIntegerField()
+    installment_date = models.DateField(null=True)
+
+    def save(self, *args, **kwargs):
+        # Check if this is a new record
+        if not self.pk:
+            # Increment the paid_installments for the associated EMI
+            self.emi.paid_installments += 1
+            self.emi.save()
+        super(EMI_Item, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if self.emi.paid_installments > 0:
+            self.emi.paid_installments -= 1
+            self.emi.save()
+        super(EMI_Item, self).delete(*args, **kwargs)
+
+    def __str__(self):
+        return f"Installment for EMI {self.emi.id} - Amount: {self.installment_amount}"
