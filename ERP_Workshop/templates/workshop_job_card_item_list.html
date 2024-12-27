@@ -100,8 +100,7 @@
             <div class="container mt-2" style="max-width:97%;">
                 <div class="text-lg-end text-start">
                     <!-- Use text-lg-end for right alignment in large screens -->
-                    <a href="#" class="btn btn-primary" data-toggle="modal"
-                        data-target="#model_close_job_card"><i class="mdi mdi-filter"></i> Close Job Card</a>
+                    <a href="#" class="btn btn-primary"  data-bs-toggle="modal" data-bs-target="#model_close_job_card"><i class="mdi mdi-filter"></i> Close Job Card</a>
 
                         <!-- Use text-lg-end for right alignment in large screens -->
                         <a href="{% url 'workshop_print_job_card' job_card.id %}" class="btn btn-primary" ><i class="mdi mdi-filter"></i>Print</a>
@@ -283,7 +282,7 @@
         <div class="modal-content">
             <div class="modal-header" style="background:#9c4b2e;">
                 <h4 class="modal-title text-white" id="exampleModalLongTitle">Close Job Card</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -303,7 +302,7 @@
                         </div> 
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-bs-dismiss="modal" aria-label="Close">Close</button>
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </form>
