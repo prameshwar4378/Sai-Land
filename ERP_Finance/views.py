@@ -6,14 +6,80 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from datetime import date
 from ERP_Admin.filters import EMIFilter
+from django.db.models import Sum, F
+from django.db.models import Count, Case, When, F, IntegerField,ExpressionWrapper
+from django.utils import timezone
+from datetime import timedelta
 # Create your views here.
 def dashboard(request):
     return render(request, 'finance_dashboard.html')
 
+
+ 
+def dashboard(request):
+    # Query to calculate total loan amount, paid amount, and remaining amount
+    emi=EMI.objects.select_related('vehicle')
+    total_loan_amount = EMI.objects.aggregate(total=Sum('loan_amount'))['total'] or 0
+
+    total_paid_amount = 0
+    total_remain_amount = 0
+    
+    # Loop through each EMI record to calculate paid and remaining amounts
+    for emi in EMI.objects.all():
+        loan_amount = emi.loan_amount
+        total_installment = emi.total_installments
+        
+        # Avoid division by zero
+        if total_installment > 0:
+            one_installment_amount = loan_amount / total_installment
+            paid_amount = one_installment_amount * emi.paid_installments
+            remain_amount = one_installment_amount * emi.remaining_installments
+            
+            total_paid_amount += paid_amount
+            total_remain_amount += remain_amount
+        else:
+            total_paid_amount += int(emi.loan_amount)
+     
+
+    # Query to calculate total installments, paid installments, and remaining installments
+    total_instalment = EMI.objects.aggregate(total=Sum('total_installments'))['total'] or 0
+    paid_instalment = EMI.objects.aggregate(total_paid=Sum('paid_installments'))['total_paid'] or 0
+    remaining_instalment = total_instalment - paid_instalment
+    total_emi_count = EMI.objects.annotate(remaining_installments=ExpressionWrapper(  F('total_installments') - F('paid_installments'), output_field=IntegerField())).filter(status='pending',remaining_installments__gt=0).count()
+    total_policy_count=Policy.objects.count()
+    
+    today = timezone.now().date()
+    seven_days_later = today + timedelta(days=7)
+    seven_days_ago = today - timedelta(days=7)
+
+    # Filter EMI records with next_due_date within the last 7 days or next 7 days and status='pending'
+    upcoming_emi = EMI.objects.filter(
+        next_due_date__range=[seven_days_ago, seven_days_later],
+        status='pending'
+    ).order_by('next_due_date')
+
+    # Filter Policy records with due_date within the last 7 days or next 7 days
+    upcoming_policy = Policy.objects.filter(
+        due_date__range=[seven_days_ago, seven_days_later]
+    ).order_by('due_date')
+    # Pass data to template
+    return render(request, 'finance_dashboard.html', {
+        'total_loan_amount': int(total_loan_amount), 
+        'total_paid_amount': int(total_paid_amount),
+        'total_remain_amount': int(total_remain_amount),
+        'total_instalment': total_instalment,
+        'paid_instalment': paid_instalment,
+        'remaining_instalment': remaining_instalment,
+        'total_emi_count': total_emi_count,
+        'total_policy_count':total_policy_count,
+        'upcoming_emi': upcoming_emi,
+        'upcoming_policy':upcoming_policy
+    })
+
+
 # View for the EMI section
 def emi_list(request):
     emi=EMI.objects.select_related('vehicle').order_by('next_due_date')
-    
     filter = EMIFilter(request.GET, queryset=emi)
     filtered_data = filter.qs  # Filtered queryset
     

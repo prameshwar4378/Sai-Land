@@ -3,6 +3,30 @@
 {% block content %}
 <style>
  
+
+    .card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: white;
+        background-clip: border-box;
+        border: 0px solid rgba(0, 0, 0, 0);
+        border-radius: .90rem;
+        margin-bottom:10px;
+        box-shadow: 0 2px 6px 0 rgb(218 218 253 / 65%), 0 2px 6px 0 rgb(206 206 238 / 54%);
+    }
+
+    .card .card-body {
+        padding: 0.5rem 1rem;
+    }
+    .header-today-section{
+        padding: 0.5rem 0.2rem;
+        border-radius:10px;
+        background-color:#fff;
+        box-shadow:0px 0px 10px -3px;
+    }
 </style>
 <main id="main" class="main">
     <div class="row">
@@ -28,10 +52,241 @@
             </div>
         </div>
 
-        <div class="container"> 
+        <div class="row">
+            <div class="col-lg-12 ">
+                <div class="row mx-1 py-2 header-today-section">
+                    <h4>Total Loan Overview</h4>
+                    <hr>
+                    <div class="container" style="">
+                        <div class="">
+        
+                            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3">
+                                <!-- Total Loan Amount Card -->
+                                <div class="col">
+                                    <div class="card radius-10 border-start border-0 border-5 border-info">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center">
+                                                <div>
+                                                    <p class="mb-0 text-secondary">Total Loan Amount</p>
+                                                    <h3 class="my-1 text-info">{{ total_loan_amount }}.00</h3>
+                                                </div>
+                                                <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                                    <h1 class="text-info">₹</h1>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                                <!-- Loan Paid Amount Card -->
+                                <div class="col">
+                                    <div class="card radius-10 border-start border-0 border-5 border-success">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center">
+                                                <div>
+                                                    <p class="mb-0 text-secondary">Loan Paid Amount</p>
+                                                    <h3 class="my-1 text-success">{{ total_paid_amount }}.00</h3>
+                                                </div>
+                                                <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                                    <h1 class="text-success">₹</h1>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                                <!-- Loan Remaining Amount Card -->
+                                <div class="col">
+                                    <div class="card radius-10 border-start border-0 border-5 border-danger">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center">
+                                                <div>
+                                                    <p class="mb-0 text-secondary">Loan Remaining Amount</p>
+                                                    <h3 class="my-1 text-danger">{{ total_remain_amount }}.00</h3>
+                                                </div>
+                                                <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                                    <h1 class="text-danger">₹</h1>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                                <!-- Total Installment Card -->
+                                <div class="col">
+                                    <div class="card radius-10 border-start border-0 border-5 border-primary">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center">
+                                                <div>
+                                                    <p class="mb-0 text-secondary">Total Installments</p>
+                                                    <h3 class="my-1" style="color:#B14ABB;">{{ total_instalment }}</h3>
+                                                </div>
+                                                <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                                    <h1><i class="mdi mdi-view-carousel" style="color:#B14ABB;"></i></h1>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                                <!-- Paid Installment Card -->
+                                <div class="col">
+                                    <div class="card radius-10 border-start border-0 border-5 border-success">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center">
+                                                <div>
+                                                    <p class="mb-0 text-success">Paid Installments</p>
+                                                    <h3 class="my-1 text-success">{{ paid_instalment }}</h3>
+                                                </div>
+                                                <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                                    <h1 class="text-success">₹</h1>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                                <!-- Remaining Installment Card -->
+                                <div class="col">
+                                    <div class="card radius-10 border-start border-0 border-5 border-danger">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center">
+                                                <div>
+                                                    <p class="mb-0 text-secondary">Remaining Installments</p>
+                                                    <h3 class="my-1 text-danger">{{ remaining_instalment }}</h3>
+                                                </div>
+                                                <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                                    <h1 class="text-danger">₹</h1>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        
+
+
+        <div class="row mt-3">
+            <div class="col-lg-12 ">
+                <div class="row mx-1 py-2 header-today-section">
+                    <h4>Active EMI's & Policy's | </h4>
+                    <hr>
+                    <div class="container" style="">
+                        <div class="">
+                            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4">
+                                <div class="col">
+                                    <div class="card radius-10 border-start bg-danger border-0 border-5  border-warning">
+                                        <div class="card-body ">
+                                            <div class="d-flex align-items-center">
+                                                <div>
+                                                    <p class="mb-0 text-light">EMI Vahicles</p>
+                                                    <h3 class="my-1 text-light">{{total_emi_count}}</h3>
+                                                </div>
+                                                <div
+                                                    class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                                    <h1  class=" text-light">₹</h1>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+        
+                                <div class="col">
+                                    <div class="card radius-10 border-start bg-warning border-0 border-5 border-danger">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center">
+                                                <div>
+                                                    <p class="mb-0 text-light">Policy vehicles</p>
+                                                    <h3 class="my-1 text-light">{{total_policy_count}}</h3>
+                                                </div>
+                                                <div
+                                                    class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                                    <h1  class=" text-light">₹</h1>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+        <div class="row mt-3">
+            <div class="col-sm-6">
+                <div class="card recent-sales overflow-auto">
+                    <div class="card-body">
+                        <h5 class="card-title">Upcoming or Expired EMI |
+                            <span style="font-size:0.8rem; color:gray;"> 7 days </span>
+                        </h5>
+                        <div class="mt-4">
+                            {% if upcoming_emi %}
+                                <ul class="list-group">
+                                    {% for emi in upcoming_emi %}
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>{{ emi.vehicle.vehicle_name }}</strong><br>
+                                                <small>Due: {{ emi.next_due_date }}</small>
+                                            </div>
+                                            <span class="badge bg-primary rounded-pill">
+                                                {{ emi.remaining_installments }} Installments Left
+                                            </span>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>No upcoming EMIs in the next 7 days.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+              </div><!-- End Card -->
+        
+              <div class="col-sm-6">
+                <div class="card recent-sales overflow-auto">
+        
+                  <div class="card-body">
+                    <h5 class="card-title">Upcomming or Expired Policy |<span style="font-size:0.8rem; color:gray;"> 7 day </span></h5>
+                    <div class="mt-4">
+                        {% if upcoming_policy %}
+                            <ul class="list-group">
+                                {% for policy in upcoming_policy %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>{{ policy.vehicle.vehicle_name }}</strong><br>
+                                            <small>Due: {{ policy.due_date }}</small>
+                                        </div>
+                                        <span class="badge bg-success rounded-pill">
+                                            {{ policy.policy_number }}
+                                        </span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No upcoming policies in the next 7 days.</p>
+                        {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div><!-- End Card -->
+        </div>
+
+        
+
+
     </div>
 </main><!-- End #main -->
  

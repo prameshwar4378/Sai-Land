@@ -3,9 +3,10 @@ from . import views
 
 from django.conf import settings
 from django.conf.urls.static import static 
+
 from .export import *
 urlpatterns = [
-    # path('login-token', CustomAuthToken.as_view(), name='api_token_auth'),
+    path('login-token', views.CustomAuthToken.as_view(), name='api_token_auth'),
     path('dashboard/', views.dashboard, name='admin_dashboard'),
     path('reload_all_caches/', views.reload_all_caches, name='admin_reload_all_caches'),
 
