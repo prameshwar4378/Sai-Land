@@ -93,8 +93,14 @@ class VehicleForm(forms.ModelForm):
     def clean_vehicle_number(self):
         vehicle_number = self.cleaned_data.get('vehicle_number') 
         vehicle_id = self.instance.id   
+
+        # Check if vehicle_number contains only alphanumeric characters (no spaces, no symbols)
+        if not re.match(r'^[A-Za-z0-9]+$', vehicle_number):
+            raise ValidationError("Vehicle number should only contain letters and numbers, no spaces or special characters are allowed.")
+        
+        # Check if the vehicle number is already registered (excluding current instance)
         if Vehicle.objects.filter(vehicle_number=vehicle_number).exclude(id=vehicle_id).exists():
-            raise ValidationError("This Vehicle number is already registered.")
+            raise ValidationError("This vehicle number is already registered.")
         return vehicle_number
 
 

@@ -18,7 +18,8 @@ from django.contrib import admin
 from django.urls import path,include
 from Website import views as WebView 
 from Website import urls as WebUrls
-from ERP_Admin import urls as ERP_Admin_Urls
+from ERP_Admin import urls as ERP_Admin_Urls 
+from ERP_Admin import API_urls as ERP_Admin_API_urls
 from ERP_Account import urls as ERP_Account_Urls
 from ERP_Workshop import urls as ERP_Workshop_Urls
 from ERP_Finance import urls as ERP_Finance_Urls
@@ -39,4 +40,5 @@ urlpatterns = [
     path('logout/', ERP_Admin_View.logout, name="logout"),  
     path('delete_user/<int:id>', ERP_Admin_View.delete_user, name="delete_user"),  
 
+    path('api/', include(ERP_Admin_API_urls)),
 ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

@@ -63,7 +63,7 @@
         </div>
         <div class="col-sm-6">
             <div class="container" style="max-width:97%;">
-                <form method="GET" action="{% url 'vehicle_data' %}">
+                <form method="GET" action="{% url 'admin_vehicle_dashboard' %}">
                     <input list="vehicleNumbers" name="vehicle_number" class="form-control d-inline w-75"
                         placeholder="Search by Vehicle Number" id="vehicleSearch">
                     <datalist id="vehicleNumbers">
@@ -108,15 +108,14 @@
                     <div class="card-content">
                         <h5 class="card-title">EMI Details</h5>
 
-                        <p class="card-text">Upcoming EMI: <strong>{{ upcoming_emi_date }}</strong></p>
-                        <p class="card-text">Upcoming EMI Date: <strong>{{ upcoming_emi_date }}</strong></p>
-                        <p class="card-text">Total Paid EMIs: <strong>{{ total_paid_emis }}</strong></p>
-                        <p class="card-text">Remaining EMIs: <strong>{{ total_paid_emis }}</strong></p>
-                        <p class="card-text">Total Amount Paid: <strong>{{ total_emi_paid }}</strong></p>
+                        <p class="card-text">EMI Amount: <strong>{{ one_emi_amount }}</strong></p>
+                        <p class="card-text">Upcoming EMI Date: <strong>{{ emi_details.next_due_date }}</strong></p>
+                        <p class="card-text">Total Paid EMIs: <strong>{{ emi_details.paid_installments }}</strong></p>
+                        <p class="card-text">Remaining EMIs: <strong>{{ emi_details.remaining_installments }}</strong></p>
+                        <p class="card-text">Total Amount Remaining: <strong>{{ remaining_emi_amount }}</strong></p>
 
                     </div>
                 </div>
-
             </div>
 
             <!-- Insurance Details -->

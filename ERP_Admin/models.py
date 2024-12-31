@@ -319,3 +319,11 @@ class EMI_Item(models.Model):
 
     def __str__(self):
         return f"Installment for EMI {self.emi.id} - Amount: {self.installment_amount}"
+    
+
+class AllocateDriverToVehicle(models.Model):
+    vahicle = models.ForeignKey('Vehicle', on_delete=models.CASCADE)
+    driver = models.ForeignKey('Driver', on_delete=models.CASCADE)
+    joining_date_time = models.DateTimeField(auto_now_add=True)
+    leaving_date_time = models.DateTimeField(auto_now=True)
+    is_active=models.BooleanField(default=True)

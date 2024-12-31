@@ -52,7 +52,7 @@ urlpatterns = [
     path('update_party/<int:id>/', views.update_party, name='admin_update_party'),
     path('delete-party/<int:id>/', views.delete_party, name='admin_delete_party'),
 
-    path('vehicle-dashboard', views.vehicle_data , name="vehicle_data"),
+    path('vehicle-dashboard', views.vehicle_dashboard , name="admin_vehicle_dashboard"), 
 
     path('export_filtered_job_cards', export_filtered_job_cards , name="export_filtered_job_cards"),
     path('export_purchase_data', export_purchase_data , name="export_purchase_data"),
