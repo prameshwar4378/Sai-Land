@@ -11,10 +11,7 @@ from django.db.models import Count, Case, When, F, IntegerField,ExpressionWrappe
 from django.utils import timezone
 from datetime import timedelta
 # Create your views here.
-def dashboard(request):
-    return render(request, 'finance_dashboard.html')
-
-
+ 
  
 def dashboard(request):
     # Query to calculate total loan amount, paid amount, and remaining amount
