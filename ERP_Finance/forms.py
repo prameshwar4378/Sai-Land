@@ -1,5 +1,5 @@
 from django import forms
-from ERP_Admin.models import Policy,EMI,EMI_Item
+from ERP_Admin.models import Policy,EMI,EMI_Item,InsuranceTaxDue
 from django.core.exceptions import ValidationError
 from datetime import date
 
@@ -23,7 +23,7 @@ class PolicyForm(forms.ModelForm):
 class EMIForm(forms.ModelForm):
     class Meta:
         model = EMI
-        fields = ['vehicle', 'loan_amount', 'total_installments', 'paid_installments', 'next_due_date', 'file','frequency','status']
+        fields = ['vehicle', 'finance_bank','loan_account_no', 'loan_amount', 'total_installments', 'paid_installments', 'next_due_date', 'file','frequency','status']
         widgets = {
             'next_due_date': forms.DateInput(attrs={'type': 'date'}),
             'loan_amount': forms.NumberInput(attrs={'placeholder': 'Enter Loan Amount'}),
@@ -39,6 +39,15 @@ class EMIForm(forms.ModelForm):
             if next_due_date <= date.today():
                 raise ValidationError("The due date cannot be in the past. Please enter a future date.")
         return next_due_date
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        vehicle = cleaned_data.get('vehicle')
+
+        # Check if a record for the same vehicle already exists only when creating a new record
+        if not self.instance.pk and vehicle and EMI.objects.filter(vehicle=vehicle).exists():
+            raise ValidationError({'vehicle': "A record for this vehicle already exists."})
+        return cleaned_data
         
 
 class EMIItemForm(forms.ModelForm):
@@ -61,3 +70,44 @@ class EMIItemForm(forms.ModelForm):
             if next_due_date <= date.today():
                 raise ValidationError("The due date cannot be in the past. Please enter a future date.")
         return next_due_date
+    
+
+class InsuranceTaxDueForm(forms.ModelForm):
+    class Meta:
+        model =  InsuranceTaxDue
+        fields = [
+            'insurance_amount', 
+            'insurance_due_date',
+            'insurance_name', 
+            'tax_frequency', 
+            'tax_amount', 
+            'tax_due_date',  
+            'fitness_due_date', 
+            'permit_due_date', 
+            'puc_due_date'
+        ]
+        widgets = {
+            'insurance_due_date': forms.DateInput(attrs={'type': 'date'}), 
+            'tax_due_date': forms.DateInput(attrs={'type': 'date'}), 
+            'fitness_due_date': forms.DateInput(attrs={'type': 'date'}), 
+            'permit_due_date': forms.DateInput(attrs={'type': 'date'}), 
+            'puc_due_date': forms.DateInput(attrs={'type': 'date'}), 
+        }
+    def clean(self):
+        cleaned_data = super().clean()
+
+        # List of fields to validate for future dates
+        date_fields = [
+            'insurance_date',
+            'tax_due_date',
+            'fitness_due_date',
+            'permit_due_date',
+            'puc_due_date'
+        ]
+
+        for field in date_fields:
+            value = cleaned_data.get(field)
+            if value and value < date.today():
+                raise ValidationError({field: f'{field.replace("_", " ").title()} must be in the future.'})
+
+        return cleaned_data

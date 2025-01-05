@@ -88,7 +88,7 @@ class UpdatePasswordForm(forms.Form):
 class VehicleForm(forms.ModelForm):
     class Meta:
         model = Vehicle
-        fields = ['vehicle_number', 'vehicle_name']  # Fields to include in the form
+        fields = ['vehicle_number', 'vehicle_name','status']  # Fields to include in the form
 
     def clean_vehicle_number(self):
         vehicle_number = self.cleaned_data.get('vehicle_number') 

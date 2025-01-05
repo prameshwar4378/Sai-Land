@@ -2,6 +2,8 @@ from django_filters import FilterSet, ModelChoiceFilter, DateFilter
 import django_filters
 from django.forms import Select, DateInput
 from ERP_Admin.models import *
+from django.db.models import Sum, F, Q
+
 
 class JobCardFilter(django_filters.FilterSet):
     start_date = django_filters.DateFilter(
@@ -127,3 +129,48 @@ class EMIFilter(django_filters.FilterSet):
             "vehicle", "loan_amount", "loan_amount_gte", "loan_amount_lte",
             "next_due_date_gte", "next_due_date_lte", "frequency", "status"
         ]
+
+from django import forms
+
+from django.db.models import Q
+ 
+import django_filters
+from django.db.models import Q
+from .models import InsuranceTaxDue, EMI, Policy
+
+class VehicleFilterForFinance(django_filters.FilterSet):
+    vehicle_number = django_filters.CharFilter(method="filter_by_vehicle_number", label="Vehicle Number")
+    start_date = django_filters.DateFilter(method="filter_by_start_date", label="Start Date")
+    end_date = django_filters.DateFilter(method="filter_by_end_date", label="End Date")
+
+    class Meta:
+        model = InsuranceTaxDue  # This is just a placeholder
+        fields = ['vehicle_number', 'start_date', 'end_date']
+
+    def filter_by_vehicle_number(self, queryset, name, value):
+        """Filter by vehicle number across all models."""
+        return queryset.filter(vehicle__vehicle_number__icontains=value)
+
+    def filter_by_start_date(self, queryset, name, value):
+        """Filter by start date across relevant fields."""
+        return queryset.filter(
+            Q(insurance_due_date__gte=value) |
+            Q(tax_due_date__gte=value) |
+            Q(fitness_due_date__gte=value) |
+            Q(permit_due_date__gte=value) |
+            Q(puc_due_date__gte=value) |
+            Q(next_due_date__gte=value) |  # EMI model
+            Q(due_date__gte=value)         # Policy model
+        )
+
+    def filter_by_end_date(self, queryset, name, value):
+        """Filter by end date across relevant fields."""
+        return queryset.filter(
+            Q(insurance_due_date__lte=value) |
+            Q(tax_due_date__lte=value) |
+            Q(fitness_due_date__lte=value) |
+            Q(permit_due_date__lte=value) |
+            Q(puc_due_date__lte=value) |
+            Q(next_due_date__lte=value) |  # EMI model
+            Q(due_date__lte=value)         # Policy model
+        )

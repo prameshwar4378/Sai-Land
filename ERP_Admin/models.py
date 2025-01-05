@@ -32,10 +32,20 @@ class CustomUser(AbstractUser):
      
     def __str__(self):
         return self.username
- 
+
+
+
+VEHICLE_STATUS = (
+    ('active', 'active'),
+    ('inactive', 'Inactive'), 
+) 
+
+
+
 class Vehicle(models.Model):
     vehicle_name = models.CharField(max_length=100)
     vehicle_number = models.CharField(max_length=50, unique=True)
+    status=models.CharField(max_length=50,default='active',choices=VEHICLE_STATUS)
     def __str__(self):
         return f"{self.vehicle_name} ({self.vehicle_number})"
 
@@ -119,6 +129,17 @@ class Model(models.Model):
     model_name = models.CharField(max_length=50, unique=True, db_index=True) 
     def __str__(self):
         return self.model_name
+ 
+class Insurance_Bank(models.Model):
+    bank_name = models.CharField(max_length=50, unique=True, db_index=True) 
+    def __str__(self):
+        return self.bank_name
+ 
+class Finance_Bank(models.Model):
+    bank_name = models.CharField(max_length=50, unique=True, db_index=True) 
+    def __str__(self):
+        return self.bank_name
+
 
 
 class Product(models.Model):
@@ -139,11 +160,11 @@ class Product(models.Model):
     def __str__(self):
         return f" #{self.product_code} on {self.product_name}"
 
-
 PURCHASE_GST=(
     ('GST BILL','GST BILL'),
     ('Without GST BILL','Without GST BILL')
 )
+
 class Purchase(models.Model):
     bill_no = models.CharField(max_length=50, db_index=True, unique=True, null=False, blank=False)
     supplier_name = models.CharField(max_length=100, db_index=True, null=True, blank=True)
@@ -251,8 +272,6 @@ class JobCardItem(models.Model):
         return f"Job Card {self.job_card_number} for Vehicle ID {self.vehicle.id}"
 
 
-
-
 class Policy(models.Model):
     policy_number=models.CharField(max_length=50) 
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='policies')
@@ -260,7 +279,7 @@ class Policy(models.Model):
     due_date = models.DateField()
 
     def __str__(self):
-        return f"Policy for {self.vehicle.vehicle_name} - {self.status}"
+        return f"Policy for {self.vehicle.vehicle_name}"
     
 
 FREQUENCY_CHOICES = (
@@ -279,6 +298,8 @@ EMI_STATUS_CHOICES = (
 
 class EMI(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='emis')
+    finance_bank = models.ForeignKey(Finance_Bank, on_delete=models.CASCADE, related_name='emis')
+    loan_account_no=models.CharField(max_length=50,null=True)
     loan_amount=models.BigIntegerField()
     total_installments = models.PositiveIntegerField()
     paid_installments = models.PositiveIntegerField(default=0)
@@ -321,9 +342,31 @@ class EMI_Item(models.Model):
         return f"Installment for EMI {self.emi.id} - Amount: {self.installment_amount}"
     
 
+class InsuranceTaxDue(models.Model):
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
+    insurance_bank = models.ForeignKey(Insurance_Bank, on_delete=models.CASCADE, related_name='emis')
+    insurance_amount = models.FloatField(null=True,blank=True)
+    insurance_name = models.CharField(max_length=255,null=True, blank=True)
+    insurance_due_date = models.DateField(null=True,blank=True) 
+    tax_frequency = models.CharField(max_length=255, choices=FREQUENCY_CHOICES,null=True, blank=True)
+    tax_amount = models.FloatField(null=True, blank=True)
+    tax_due_date = models.DateField(null=True, blank=True) 
+    fitness_due_date = models.DateField(null=True,blank=True)
+    permit_due_date = models.DateField(null=True,blank=True)
+    puc_due_date = models.DateField(null=True,blank=True)
+
 class AllocateDriverToVehicle(models.Model):
-    vahicle = models.ForeignKey('Vehicle', on_delete=models.CASCADE)
-    driver = models.ForeignKey('Driver', on_delete=models.CASCADE)
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name="allocated_drivers")
+    driver = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name="allocated_vehicles")
     joining_date_time = models.DateTimeField(auto_now_add=True)
     leaving_date_time = models.DateTimeField(auto_now=True)
-    is_active=models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
+ 
+    class Meta:
+        indexes = [
+            models.Index(fields=['vehicle', 'is_active']),
+            models.Index(fields=['driver', 'is_active']),
+    ]
+
+    def __str__(self):
+        return f"Driver {self.driver} assigned to Vehicle {self.vehicle}"

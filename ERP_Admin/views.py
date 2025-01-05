@@ -242,7 +242,6 @@ def dashboard(request):
     }
     return render(request, "admin_dashboard.html", context)
 
-
 def notifications(request):
     return render(request, "admin_notifications.html")
 
@@ -777,7 +776,6 @@ from datetime import datetime, timedelta
 
 def vehicle_dashboard(request):
     vehicle_data = Vehicle.objects.all()
-
     vehicle_number = request.GET.get('vehicle_number', '').strip()
     vehicle = None
     job_cards = []
@@ -790,39 +788,39 @@ def vehicle_dashboard(request):
     remaining_emi_amount=0
 
     vehicle = Vehicle.objects.filter(vehicle_number__iexact=vehicle_number).first()
-    # try:
-    if vehicle_number:
-        # Get the vehicle by its vehicle_number
-        
-        if vehicle:
-            # Query job cards related to this vehicle
-            job_cards = JobCard.objects.filter(vehicle=vehicle)
+    try:
+        if vehicle_number:
+            # Get the vehicle by its vehicle_number
             
-            for job_card in job_cards:
-                # Aggregate total item cost for the current job card
-                items = JobCardItem.objects.filter(job_card=job_card)
-                item_cost = items.aggregate(Sum('total_cost'))['total_cost__sum'] or 0
+            if vehicle:
+                # Query job cards related to this vehicle
+                job_cards = JobCard.objects.filter(vehicle=vehicle)
                 
-                # Labour cost for the current job card
-                labour_cost = job_card.labour_cost or 0
-                
-                # Update totals
-                total_labour_cost += labour_cost
-                total_item_cost += item_cost
+                for job_card in job_cards:
+                    # Aggregate total item cost for the current job card
+                    items = JobCardItem.objects.filter(job_card=job_card)
+                    item_cost = items.aggregate(Sum('total_cost'))['total_cost__sum'] or 0
+                    
+                    # Labour cost for the current job card
+                    labour_cost = job_card.labour_cost or 0
+                    
+                    # Update totals
+                    total_labour_cost += labour_cost
+                    total_item_cost += item_cost
 
-            # Grand total cost (labour + items)
-            grand_total_cost = total_labour_cost + total_item_cost
+                # Grand total cost (labour + items)
+                grand_total_cost = total_labour_cost + total_item_cost
 
-            # Fetch EMI related to the vehicle
-            emi_details = EMI.objects.filter(vehicle=vehicle).first() 
+                # Fetch EMI related to the vehicle
+                emi_details = EMI.objects.filter(vehicle=vehicle).first() 
 
-            if emi_details:
-                one_emi_amount = emi_details.loan_amount / emi_details.total_installments
-                remaining_emi_amount=int(one_emi_amount)*int(emi_details.remaining_installments)
+                if emi_details:
+                    one_emi_amount = emi_details.loan_amount / emi_details.total_installments
+                    remaining_emi_amount=int(one_emi_amount)*int(emi_details.remaining_installments)
 
-    # except Exception as e:
-    #     # Log the exception if needed (e.g., with logging)
-    #     return render(request, '404.html', {})
+    except Exception as e:
+        # Log the exception if needed (e.g., with logging)
+        return render(request, '404.html', {})
 
     context = {
         'vehicle': vehicle,
@@ -842,3 +840,72 @@ def vehicle_dashboard(request):
     return render(request, 'admin_vehicle_dashboard.html', context)
 
 
+import qrcode
+from io import BytesIO
+from django.http import HttpResponse
+
+# def generate_and_download_qr(request, vehicle_number):
+#     """
+#     Generate a QR code for the given vehicle name and download it directly.
+#     """
+#     # Create a QR code object
+#     qr = qrcode.QRCode(
+#         version=1,  # Controls the size of the QR Code
+#         error_correction=qrcode.constants.ERROR_CORRECT_L,
+#         box_size=10,
+#         border=4,
+#     )
+    
+#     # Add data to the QR code
+#     qr.add_data(vehicle_number)
+#     qr.make(fit=True)
+
+#     # Create an image of the QR code
+#     img = qr.make_image(fill_color="black", back_color="white")
+
+#     # Save the QR code image to a buffer
+#     buffer = BytesIO()
+#     img.save(buffer, format="PNG")
+#     buffer.seek(0)
+
+#     # Create the HTTP response for direct download
+#     response = HttpResponse(buffer, content_type="image/png")
+#     response['Content-Disposition'] = f'attachment; filename="{vehicle_number}_QR.png"' 
+#     return response
+
+from django.shortcuts import render
+from django.http import HttpResponse
+import qrcode
+from io import BytesIO
+import base64
+
+def generate_qr(request, vehicle_number):
+    """
+    Generate a QR code for the given vehicle number and display it on an HTML page.
+    """
+    vehicle=Vehicle.objects.get(vehicle_number=vehicle_number)
+    # Create a QR code object
+    qr = qrcode.QRCode(
+        version=1,  # Controls the size of the QR Code
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    
+    # Add data to the QR code
+    qr.add_data(vehicle_number)
+    qr.make(fit=True)
+
+    # Create an image of the QR code
+    img = qr.make_image(fill_color="black", back_color="white")
+
+    # Save the QR code image to a buffer
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
+    buffer.seek(0)
+
+    # Convert the image to base64 string
+    qr_image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+
+    # Render the HTML template and pass the base64 image string
+    return render(request, 'admin_print_qr.html', {'qr_image_base64': qr_image_base64, 'vehicle': vehicle})

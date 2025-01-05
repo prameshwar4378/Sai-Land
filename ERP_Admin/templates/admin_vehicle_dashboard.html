@@ -63,6 +63,10 @@
         </div>
         <div class="col-sm-6">
             <div class="container" style="max-width:97%;">
+                {% if vehicle.vehicle_number %}
+                <a href="{% url 'generate_and_download_qr' vehicle.vehicle_number %}">Download QR</a>
+                {% endif %}
+
                 <form method="GET" action="{% url 'admin_vehicle_dashboard' %}">
                     <input list="vehicleNumbers" name="vehicle_number" class="form-control d-inline w-75"
                         placeholder="Search by Vehicle Number" id="vehicleSearch">

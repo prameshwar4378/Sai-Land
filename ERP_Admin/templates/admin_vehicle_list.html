@@ -88,6 +88,7 @@
                                         <th scope="col" class="text-center text-white" style="">Sr.No</th>
                                         <th scope="col" class="text-center text-white" style="">Vehicle Number</th>
                                         <th scope="col" class="text-center text-white" style="">Vehicle Name</th>
+                                        <th scope="col" class="text-center text-white" style="">Download QR</th>
                                         <th scope="col" class="text-center text-white" style="">Action</th>
                                     </tr>
                                 </thead>
@@ -98,6 +99,9 @@
                                         <td>{{forloop.counter}}</td>
                                         <td>{{r.vehicle_number}}</td>
                                         <td>{{r.vehicle_name}}</td>
+                                        <td class="text-center">
+                                            <a href="{% url 'generate_and_download_qr' r.vehicle_number %}" class="btn btn-primary" target="__blank"><i class="bi bi-qr-code"></i></a>
+                                        </td>
                                         <td>
                                             <center>
                                                 <a href="javascript:void(0);" data-url="{% url 'admin_update_vehicle' r.id %}" class="btn btn-warning px-2 py-2" onclick="mini_window_2(this)">Update</a>

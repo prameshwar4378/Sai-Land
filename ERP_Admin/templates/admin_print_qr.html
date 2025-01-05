@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 10px;
+            font-family: Poppins;
+            color: rgb(87, 2, 66);
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        .download-btn {
+            background: green;
+            padding: 5px;
+            border-radius: 10px;
+            width: 200px;
+            cursor: pointer;
+            color: white;
+            text-align: center;
+        }
+        
+        .qr-section {
+            border: 8px solid rgb(87, 2, 66);
+            padding: 50px;
+            text-align: center;
+            width: 100%;
+            border-radius: 50px;
+        }
+
+        .page {
+            text-align:center;
+            width: 500px;
+            height: 100%;
+            margin: 0cm auto;
+            border-radius: 5px;
+            background-size: 100% 100%;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            padding:20px;
+        }
+
+        img {
+            width: 100%;
+        }
+
+
+
+    .download-btn {
+        background: linear-gradient(135deg, #4caf50, #8bc34a);
+        padding: 15px 30px;
+        border-radius: 50px;
+        color: white;
+        font-size: 18px;
+        font-weight: bold;
+        text-decoration: none;
+        text-align: center;
+        cursor: pointer;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+
+    .download-btn:hover {
+        background: linear-gradient(135deg, #388e3c, #689f38);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+        transform: translateY(-4px);
+    }
+
+    .download-btn:active {
+        transform: translateY(2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .download-btn:focus {
+        outline: none;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+        <div class="qr-section">
+            <h4>Sai Land Developers</h4>
+            <img src="data:image/png;base64,{{ qr_image_base64 }}" alt="QR Code">
+            <br>
+            <h2>{{ vehicle.vehicle_number }}</h2>
+            <h4>{{ vehicle.vehicle_name }}</h4>
+        </div>
+    </div>
+<br>
+<center>
+    <a href="#" onclick="convertPageToImage()" class="download-btn">
+        Download QR
+    </a>
+</center>
+
+    <script>
+        function convertPageToImage() {
+            // Wait for the image to fully load before capturing
+            const pageElement = document.querySelector('.page');
+            
+            // Use html2canvas library to capture the page as an image
+            html2canvas(pageElement).then(function (canvas) {
+                // Convert the canvas to a data URL representing the image
+                const imageDataURL = canvas.toDataURL('image/jpeg');
+
+                // Create an anchor element to trigger the image download
+                const downloadLink = document.createElement('a');
+                downloadLink.href = imageDataURL;
+                downloadLink.download = "{{ vehicle.vehicle_number }}.jpg"; // Use vehicle number as filename
+                downloadLink.click();
+            });
+        }
+    </script>
+</body>
+</html>

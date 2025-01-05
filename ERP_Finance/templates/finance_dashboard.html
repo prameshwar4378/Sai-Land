@@ -51,237 +51,368 @@
                 </div>
             </div>
         </div>
-
-        <div class="row">
-            <div class="col-lg-12 ">
-                <div class="row mx-1 py-2 header-today-section">
-                    <h4>Total Loan Overview</h4>
-                    <hr>
-                    <div class="container" style="">
-                        <div class="">
-        
-                            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3">
-                                <!-- Total Loan Amount Card -->
-                                <div class="col">
-                                    <div class="card radius-10 border-start border-0 border-5 border-info">
-                                        <div class="card-body">
-                                            <div class="d-flex align-items-center">
-                                                <div>
-                                                    <p class="mb-0 text-secondary">Total Loan Amount</p>
-                                                    <h3 class="my-1 text-info">{{ total_loan_amount }}.00</h3>
-                                                </div>
-                                                <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
-                                                    <h1 class="text-info">₹</h1>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            
-                                <!-- Loan Paid Amount Card -->
-                                <div class="col">
-                                    <div class="card radius-10 border-start border-0 border-5 border-success">
-                                        <div class="card-body">
-                                            <div class="d-flex align-items-center">
-                                                <div>
-                                                    <p class="mb-0 text-secondary">Loan Paid Amount</p>
-                                                    <h3 class="my-1 text-success">{{ total_paid_amount }}.00</h3>
-                                                </div>
-                                                <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
-                                                    <h1 class="text-success">₹</h1>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            
-                                <!-- Loan Remaining Amount Card -->
-                                <div class="col">
-                                    <div class="card radius-10 border-start border-0 border-5 border-danger">
-                                        <div class="card-body">
-                                            <div class="d-flex align-items-center">
-                                                <div>
-                                                    <p class="mb-0 text-secondary">Loan Remaining Amount</p>
-                                                    <h3 class="my-1 text-danger">{{ total_remain_amount }}.00</h3>
-                                                </div>
-                                                <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
-                                                    <h1 class="text-danger">₹</h1>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            
-                                <!-- Total Installment Card -->
-                                <div class="col">
-                                    <div class="card radius-10 border-start border-0 border-5 border-primary">
-                                        <div class="card-body">
-                                            <div class="d-flex align-items-center">
-                                                <div>
-                                                    <p class="mb-0 text-secondary">Total Installments</p>
-                                                    <h3 class="my-1" style="color:#B14ABB;">{{ total_instalment }}</h3>
-                                                </div>
-                                                <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
-                                                    <h1><i class="mdi mdi-view-carousel" style="color:#B14ABB;"></i></h1>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            
-                                <!-- Paid Installment Card -->
-                                <div class="col">
-                                    <div class="card radius-10 border-start border-0 border-5 border-success">
-                                        <div class="card-body">
-                                            <div class="d-flex align-items-center">
-                                                <div>
-                                                    <p class="mb-0 text-success">Paid Installments</p>
-                                                    <h3 class="my-1 text-success">{{ paid_instalment }}</h3>
-                                                </div>
-                                                <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
-                                                    <h1 class="text-success">₹</h1>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            
-                                <!-- Remaining Installment Card -->
-                                <div class="col">
-                                    <div class="card radius-10 border-start border-0 border-5 border-danger">
-                                        <div class="card-body">
-                                            <div class="d-flex align-items-center">
-                                                <div>
-                                                    <p class="mb-0 text-secondary">Remaining Installments</p>
-                                                    <h3 class="my-1 text-danger">{{ remaining_instalment }}</h3>
-                                                </div>
-                                                <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
-                                                    <h1 class="text-danger">₹</h1>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        
-
-
+    </div>
+  
         <div class="row mt-3">
-            <div class="col-lg-12 ">
                 <div class="row mx-1 py-2 header-today-section">
-                    <h4>Active EMI's & Policy's | </h4>
+                    <h4>Next 30 Days Dues Count</h4>
                     <hr>
-                    <div class="container" style="">
-                        <div class="">
-                            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4">
-                                <div class="col">
-                                    <div class="card radius-10 border-start bg-danger border-0 border-5  border-warning">
-                                        <div class="card-body ">
-                                            <div class="d-flex align-items-center">
-                                                <div>
-                                                    <p class="mb-0 text-light">EMI Vahicles</p>
-                                                    <h3 class="my-1 text-light">{{total_emi_count}}</h3>
-                                                </div>
-                                                <div
-                                                    class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
-                                                    <h1  class=" text-light">₹</h1>
-                                                </div>
-                                            </div>
+                    <div class="row">
+                        <!-- Total Loan Amount Card -->
+                        <div class="col-sm-4">
+                            <div class="card radius-10 border-start border-0 border-5 border-info">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <p class="mb-0 text-secondary">EMI Dues Count</p>
+                                            <h3 class="my-1 text-info">{{ thirty_days_counts.emi_dues }}</h3>
+                                        </div>
+                                        <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                            <h1 class="text-info">₹</h1>
                                         </div>
                                     </div>
                                 </div>
-        
-                                <div class="col">
-                                    <div class="card radius-10 border-start bg-warning border-0 border-5 border-danger">
-                                        <div class="card-body">
-                                            <div class="d-flex align-items-center">
-                                                <div>
-                                                    <p class="mb-0 text-light">Policy vehicles</p>
-                                                    <h3 class="my-1 text-light">{{total_policy_count}}</h3>
-                                                </div>
-                                                <div
-                                                    class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
-                                                    <h1  class=" text-light">₹</h1>
-                                                </div>
-                                            </div>
+                            </div>
+                        </div>
+                    
+                        <!-- Loan Paid Amount Card -->
+                        <div class="col-sm-4">
+                            <div class="card radius-10 border-start border-0 border-5 border-success">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <p class="mb-0 text-secondary">Policy Dues Count</p>
+                                            <h3 class="my-1 text-success">{{ thirty_days_counts.policy_dues }}</h3>
+                                        </div>
+                                        <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                            <h1 class="text-danger">₹</h1>
                                         </div>
                                     </div>
                                 </div>
-                                 
+                            </div>
+                        </div>
+                    
+                        <!-- Loan Remaining Amount Card -->
+                        <div class="col-sm-4">
+                            <div class="card radius-10 border-start border-0 border-5 border-danger">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <p class="mb-0 text-secondary">Inssurance Count</p>
+                                            <h3 class="my-1 text-danger">{{ thirty_days_counts.insurance_dues }}</h3>
+                                        </div>
+                                        <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                            <h1 class="text-danger">₹</h1>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Total Installment Card -->
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <div class="card radius-10 border-start border-0 border-5 border-primary">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <p class="mb-0 text-secondary">Tax Dues</p>
+                                            <h3 class="my-1" style="color:#B14ABB;">{{ thirty_days_counts.tax_dues }}</h3>
+                                        </div>
+                                        <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                            <h1 class="text-danger">₹</h1>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <!-- Paid Installment Card -->
+                        <div class="col-sm-3">
+                            <div class="card radius-10 border-start border-0 border-5 border-success">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <p class="mb-0 text-success">Fitness Dues</p>
+                                            <h3 class="my-1 text-success">{{ thirty_days_counts.fitness_dues }}</h3>
+                                        </div>
+                                        <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                            <h1 class="text-success">₹</h1>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <!-- Remaining Installment Card -->
+                        <div class="col-sm-3">
+                            <div class="card radius-10 border-start border-0 border-5 border-danger">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <p class="mb-0 text-secondary">Permit Dues</p>
+                                            <h3 class="my-1 text-danger">{{ thirty_days_counts.permit_dues }}</h3>
+                                        </div>
+                                        <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                            <h1 class="text-danger">₹</h1>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-3">
+                            <div class="card radius-10 border-start border-0 border-5 border-danger">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <p class="mb-0 text-secondary">PUC Dues</p>
+                                            <h3 class="my-1 text-danger">{{ thirty_days_counts.puc_dues }}</h3>
+                                        </div>
+                                        <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                            <h1 class="text-danger">₹</h1>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+ 
+            </div>
+        </div>  
+ 
+
+        {% if expire_dues_counts.insurance_dues  %}
+        <div class="row mt-3">
+            <div class="row mx-1 py-2 header-today-section">
+                <h4>Expire Dues Count</h4>
+                <hr>
+                
+                    
+                    <div class="row">
+                        <!-- EMI Dues Card -->
+                        {% if expire_dues_counts.emi_dues %}
+                        <div class="col-sm-4">
+                            <div class="card radius-10 border-start border-0 border-5 border-info">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <p class="mb-0 text-secondary">EMI Dues Count</p>
+                                            <h3 class="my-1 text-info">{{ expire_dues_counts.emi_dues }}</h3>
+                                        </div>
+                                        <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                            <h1 class="text-info">₹</h1>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+        
+                        <!-- Policy Dues Card -->
+                        {% if expire_dues_counts.policy_dues %}
+                        <div class="col-sm-4">
+                            <div class="card radius-10 border-start border-0 border-5 border-success">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <p class="mb-0 text-secondary">Policy Dues Count</p>
+                                            <h3 class="my-1 text-success">{{ expire_dues_counts.policy_dues }}</h3>
+                                        </div>
+                                        <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                            <h1 class="text-danger">₹</h1>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+        
+                        <!-- Insurance Dues Card -->
+                        {% if expire_dues_counts.insurance_dues %}
+                        <div class="col-sm-4">
+                            <div class="card radius-10 border-start border-0 border-5 border-danger">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <p class="mb-0 text-secondary">Insurance Dues Count</p>
+                                            <h3 class="my-1 text-danger">{{ expire_dues_counts.insurance_dues }}</h3>
+                                        </div>
+                                        <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                            <h1 class="text-danger">₹</h1>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+        
+                    <div class="row">
+                        <!-- Tax Dues Card -->
+                        {% if expire_dues_counts.tax_dues %}
+                        <div class="col-sm-3">
+                            <div class="card radius-10 border-start border-0 border-5 border-primary">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <p class="mb-0 text-secondary">Tax Dues</p>
+                                            <h3 class="my-1" style="color:#B14ABB;">{{ expire_dues_counts.tax_dues }}</h3>
+                                        </div>
+                                        <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                            <h1 class="text-danger">₹</h1>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+        
+                        <!-- Fitness Dues Card -->
+                        {% if expire_dues_counts.fitness_dues %}
+                        <div class="col-sm-3">
+                            <div class="card radius-10 border-start border-0 border-5 border-success">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <p class="mb-0 text-success">Fitness Dues</p>
+                                            <h3 class="my-1 text-success">{{ expire_dues_counts.fitness_dues }}</h3>
+                                        </div>
+                                        <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                            <h1 class="text-success">₹</h1>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+        
+                        <!-- Permit Dues Card -->
+                        {% if expire_dues_counts.permit_dues %}
+                        <div class="col-sm-3">
+                            <div class="card radius-10 border-start border-0 border-5 border-danger">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <p class="mb-0 text-secondary">Permit Dues</p>
+                                            <h3 class="my-1 text-danger">{{ expire_dues_counts.permit_dues }}</h3>
+                                        </div>
+                                        <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                            <h1 class="text-danger">₹</h1>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+        
+                        <!-- PUC Dues Card -->
+                        {% if expire_dues_counts.puc_dues %}
+                        <div class="col-sm-3">
+                            <div class="card radius-10 border-start border-0 border-5 border-danger">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <p class="mb-0 text-secondary">PUC Dues</p>
+                                            <h3 class="my-1 text-danger">{{ expire_dues_counts.puc_dues }}</h3>
+                                        </div>
+                                        <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                            <h1 class="text-danger">₹</h1>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div> 
+
                 </div>
             </div>
-        </div>
+            {% endif %}
         
+
+
+
+
+         
         
         <div class="row mt-3">
             <div class="col-sm-6">
                 <div class="card recent-sales overflow-auto">
                     <div class="card-body">
-                        <h5 class="card-title">Upcoming or Expired EMI |
-                            <span style="font-size:0.8rem; color:gray;"> 7 days </span>
+                        <h5 class="card-title">Upcoming Dues |
+                            <span style="font-size:0.8rem; color:gray;"> 2 days </span>
                         </h5>
-                        <div class="mt-4">
-                            {% if upcoming_emi %}
-                                <ul class="list-group">
-                                    {% for emi in upcoming_emi %}
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <strong>{{ emi.vehicle.vehicle_name }}</strong><br>
-                                                <small>Due: {{ emi.next_due_date }}</small>
-                                            </div>
-                                            <span class="badge bg-primary rounded-pill">
-                                                {{ emi.remaining_installments }} Installments Left
-                                            </span>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            {% else %}
-                                <p>No upcoming EMIs in the next 7 days.</p>
-                            {% endif %}
-                        </div>
+                        {% if two_days_later_dues %}
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Vehicle Number</th>
+                                    <th>Due Date</th>
+                                    <th>Due Name</th>
+                                    <th  class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for due in two_days_later_dues %}
+                                    <tr>
+                                        <td>{{ due.vehicle_number }}</td>
+                                        <td>{{ due.due_date|date:"d-M-Y" }}</td>
+                                        <td>{{ due.due_name }}</td>
+                                        <td  class="text-center">
+                                            <a href="{% url 'finance_vehicle_dashboard' due.vehicle_id %}" class="btn btn-primary btn-sm">Read More</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>No upcoming dues found.</p>
+                    {% endif %}
                     </div>
                 </div>
                 
-              </div><!-- End Card -->
-        
-              <div class="col-sm-6">
+            </div><!-- End Card -->
+
+            <div class="col-sm-6">
                 <div class="card recent-sales overflow-auto">
-        
-                  <div class="card-body">
-                    <h5 class="card-title">Upcomming or Expired Policy |<span style="font-size:0.8rem; color:gray;"> 7 day </span></h5>
-                    <div class="mt-4">
-                        {% if upcoming_policy %}
-                            <ul class="list-group">
-                                {% for policy in upcoming_policy %}
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <strong>{{ policy.vehicle.vehicle_name }}</strong><br>
-                                            <small>Due: {{ policy.due_date }}</small>
-                                        </div>
-                                        <span class="badge bg-success rounded-pill">
-                                            {{ policy.policy_number }}
-                                        </span>
-                                    </li>
+                    <div class="card-body">
+                        <h5 class="card-title">Expire Dues |
+                            <span style="font-size:0.8rem; color:gray;"> 15 days </span>
+                        </h5>
+                        {% if fifteen_days_ago_expire_dues %}
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Vehicle Number</th>
+                                    <th>Due Date</th>
+                                    <th>Due Name</th>
+                                    <th class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for due in fifteen_days_ago_expire_dues %}
+                                    <tr>
+                                        <td>{{ due.vehicle_number }}</td>
+                                        <td>{{ due.due_date|date:"d-M-Y" }}</td>
+                                        <td>{{ due.due_name }}</td>
+                                        <td class="text-center">
+                                            <a href="{% url 'finance_vehicle_dashboard' due.vehicle_id %}" class="btn btn-primary btn-sm">Read More</a>
+                                        </td>
+                                    </tr>
                                 {% endfor %}
-                            </ul>
-                        {% else %}
-                            <p>No upcoming policies in the next 7 days.</p>
-                        {% endif %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>No Recent Expire Dues Found.</p>
+                    {% endif %}
                     </div>
-                  </div>
                 </div>
-              </div><!-- End Card -->
+                
+            </div><!-- End Card -->
+
+
         </div>
 
         

@@ -1,0 +1,113 @@
+{% extends "base_window.html" %}
+{% block title %}Update Insurance{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+<style>
+body{
+    background-color:rgb(255, 255, 255);
+
+}
+
+fieldset {
+    border: 2px solid #b9b9b9; /* Green border */
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    background-color: #f8f8f8;
+}
+
+legend {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #73472a; /* Green text */
+    padding-top: 0 10px;
+}
+
+</style>
+<main id="main" class="main">
+
+    
+    <section class="section dashboard">
+        <div class="container-fluid mb-3 form-header p-3">
+            <div class="row p-1 rounded" >
+                <div class="col-sm-12">
+                    <div class="alert alert-warning text-center mt-2 p-1">
+                        <h2>Update Insurance, Tax, Dues</h2>
+                    </div>  
+                                 
+                   <form method="POST" enctype="multipart/form-data"  > {% csrf_token %} 
+                        <div class="row  mt-1"> 
+                                    <fieldset>
+                                        <legend>Insurance Details</legend>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form.insurance_amount|as_crispy_field }}
+                                            </div>
+                                            <div class="col">
+                                                {{ form.insurance_name|as_crispy_field }}
+                                            </div>
+                                            <div class="col">
+                                                {{ form.insurance_due_date|as_crispy_field }}
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                
+                                    <fieldset>
+                                        <legend>Tax Details</legend>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form.tax_frequency|as_crispy_field }}
+                                            </div>
+                                            <div class="col">
+                                                {{ form.tax_amount|as_crispy_field }}
+                                            </div>
+                                            <div class="col">
+                                                {{ form.tax_due_date|as_crispy_field }}
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                    
+                                    <fieldset>
+                                        <legend>Other Due Dates</legend>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form.fitness_due_date|as_crispy_field }}
+                                            </div>
+                                            <div class="col">
+                                                {{ form.permit_due_date|as_crispy_field }}
+                                            </div>
+                                            <div class="col">
+                                                {{ form.puc_due_date|as_crispy_field }}
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                        </div>
+                        <center><button type="submit" class="btn btn-primary mt-1 px-5">Submit</button></center>
+                    </form>
+
+                </div>  
+            </div>
+        </div>
+
+         
+    </section>
+
+</main><!-- End #main -->
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dropdownIds = ['id_vehicle', ];
+        dropdownIds.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                new Choices(element, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    noResultsText: 'No matching results',
+                });
+            }
+        });
+    });
+</script>
+
+{% endblock content %}

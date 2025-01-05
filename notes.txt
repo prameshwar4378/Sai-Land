@@ -8,6 +8,13 @@ port: 5432
 password : rood
 
 
-Need to Update status on User Management is_active  field
+
+need to make CRUD operation on Provided Table
+
+Model
+Insurance_Bank
+Finance_Bank
  
- 
+
+Get Pass Feature Need to add 
+
