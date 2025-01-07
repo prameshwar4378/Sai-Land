@@ -298,7 +298,7 @@ EMI_STATUS_CHOICES = (
 
 class EMI(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='emis')
-    finance_bank = models.ForeignKey(Finance_Bank, on_delete=models.CASCADE, related_name='emis')
+    finance_bank = models.ForeignKey(Finance_Bank, on_delete=models.CASCADE, related_name='emis',null=True, blank=True)
     loan_account_no=models.CharField(max_length=50,null=True)
     loan_amount=models.BigIntegerField()
     total_installments = models.PositiveIntegerField()
@@ -344,9 +344,8 @@ class EMI_Item(models.Model):
 
 class InsuranceTaxDue(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
-    insurance_bank = models.ForeignKey(Insurance_Bank, on_delete=models.CASCADE, related_name='emis')
+    insurance_bank = models.ForeignKey(Insurance_Bank, on_delete=models.CASCADE, null=True, blank=True)
     insurance_amount = models.FloatField(null=True,blank=True)
-    insurance_name = models.CharField(max_length=255,null=True, blank=True)
     insurance_due_date = models.DateField(null=True,blank=True) 
     tax_frequency = models.CharField(max_length=255, choices=FREQUENCY_CHOICES,null=True, blank=True)
     tax_amount = models.FloatField(null=True, blank=True)

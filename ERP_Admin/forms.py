@@ -85,6 +85,12 @@ class UpdatePasswordForm(forms.Form):
         return cleaned_data
 
 
+class ModelForm(forms.ModelForm):
+    class Meta:
+        model = Model
+        fields = ['model_name']
+
+
 class VehicleForm(forms.ModelForm):
     class Meta:
         model = Vehicle

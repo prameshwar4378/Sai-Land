@@ -14078,14 +14078,7 @@
                 <i class="bi bi-wallet"></i>
                 <span>Financial Management</span>
             </a>
-        </li>
-       <li class="nav-item">
-            <a class="nav-link" href="{% url 'admin_vehicle_dashboard' %}">
-                <i class="bi bi-car-front"></i>
-                <span>Vehicle Dashboard</span>
-            </a>
-        </li>
-
+        </li> 
         <li class="nav-item">
             <a class="nav-link collapsed" data-bs-target="#workshop" data-bs-toggle="collapse" href="#">
                 <i class="bi bi-gear-fill"></i><span>Workshop</span><i class="bi bi-chevron-down ms-auto"></i>
@@ -14121,47 +14114,80 @@
                 <span>Reports</span>
             </a>
         </li>-->
+
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'admin_user_management' %}">
-                <i class="bi bi-person"></i>
-                <span>User Management</span>
+            <a class="nav-link collapsed" data-bs-target="#vehicle-nav" data-bs-toggle="collapse" href="#">
+              <i class="bi bi-layout-text-window-reverse"></i><span>Vehicle List</span><i class="bi bi-chevron-down ms-auto"></i>
             </a>
-        </li>
- 
- 
+            <ul id="vehicle-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+              <li>
+                <a href="{% url "admin_vehicle_list" %}" style="text-decoration:none;">
+                    <i class="bi bi-truck" style="font-size:15px;"></i><span>Vehicles</span>
+                </a>
+              </li>
+              <li>
+                <a href="{% url 'admin_vehicle_model_list' %}" style="text-decoration:none;">
+                    <i class="bi bi-grid" style="font-size:15px;"></i><span>Vehicle Model</span>
+                </a>
+              </li>
+              <li>
+                <a href="{% url 'admin_vehicle_dashboard' %}" style="text-decoration:none;">
+                    <i class="bi bi-grid" style="font-size:15px;"></i><span>Vehicle Dashboard</span>
+                </a>
+              </li>
+       
+      
+            </ul>
+          </li><!-- End Tables Nav -->
+
+          
+        <li class="nav-item">
+            <a class="nav-link" href="{% url "admin_drivers_list" %}">
+                <i class="bi bi-person-bounding-box"></i>
+                <span>Driver List</span>
+            </a>
+        </li> 
+
+        <li class="nav-item">
+            <a class="nav-link" href="{% url "admin_technician_list" %}">
+                <i class="bi bi-tools"></i>
+                <span>Technician List</span>
+            </a>
+        </li> 
+
+        <li class="nav-item">
+            <a class="nav-link" href="{% url "admin_party_list" %}">
+                <i class="bi bi-people"></i>
+                <span>Party List</span>
+            </a>
+        </li> 
+
+
+
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'admin_user_management' %}">
+            <i class="bi bi-person"></i>
+            <span>User Management</span>
+        </a>
+    </li>
+
      
     <li class="nav-item">
-      <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
-        <i class="bi bi-layout-text-window-reverse"></i><span>More</span><i class="bi bi-chevron-down ms-auto"></i>
-      </a>
-      <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-        <li>
-          <a href="{% url "admin_vehicle_list" %}" style="text-decoration:none;">
-              <i class="bi bi-truck" style="font-size:15px;"></i><span>Vehicle List</span>
-          </a>
-        </li>
-        <li>
-          <a href="{% url "admin_drivers_list" %}" style="text-decoration:none;">
-              <i class="bi bi-person-bounding-box" style="font-size:15px;"></i><span>Driver List</span>
-          </a>
-        </li>
-
-        <li>
-            <a href="{% url "admin_technician_list" %}" style="text-decoration:none;">
-                <i class="bi bi-tools" style="font-size:15px;"></i><span>Technician List</span>
-            </a>
-          </li>
-
+        <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-layout-text-window-reverse"></i><span>More</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+   
           <li>
-            <a href="{% url "admin_party_list" %}" style="text-decoration:none;">
-                <i class="bi bi-tools" style="font-size:15px;"></i><span>Party List</span>
+            <a href="{% url "admin_drivers_list" %}" style="text-decoration:none;">
+                <i class="bi bi-person-bounding-box" style="font-size:15px;"></i><span>Driver List</span>
             </a>
           </li>
-
-      </ul>
+   
+  
+        </ul>
     </li><!-- End Tables Nav -->
-
-
+  
 
     </ul>
 </aside><!--  End Sidebar-->

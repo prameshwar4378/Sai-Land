@@ -242,6 +242,36 @@ def dashboard(request):
     }
     return render(request, "admin_dashboard.html", context)
 
+
+def vehicle_model_list(request):
+    rec = Model.objects.all()
+    if request.method == 'POST':
+        form = ModelForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Model Created Success.')
+            return redirect('/admin/vehicle_model_list')
+    else: 
+        form = ModelForm()
+    return render(request, 'admin_vehicle_model_list.html', {'rec': rec,'form': form})
+ 
+def vehicle_model_update(request, id):
+    model_instance = get_object_or_404(Model, id=id)
+    if request.method == 'POST':
+        form = ModelForm(request.POST, instance=model_instance)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Model Updated Success.')
+    else:
+        form = ModelForm(instance=model_instance)
+    return render(request, 'admin_vehicle_model_update.html', {'form': form})
+
+def vehicle_model_delete(request, id):
+    model_instance = get_object_or_404(Model, id=id)
+    model_instance.delete()
+    messages.success(request, 'Model Deleted Success.')
+    return redirect('/admin/vehicle_model_list')
+
 def notifications(request):
     return render(request, "admin_notifications.html")
 

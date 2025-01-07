@@ -3,7 +3,12 @@
 {% load crispy_forms_tags %}
 {% block content %}
 <style>
-  
+    #id_vehicle {
+        pointer-events: none; /* Prevents user interaction */
+        background-color: #f5f5f5; /* Optional: Makes it look like a read-only field */
+        color: #6c757d; /* Optional: Gray out text for a read-only appearance */
+      }
+     
 </style>
 <main id="main" class="main">
 
@@ -45,21 +50,5 @@
     </section>
 
 </main><!-- End #main -->
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const dropdownIds = ['id_vehicle', ];
-        dropdownIds.forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                new Choices(element, {
-                    searchEnabled: true,
-                    itemSelectText: '',
-                    noResultsText: 'No matching results',
-                });
-            }
-        });
-    });
-</script>
 
 {% endblock content %}

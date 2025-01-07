@@ -1,5 +1,5 @@
 from django.shortcuts import render,get_object_or_404,redirect
-from ERP_Admin.models import Policy,EMI,EMI_Item,Vehicle,InsuranceTaxDue
+from ERP_Admin.models import Policy,EMI,EMI_Item,Vehicle,InsuranceTaxDue,Insurance_Bank,Finance_Bank
 from .forms import *
 from django.http import JsonResponse
 from django.contrib import messages
@@ -91,20 +91,26 @@ def dashboard(request):
         'fifteen_days_ago_expire_dues':fifteen_days_ago_expire_dues
 
     })
+ 
 
+ 
 def vehicle_list(request):
-    # Apply the filter to the queryset
-    queryset=Vehicle.objects.all()
-    # Get the filtered vehicles
+    # Instantiate the filter form
+    filter_form = VehicleFilterForFinance(request.GET or None)
+    queryset = Vehicle.objects.all()
 
-    # Prepare the context with the filtered vehicles
+    # Initialize filters
+    start_date = filter_form.cleaned_data.get('start_date') if filter_form.is_valid() else None
+    end_date = filter_form.cleaned_data.get('end_date') if filter_form.is_valid() else None
+
+    # Prepare the context
     context = []
     for vehicle in queryset:
         # Get related data for each vehicle
         policies = vehicle.policies.all()
         emis = vehicle.emis.all()
         insurance_tax = vehicle.insurancetaxdue_set.first()  # Assuming one insurance/tax record
-        
+
         # Extract relevant due dates
         policy_due_date = policies[0].due_date if policies else None
         emi_due_date = emis[0].next_due_date if emis else None
@@ -113,6 +119,44 @@ def vehicle_list(request):
         fitness_due_date = insurance_tax.fitness_due_date if insurance_tax else None
         permit_due_date = insurance_tax.permit_due_date if insurance_tax else None
         puc_due_date = insurance_tax.puc_due_date if insurance_tax else None
+
+        # Apply date filtering
+        if start_date and not end_date:
+            # Only dates greater than or equal to start_date
+            if not (
+                (policy_due_date and policy_due_date >= start_date) or
+                (emi_due_date and emi_due_date >= start_date) or
+                (insurance_due_date and insurance_due_date >= start_date) or
+                (tax_due_date and tax_due_date >= start_date) or
+                (fitness_due_date and fitness_due_date >= start_date) or
+                (permit_due_date and permit_due_date >= start_date) or
+                (puc_due_date and puc_due_date >= start_date)
+            ):
+                continue  # Skip vehicles that don't match the filter
+        elif end_date and not start_date:
+            # Only dates less than or equal to end_date
+            if not (
+                (policy_due_date and policy_due_date <= end_date) or
+                (emi_due_date and emi_due_date <= end_date) or
+                (insurance_due_date and insurance_due_date <= end_date) or
+                (tax_due_date and tax_due_date <= end_date) or
+                (fitness_due_date and fitness_due_date <= end_date) or
+                (permit_due_date and permit_due_date <= end_date) or
+                (puc_due_date and puc_due_date <= end_date)
+            ):
+                continue  # Skip vehicles that don't match the filter
+        elif start_date and end_date:
+            # Dates within the range of start_date and end_date
+            if not (
+                (policy_due_date and start_date <= policy_due_date <= end_date) or
+                (emi_due_date and start_date <= emi_due_date <= end_date) or
+                (insurance_due_date and start_date <= insurance_due_date <= end_date) or
+                (tax_due_date and start_date <= tax_due_date <= end_date) or
+                (fitness_due_date and start_date <= fitness_due_date <= end_date) or
+                (permit_due_date and start_date <= permit_due_date <= end_date) or
+                (puc_due_date and start_date <= puc_due_date <= end_date)
+            ):
+                continue  # Skip vehicles that don't match the filter
 
         # Add vehicle info to the context
         context.append({
@@ -127,13 +171,20 @@ def vehicle_list(request):
             'puc_due_date': puc_due_date,
         })
 
-    # Pass the filter and the context to the template
+    # Render the template with the filter form and context
     return render(request, 'finance_vehicle_list.html', {
+        'filter_form': filter_form,
         'context': context
     })
 
+
+
+
 # View for the EMI section
 def vehicle_dashboard(request,id):
+    emi_form=EMIForm()
+    policy_form=PolicyForm()
+
     vehicle = Vehicle.objects.all() or None
     vehicle = Vehicle.objects.get(id=id)
     insurance_tax_due_data=InsuranceTaxDue.objects.filter(vehicle=vehicle) 
@@ -159,6 +210,8 @@ def vehicle_dashboard(request,id):
         'vehicle_id':id,
         'vehicle':vehicle,
         'form':form,
+        'emi_form':emi_form,
+        'policy_form':policy_form,
         'is_data_exist':is_data_exist,
         'emi':emi,
         'emi_amount':emi_amount,
@@ -412,3 +465,66 @@ def update_policy(request, id):
 # View for the Reports section
 def reports_list(request):
     return render(request, 'finance_reports_list.html')
+
+
+
+
+def insurance_bank_list(request):
+    rec = Insurance_Bank.objects.all()
+    if request.method == 'POST':
+        form = InsuranceBankForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Record Created Success.')
+            return redirect('/finance/insurance_bank_list/')
+    else: 
+        form = InsuranceBankForm()
+    return render(request, 'finance_insurance_bank_list.html', {'rec': rec,'form': form})
+ 
+def insurance_bank_update(request, id):
+    model_instance = get_object_or_404(Insurance_Bank, id=id)
+    if request.method == 'POST':
+        form = InsuranceBankForm(request.POST, instance=model_instance)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Record Updated Success.')
+    else:
+        form = InsuranceBankForm(instance=model_instance)
+    return render(request, 'finance_insurance_bank_update.html', {'form': form})
+
+def insurance_bank_delete(request, id):
+    model_instance = get_object_or_404(Insurance_Bank, id=id)
+    model_instance.delete()
+    messages.success(request, 'Record Deleted Success.')
+    return redirect('/finance/insurance_bank_list')
+
+
+
+def finance_bank_list(request):
+    rec = Finance_Bank.objects.all()
+    if request.method == 'POST':
+        form = FinanceBankForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Record Created Success.')
+            return redirect('/finance/finance_bank_list/')
+    else: 
+        form = FinanceBankForm()
+    return render(request, 'finance_finance_bank_list.html', {'rec': rec,'form': form})
+ 
+def finance_bank_update(request, id):
+    model_instance = get_object_or_404(Finance_Bank, id=id)
+    if request.method == 'POST':
+        form = FinanceBankForm(request.POST, instance=model_instance)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Record Updated Success.')
+    else:
+        form = FinanceBankForm(instance=model_instance)
+    return render(request, 'finance_finance_bank_update.html', {'form': form})
+
+def finance_bank_delete(request, id): 
+    model_instance = get_object_or_404(Finance_Bank, id=id)
+    model_instance.delete()
+    messages.success(request, 'Record Deleted Success.')
+    return redirect('/finance/finance_bank_list')

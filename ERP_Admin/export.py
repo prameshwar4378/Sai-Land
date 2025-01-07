@@ -409,3 +409,114 @@ def export_emi_data(request):
     wb.save(response)
 
     return response
+
+
+
+ 
+from .filters import VehicleFilterForFinance
+
+def export_vehicle_for_finance(request):
+    # Instantiate the filter form
+    filter_form = VehicleFilterForFinance(request.GET or None)
+    queryset = Vehicle.objects.all()
+
+    # Initialize filters
+    start_date = filter_form.cleaned_data.get('start_date') if filter_form.is_valid() else None
+    end_date = filter_form.cleaned_data.get('end_date') if filter_form.is_valid() else None
+
+    # Prepare the filtered data
+    vehicles_data = []
+    for vehicle in queryset:
+        # Get related data for each vehicle
+        policies = vehicle.policies.all()
+        emis = vehicle.emis.all()
+        insurance_tax = vehicle.insurancetaxdue_set.first()  # Assuming one insurance/tax record
+
+        # Extract relevant due dates
+        policy_due_date = policies[0].due_date if policies else None
+        emi_due_date = emis[0].next_due_date if emis else None
+        insurance_due_date = insurance_tax.insurance_due_date if insurance_tax else None
+        tax_due_date = insurance_tax.tax_due_date if insurance_tax else None
+        fitness_due_date = insurance_tax.fitness_due_date if insurance_tax else None
+        permit_due_date = insurance_tax.permit_due_date if insurance_tax else None
+        puc_due_date = insurance_tax.puc_due_date if insurance_tax else None
+
+        # Apply date filtering
+        if start_date and not end_date:
+            if not (
+                (policy_due_date and policy_due_date >= start_date) or
+                (emi_due_date and emi_due_date >= start_date) or
+                (insurance_due_date and insurance_due_date >= start_date) or
+                (tax_due_date and tax_due_date >= start_date) or
+                (fitness_due_date and fitness_due_date >= start_date) or
+                (permit_due_date and permit_due_date >= start_date) or
+                (puc_due_date and puc_due_date >= start_date)
+            ):
+                continue
+        elif end_date and not start_date:
+            if not (
+                (policy_due_date and policy_due_date <= end_date) or
+                (emi_due_date and emi_due_date <= end_date) or
+                (insurance_due_date and insurance_due_date <= end_date) or
+                (tax_due_date and tax_due_date <= end_date) or
+                (fitness_due_date and fitness_due_date <= end_date) or
+                (permit_due_date and permit_due_date <= end_date) or
+                (puc_due_date and puc_due_date <= end_date)
+            ):
+                continue
+        elif start_date and end_date:
+            if not (
+                (policy_due_date and start_date <= policy_due_date <= end_date) or
+                (emi_due_date and start_date <= emi_due_date <= end_date) or
+                (insurance_due_date and start_date <= insurance_due_date <= end_date) or
+                (tax_due_date and start_date <= tax_due_date <= end_date) or
+                (fitness_due_date and start_date <= fitness_due_date <= end_date) or
+                (permit_due_date and start_date <= permit_due_date <= end_date) or
+                (puc_due_date and start_date <= puc_due_date <= end_date)
+            ):
+                continue
+
+        # Add vehicle info to the export data
+        vehicles_data.append({
+            'vehicle_number': vehicle.vehicle_number,
+            'policy_due_date': policy_due_date,
+            'emi_due_date': emi_due_date,
+            'insurance_due_date': insurance_due_date,
+            'tax_due_date': tax_due_date,
+            'fitness_due_date': fitness_due_date,
+            'permit_due_date': permit_due_date,
+            'puc_due_date': puc_due_date,
+        })
+
+    # Create an Excel workbook
+    workbook = openpyxl.Workbook()
+    sheet = workbook.active
+    sheet.title = 'Vehicles'
+
+    # Add header row with bold font
+    header = [
+        'Vehicle Number', 'Policy Due Date', 'EMI Due Date', 'Insurance Due Date',
+        'Tax Due Date', 'Fitness Due Date', 'Permit Due Date', 'PUC Due Date'
+    ]
+    for col_num, column_title in enumerate(header, 1):
+        cell = sheet.cell(row=1, column=col_num)
+        cell.value = column_title
+        cell.font = Font(bold=True)
+
+    # Add vehicle data to rows
+    for row_num, vehicle in enumerate(vehicles_data, 2):
+        sheet.cell(row=row_num, column=1).value = vehicle['vehicle_number']
+        sheet.cell(row=row_num, column=2).value = vehicle['policy_due_date']
+        sheet.cell(row=row_num, column=3).value = vehicle['emi_due_date']
+        sheet.cell(row=row_num, column=4).value = vehicle['insurance_due_date']
+        sheet.cell(row=row_num, column=5).value = vehicle['tax_due_date']
+        sheet.cell(row=row_num, column=6).value = vehicle['fitness_due_date']
+        sheet.cell(row=row_num, column=7).value = vehicle['permit_due_date']
+        sheet.cell(row=row_num, column=8).value = vehicle['puc_due_date']
+
+    # Create HTTP response for download
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=vehicles.xlsx'
+    workbook.save(response)
+
+    return response

@@ -14093,7 +14093,29 @@
             </a>
         </li>
 
-
+     
+        <li class="nav-item">
+            <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
+              <i class="bi bi-layout-text-window-reverse"></i><span>More</span><i class="bi bi-chevron-down ms-auto"></i>
+            </a>
+            <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+       
+                <li>
+                    <a href="{% url "finance_insurance_bank_list" %}" style="text-decoration:none;">
+                        <i class="bi bi-bank" style="font-size:15px;"></i><span>Insurance Bank</span>
+                    </a>
+                  </li>
+       
+                  <li>
+                    <a href="{% url "finance_finance_bank_list" %}" style="text-decoration:none;">
+                        <i class="bi bi-bank" style="font-size:15px;"></i><span>Finance Bank</span>
+                    </a>
+                  </li>
+               
+      
+            </ul>
+        </li><!-- End Tables Nav -->
+      
 
     </ul>
 </aside><!--  End Sidebar-->

@@ -3,38 +3,11 @@
 {% load crispy_forms_tags %}
 {% block content %}
 <style>
-    .dropdown {
-        position: relative;
-        display: inline-block;
-    }
-
-    .dropdown-content {
-        display: none;
-        position: absolute;
-        background-color: #f9f9f9;
-        min-width: 100px;
-        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-        z-index: 1;
-        border-radius: 10px;
-    }
-
-    .dropdown-content a {
-        color: black;
-        padding: 5px 10px;
-        text-decoration: none;
-        display: block;
-        text-align: left;
-    }
-
-    .dropdown-content a:hover {
-        background-color: #f1f1f1;
-    }
-
-    .dropdown:hover .dropdown-content {
-        display: block;
-    }
-
-
+  #id_vehicle {
+    pointer-events: none; /* Prevents user interaction */
+    background-color: #f5f5f5; /* Optional: Makes it look like a read-only field */
+    color: #6c757d; /* Optional: Gray out text for a read-only appearance */
+  }
  
 .details {
     background-color: #f9f9f9;
@@ -72,7 +45,9 @@
     margin-top: 1rem;
 }
 
-
+.card{
+    height:90%;
+}
 
 fieldset {
     border: 2px solid #b9b9b9; /* Green border */
@@ -108,15 +83,10 @@ legend {
                 <div class="container" style="max-width:97%;">
                     <div class="text-lg-end text-start"> 
                         {% if not is_data_exist %}
-                        <a href="#" class="btn text-light" data-toggle="modal"
-                        data-target="#model_create_record" style="background: linear-gradient(90deg, rgb(3, 32, 0) 0%,   rgb(0, 80, 141) 100%);" data-toggle="modal"><i class="bi bi-file-earmark-spreadsheet"></i> | Create</a> 
+                        <a href="#" class="btn text-light" data-toggle="modal" data-target="#model_create_record" style="background: linear-gradient(90deg, rgb(3, 32, 0) 0%,   rgb(0, 80, 141) 100%);" data-toggle="modal"><i class="bi bi-file-earmark-spreadsheet"></i> | Create</a> 
                         {% else %}
                         <a href="javascript:void(0);" data-url="{% url 'finance_update_insurance_tax_due' insurance_tax_due_id %}" class="btn btn-primary " onclick="mini_window_1(this)" style="background: linear-gradient(90deg, rgb(3, 32, 0) 0%,   rgb(141, 87, 0) 100%);">Update</a>
                         {% endif %}
-                        
- 
-                            <a href="#" class="btn text-light" data-toggle="modal"
-                            data-target="#model_export_excel" style="background: linear-gradient(90deg, rgb(3, 32, 0) 0%,   rgb(31, 141, 0) 100%);"><i class="bi bi-file-earmark-spreadsheet"></i> | Export</a> 
                     </div>
 
                 </div>
@@ -125,10 +95,11 @@ legend {
 
         <section class="section dashboard">
             <div class="row">
-                <div class="col-lg-12">
-                    <div class="row">
-                        
-                    </div>
+                <div class="col-lg-4  p-3" > 
+                    <p class="alert alert-primary" style="width: 100%; margin-bottom:-20px;">Vehicle Number : <b>{{ emi.vehicle.vehicle_number }}</b></p>
+                </div>
+                <div class="col-lg-8  p-3" > 
+                    <p class="alert alert-primary" style="width: 100%; margin-bottom:-20px;">Vehicle Number : <b>{{ emi.vehicle.vehicle_name }}</b></p>
                 </div>
             </div>
             <hr>
@@ -150,6 +121,10 @@ legend {
                             <div class="mt-2 details">
                                 {% if emi %}
                                 <div class="record">
+                                    <span class="label">File:</span>
+                                    <span class="value"> <a href="/media/{{emi.file}}" download>Download</a> </span>
+                                </div>
+                                <div class="record">
                                     <span class="label">EMI Amount:</span>
                                     <span class="value">{{ emi_amount }}</span>
                                 </div>
@@ -158,7 +133,7 @@ legend {
                                     <span class="value">{{ emi.next_due_date }}</span>
                                 </div> 
                                 {% else %}
-                                    <p>No EMI Record Found. <a href="{% url 'finance_emi_list' %}">create new</a></p>
+                                    <p>No EMI Record Found. <a href="#" data-toggle="modal" data-target="#model_create_emi">create new</a></p>
                                 {% endif %}  
                             </div>
                         </div>
@@ -166,6 +141,75 @@ legend {
                 </div><!-- End Card -->
              
                 
+                
+                
+                <div class="col-sm-4">
+                    <div class="card recent-sales overflow-auto">
+                        <div class="card-body">
+                            <h4 class="card-title">Insurance  | 
+                                {% if insurance_tax_due.insurance_due_date %} 
+                                <span style="font-weight: 200; ">
+                                    <a href="javascript:void(0);" style="text-decoration: none;" data-url="{% url 'finance_update_insurance_tax_due' insurance_tax_due_id %}"   onclick="mini_window_1(this)"  >Update</a>
+                                </span> 
+                                {% endif %}   
+                            </h4>
+
+                            <div class="mt-2 details">
+                                {% if insurance_tax_due.insurance_due_date %}
+                                <div class="record">
+                                    <span class="label">Insurance Amount:</span>
+                                    <span class="value">{{ insurance_tax_due.insurance_amount }}</span>
+                                </div>
+                                <div class="record">
+                                    <span class="label">Due Date:</span>
+                                    <span class="value">{{ insurance_tax_due.insurance_due_date }}</span>
+                                </div> 
+                                <div class="record">
+                                    <span class="label">Insurance Bank:</span>
+                                    <span class="value">{{ insurance_tax_due.insurance_bank }}</span>
+                                </div> 
+                                {% else %}
+                                    <p>No Insurance Record Found. </p>
+                                {% endif %}  
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- End Card -->
+             
+                
+                <div class="col-sm-4">
+                    <div class="card recent-sales overflow-auto">
+                        <div class="card-body">
+                            <h4 class="card-title">Tax  | 
+                                {% if insurance_tax_due.tax_due_date %} 
+                                <span style="font-weight: 200; ">
+                                    <a href="javascript:void(0);" style="text-decoration: none;" data-url="{% url 'finance_update_insurance_tax_due' insurance_tax_due_id %}"   onclick="mini_window_1(this)"  >Update</a>
+                                </span> 
+                                {% endif %}   
+                             </h4>
+                            <div class="mt-2 details">
+                                {% if insurance_tax_due.tax_due_date %}
+                                <div class="record">
+                                    <span class="label">Tax Amount:</span>
+                                    <span class="value">{{ insurance_tax_due.tax_amount }}</span>
+                                </div>
+                                <div class="record">
+                                    <span class="label">Due Date:</span>
+                                    <span class="value">{{ insurance_tax_due.tax_due_date }}</span>
+                                </div> 
+                                <div class="record">
+                                    <span class="label">Frequency:</span>
+                                    <span class="value">{{ insurance_tax_due.tax_frequency }}</span>
+                                </div> 
+                                {% else %}
+                                    <p>No Tax Record Found.</p>
+                                {% endif %}  
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- End Card -->
+             
+
                 <div class="col-sm-4">
                     <div class="card recent-sales overflow-auto">
                         <div class="card-body">
@@ -189,7 +233,7 @@ legend {
                                     <span class="value">{{ policy.due_date }}</span>
                                 </div> 
                                 {% else %}
-                                    <p>No Policy Record Found. <a href="{% url 'finance_policy_list' %}">create new</a></p>
+                                    <p>No Policy Record Found. <a href="#" data-toggle="modal" data-target="#model_create_policy">create new</a></p>
                                 {% endif %}  
                             </div>
                         </div>
@@ -200,59 +244,17 @@ legend {
                 <div class="col-sm-4">
                     <div class="card recent-sales overflow-auto">
                         <div class="card-body">
-                            <h4 class="card-title">Insurance   </h4>
-                            <div class="mt-2 details">
-                                {% if insurance_tax_due.insurance_due_date %}
-                                <div class="record">
-                                    <span class="label">Insurance Amount:</span>
-                                    <span class="value">{{ insurance_tax_due.insurance_amount }}</span>
-                                </div>
-                                <div class="record">
-                                    <span class="label">Due Date:</span>
-                                    <span class="value">{{ insurance_tax_due.insurance_due_date }}</span>
-                                </div> 
-                                {% else %}
-                                    <p>No Insurance Record Found. </p>
-                                {% endif %}  
-                            </div>
-                        </div>
-                    </div>
-                </div><!-- End Card -->
-             
-                
-                <div class="col-sm-4">
-                    <div class="card recent-sales overflow-auto">
-                        <div class="card-body">
-                            <h4 class="card-title">Tax  </h4>
-                            <div class="mt-2 details">
-                                {% if insurance_tax_due.tax_due_date %}
-                                <div class="record">
-                                    <span class="label">Tax Amount:</span>
-                                    <span class="value">{{ insurance_tax_due.tax_amount }}</span>
-                                </div>
-                                <div class="record">
-                                    <span class="label">Due Date:</span>
-                                    <span class="value">{{ insurance_tax_due.tax_due_date }}</span>
-                                </div> 
-                                {% else %}
-                                    <p>No Tax Record Found.</p>
-                                {% endif %}  
-                            </div>
-                        </div>
-                    </div>
-                </div><!-- End Card -->
-             
-
-                
-                
-                <div class="col-sm-4">
-                    <div class="card recent-sales overflow-auto">
-                        <div class="card-body">
-                            <h4 class="card-title">Fitness Due  </h4>
+                            <h4 class="card-title">Fitness Due  | 
+                                {% if insurance_tax_due.fitness_due_date %} 
+                                <span style="font-weight: 200; ">
+                                    <a href="javascript:void(0);" style="text-decoration: none;" data-url="{% url 'finance_update_insurance_tax_due' insurance_tax_due_id %}"   onclick="mini_window_1(this)"  >Update</a>
+                                </span> 
+                                {% endif %}   
+                             </h4>
                             <div class="mt-2 details">
                                 {% if insurance_tax_due.fitness_due_date %}
                                 <div class="record">
-                                    <span class="label">EMI Amount:</span>
+                                    <span class="label">Due Date:</span>
                                     <span class="value">{{ insurance_tax_due.fitness_due_date }}</span>
                                 </div> 
                                 {% else %}
@@ -267,11 +269,17 @@ legend {
                 <div class="col-sm-4">
                     <div class="card recent-sales overflow-auto">
                         <div class="card-body">
-                            <h4 class="card-title">Fitness Due  </h4>
+                            <h4 class="card-title">Permit Due  | 
+                                {% if insurance_tax_due.permit_due_date %} 
+                                <span style="font-weight: 200; ">
+                                    <a href="javascript:void(0);" style="text-decoration: none;" data-url="{% url 'finance_update_insurance_tax_due' insurance_tax_due_id %}"   onclick="mini_window_1(this)"  >Update</a>
+                                </span> 
+                                {% endif %}   
+                             </h4>
                             <div class="mt-2 details">
                                 {% if insurance_tax_due.permit_due_date %}
                                 <div class="record">
-                                    <span class="label">Permit Amount:</span>
+                                    <span class="label">Due Date:</span>
                                     <span class="value">{{ insurance_tax_due.permit_due_date }}</span>
                                 </div> 
                                 {% else %}
@@ -286,7 +294,13 @@ legend {
                 <div class="col-sm-4">
                     <div class="card recent-sales overflow-auto">
                         <div class="card-body">
-                            <h4 class="card-title">PUC Due  </h4>
+                            <h4 class="card-title">PUC Due  | 
+                                {% if insurance_tax_due.puc_due_date %} 
+                                <span style="font-weight: 200; ">
+                                    <a href="javascript:void(0);" style="text-decoration: none;" data-url="{% url 'finance_update_insurance_tax_due' insurance_tax_due_id %}"   onclick="mini_window_1(this)"  >Update</a>
+                                </span> 
+                                {% endif %}   
+                             </h4>
                             <div class="mt-2 details">
                                 {% if insurance_tax_due.puc_due_date %}
                                 <div class="record">
@@ -303,6 +317,102 @@ legend {
             </div>
         </section>
 </main><!-- End #main -->
+
+
+
+<div class="modal fade" id="model_create_emi" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#9c4b2e;">
+                <h4 class="modal-title text-white" id="exampleModalLongTitle">Create EMI</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left">
+                <div class="alert alert-danger d-none" id="createEMIError"></div>
+                <form id="createEMIForm" method="POST" enctype="multipart/form-data" action="{% url 'finance_create_emi' %}">
+                    {% csrf_token %}
+                    <div class="row">
+                        <!-- Vehicle Field -->
+                        <div class="col-sm-6">
+                            {{ emi_form.vehicle|as_crispy_field }}
+                        </div>
+                        <!-- Loan Amount Field -->
+                        <div class="col-sm-6">
+                            {{ emi_form.loan_amount|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ emi_form.loan_account_no|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ emi_form.finance_bank|as_crispy_field }}
+                        </div>
+                        <!-- Total Installments Field -->
+                        <div class="col-sm-6">
+                            {{ emi_form.total_installments|as_crispy_field }}
+                        </div>
+                        <!-- Paid Installments Field -->
+                        <div class="col-sm-6">
+                            {{ emi_form.paid_installments|as_crispy_field }}
+                        </div>
+                        <!-- Next Due Date Field -->
+                        <div class="col-sm-6">
+                            {{ emi_form.next_due_date|as_crispy_field }}
+                        </div>
+                        <!-- File Upload Field -->
+                        <div class="col-sm-6">
+                            {{ emi_form.file|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ emi_form.frequency|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ emi_form.status|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="model_create_policy" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#9c4b2e;">
+                <h4 class="modal-title text-white" id="exampleModalLongTitle">Create Policy</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left">
+                <div class="alert alert-danger d-none" id="createPolicyFormError"></div>
+                <form id="createPolicyForm" method="POST" enctype="multipart/form-data" action="{% url 'finance_create_policy' %}">
+                    {% csrf_token %}
+                    <div class="row">  
+                        <div class="col-sm-12">{{ policy_form.vehicle|as_crispy_field }}</div>
+                        <div class="col-sm-12">{{ policy_form.policy_number|as_crispy_field }}</div>
+                        <div class="col-sm-12">{{ policy_form.policy_file|as_crispy_field }}</div>
+                        <div class="col-sm-12">{{ policy_form.due_date|as_crispy_field }}</div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 
@@ -328,8 +438,8 @@ legend {
                                 {{ form.insurance_amount|as_crispy_field }}
                             </div>
                             <div class="col">
-                                {{ form.insurance_name|as_crispy_field }}
-                            </div>
+                                {{ form.insurance_bank|as_crispy_field }}
+                            </div> 
                             <div class="col">
                                 {{ form.insurance_due_date|as_crispy_field }}
                             </div>
@@ -400,27 +510,17 @@ legend {
 </div>
 
 
+  
 <script>
- $(function(){
-  $("#id_driver").selectize();
-  $("#id_party").selectize();
-  $("#id_technician").selectize();
-  $("#id_vehicle").selectize();
-  $("#filter_technician").selectize();
-  $("#filter_driver").selectize();
-  $("#filter_vehicle").selectize();
-  $("#filter_party").selectize();
- }); 
-</script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const selectElements = document.querySelectorAll("#id_vehicle");
+        const defaultValue = "{{ vehicle_id }}"; // Make sure vehicle_id is passed as a context variable in your template.
 
-<script>
-    $(document).ready(function () {
-        $('#emi').DataTable({
-            "scrollX": true // If you want horizontal scrolling
+        selectElements.forEach(selectElement => {
+            selectElement.value = defaultValue;
         });
-    }); 
+    });
 </script>
-
 
 
 <script>
@@ -476,7 +576,92 @@ document.getElementById('createForm').addEventListener('submit', function (e) {
 
 </script>
 
- 
+
+
+<script>
+    document.getElementById('createEMIForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+        const errorAlert = document.getElementById('createEMIError');
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // alert(data.message); // Show success alert// Show success alert
+                location.reload();   // Refresh the page or update the list dynamically
+            } else {
+                let errorMessage = '<strong>Error:</strong><br>';
+                for (const [field, errors] of Object.entries(data.errors)) {
+                    errorMessage += `${field}: ${errors.join(', ')}<br>`;
+                }
+                errorAlert.innerHTML = errorMessage;
+                errorAlert.classList.remove('d-none');
+            }
+        })
+        .catch(error => {
+            errorAlert.innerHTML = '<strong>An unexpected error occurred. Please try again later.</strong>';
+            errorAlert.classList.remove('d-none');
+        });
+    });
+    
+    </script>
+    
+
+
+
+    <script>
+        $(document).ready(function () {
+             
+            $("#createPolicyForm").on("submit", function (e) {
+                e.preventDefault(); // Prevent form from refreshing the page
+                let formData = new FormData(this);
+                $.ajax({
+                    url: $(this).attr("action"),
+                    method: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.success) {
+                            //alert(response.message); // Show success message
+                            $("#model_create_policy").modal("hide"); // Close modal
+                            location.reload(); // Optionally reload the page
+                        }
+                    },
+                    error: function (xhr) {
+                        let errorDiv = $("#createPolicyFormError");
+                        errorDiv.removeClass("d-none"); // Make the error alert visible
+    
+                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                            // Collect and display all errors
+                            let errorMessages = Object.values(xhr.responseJSON.errors)
+                                .flat()
+                                .join("<br>");
+                            errorDiv.html(errorMessages);
+                        } else {
+                            errorDiv.html("An unexpected error occurred. Please try again.");
+                        }
+                    },
+                });
+            });
+    
+            // Reset error message when modal is closed
+            $("#model_create_policy").on("hidden.bs.modal", function () {
+                $("#createPolicyFormError").addClass("d-none").html("");
+                $("#createPolicyForm")[0].reset(); // Reset the form
+            });
+        });
+    </script>
+
+
+    
 
 <script>
     function mini_window_1(element) { 

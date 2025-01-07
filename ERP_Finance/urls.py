@@ -22,4 +22,13 @@ urlpatterns = [
     path('update_policy/<int:id>', views.update_policy, name='finance_update_policy'),
 
     path('reports_list/', views.reports_list, name='finance_reports_list'),
+
+     
+    path('insurance_bank_list/', views.insurance_bank_list, name='finance_insurance_bank_list'),
+    path('insurance_bank_update/<int:id>', views.insurance_bank_update, name='finance_insurance_bank_update'),
+    path('insurance_bank_delete/<int:id>', views.insurance_bank_delete, name='finance_insurance_bank_delete'),
+    
+    path('finance_bank_list/', views.finance_bank_list, name='finance_finance_bank_list'),
+    path('finance_bank_update/<int:id>', views.finance_bank_update, name='finance_finance_bank_update'),
+    path('finance_bank_delete/<int:id>', views.finance_bank_delete, name='finance_finance_bank_delete'),
 ]

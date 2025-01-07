@@ -55,7 +55,9 @@ urlpatterns = [
     path('vehicle-dashboard', views.vehicle_dashboard , name="admin_vehicle_dashboard"), 
     path('generate_and_download_qr/<vehicle_number>', views.generate_qr, name="generate_and_download_qr"),
 
-
+    path('vehicle_model_list', views.vehicle_model_list , name="admin_vehicle_model_list"), 
+    path('vehicle_model_update/<int:id>', views.vehicle_model_update , name="admin_vehicle_model_update"), 
+    path('vehicle_model_delete/<int:id>', views.vehicle_model_delete , name="admin_vehicle_model_delete"), 
 
     path('export_filtered_job_cards', export_filtered_job_cards , name="export_filtered_job_cards"),
     path('export_purchase_data', export_purchase_data , name="export_purchase_data"),
@@ -66,6 +68,7 @@ urlpatterns = [
     path('export_party_data', export_party_data , name="export_party_data"),
     path('export_policy_data', export_policy_data , name="export_policy_data"),
     path('export_emi_data', export_emi_data , name="export_emi_data"),
+    path('export_vehicle_for_finance', export_vehicle_for_finance , name="export_vehicle_for_finance"),
 
 
 ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

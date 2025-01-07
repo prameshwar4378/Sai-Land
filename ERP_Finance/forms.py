@@ -1,5 +1,5 @@
 from django import forms
-from ERP_Admin.models import Policy,EMI,EMI_Item,InsuranceTaxDue
+from ERP_Admin.models import Policy,EMI,EMI_Item,InsuranceTaxDue,Insurance_Bank,Finance_Bank
 from django.core.exceptions import ValidationError
 from datetime import date
 
@@ -78,7 +78,7 @@ class InsuranceTaxDueForm(forms.ModelForm):
         fields = [
             'insurance_amount', 
             'insurance_due_date',
-            'insurance_name', 
+            'insurance_bank', 
             'tax_frequency', 
             'tax_amount', 
             'tax_due_date',  
@@ -111,3 +111,15 @@ class InsuranceTaxDueForm(forms.ModelForm):
                 raise ValidationError({field: f'{field.replace("_", " ").title()} must be in the future.'})
 
         return cleaned_data
+    
+
+
+class InsuranceBankForm(forms.ModelForm):
+    class Meta:
+        model = Insurance_Bank
+        fields = ['bank_name']
+
+class FinanceBankForm(forms.ModelForm):
+    class Meta:
+        model = Finance_Bank
+        fields = ['bank_name']
