@@ -154,7 +154,7 @@ class Product(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.product_image:
-            self.product_image = 'default_image.jpg'  # Set default image if no image is uploaded
+            self.product_image = 'default_image.webp'  # Set default image if no image is uploaded
         super(Product, self).save(*args, **kwargs)
     
     def __str__(self):
