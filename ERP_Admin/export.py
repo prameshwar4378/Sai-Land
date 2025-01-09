@@ -435,8 +435,7 @@ def export_vehicle_for_finance(request):
         policy_due_date = policies[0].due_date if policies else None
         policy_number = policies[0].policy_number if policies else None
         policy_file = policies[0].policy_file.url if policies else None
-
-        finance_bank = emis[0].finance_bank.bank_name if emis else None
+ 
         loan_account_no = emis[0].loan_account_no if emis else None
         emi_due_date = emis[0].next_due_date if emis else None
         emi_frequency = emis[0].frequency if emis else None
@@ -445,9 +444,7 @@ def export_vehicle_for_finance(request):
         total_installments = emis[0].total_installments if emis else None
         paid_installments = emis[0].paid_installments if emis else None
         remaining_installments = emis[0].remaining_installments if emis else None
-
-        insurance_bank = insurance_tax.insurance_bank.bank_name if insurance_tax.insurance_bank else None
-        insurance_amount = insurance_tax.insurance_tax.insurance_amount if insurance_tax else None
+ 
         insurance_due_date = insurance_tax.insurance_due_date if insurance_tax else None
         insurance_amount = insurance_tax.insurance_amount if insurance_tax else None
         tax_due_date = insurance_tax.tax_due_date if insurance_tax else None
@@ -497,7 +494,6 @@ def export_vehicle_for_finance(request):
             'policy_due_date': policy_due_date,
             'policy_number': policy_number,
             'policy_file': policy_file,
-            'finance_bank': finance_bank,
             'loan_account_no': loan_account_no,
             'emi_due_date': emi_due_date,
             'emi_frequency': emi_frequency,
@@ -506,7 +502,6 @@ def export_vehicle_for_finance(request):
             'total_installments': total_installments,
             'paid_installments': paid_installments,
             'remaining_installments': remaining_installments,
-            'insurance_bank': insurance_bank,
             'insurance_amount': insurance_amount,
             'insurance_due_date': insurance_due_date,
             'insurance_amount': insurance_amount,
@@ -525,8 +520,8 @@ def export_vehicle_for_finance(request):
     # Add header row with bold font
     header = [
         'Vehicle Number', 'Policy Due Date', 'Policy Number', 'Policy File',
-        'EMI Finance Bank','Loan Account No','EMI Due Date', 'EMI Frequency', 'EMI Status', 'EMI File', 'Total Installments','Paid Installments','Remaining Installments',
-        'Insurance Bank','Insurance Amount','Insurance Due Date', 'Insurance Amount', 'Tax Due Date', 'Tax Amount',
+        'Loan Account No','EMI Due Date', 'EMI Frequency', 'EMI Status', 'EMI File', 'Total Installments','Paid Installments','Remaining Installments',
+        'Insurance Amount','Insurance Due Date', 'Insurance Amount', 'Tax Due Date', 'Tax Amount',
         'Fitness Due Date', 'Permit Due Date', 'PUC Due Date'
     ]
     for col_num, column_title in enumerate(header, 1):
