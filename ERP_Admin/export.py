@@ -414,7 +414,6 @@ def export_emi_data(request):
 
  
 from .filters import VehicleFilterForFinance
-
 def export_vehicle_for_finance(request):
     # Instantiate the filter form
     filter_form = VehicleFilterForFinance(request.GET or None)
@@ -432,11 +431,27 @@ def export_vehicle_for_finance(request):
         emis = vehicle.emis.all()
         insurance_tax = vehicle.insurancetaxdue_set.first()  # Assuming one insurance/tax record
 
-        # Extract relevant due dates
+        # Extract relevant data
         policy_due_date = policies[0].due_date if policies else None
+        policy_number = policies[0].policy_number if policies else None
+        policy_file = policies[0].policy_file.url if policies else None
+
+        finance_bank = emis[0].finance_bank.bank_name if emis else None
+        loan_account_no = emis[0].loan_account_no if emis else None
         emi_due_date = emis[0].next_due_date if emis else None
+        emi_frequency = emis[0].frequency if emis else None
+        emi_status = emis[0].status if emis else None
+        emi_file = emis[0].file.url if emis else None
+        total_installments = emis[0].total_installments if emis else None
+        paid_installments = emis[0].paid_installments if emis else None
+        remaining_installments = emis[0].remaining_installments if emis else None
+
+        insurance_bank = insurance_tax.insurance_bank.bank_name if insurance_tax.insurance_bank else None
+        insurance_amount = insurance_tax.insurance_tax.insurance_amount if insurance_tax else None
         insurance_due_date = insurance_tax.insurance_due_date if insurance_tax else None
+        insurance_amount = insurance_tax.insurance_amount if insurance_tax else None
         tax_due_date = insurance_tax.tax_due_date if insurance_tax else None
+        tax_amount = insurance_tax.tax_amount if insurance_tax else None
         fitness_due_date = insurance_tax.fitness_due_date if insurance_tax else None
         permit_due_date = insurance_tax.permit_due_date if insurance_tax else None
         puc_due_date = insurance_tax.puc_due_date if insurance_tax else None
@@ -480,9 +495,23 @@ def export_vehicle_for_finance(request):
         vehicles_data.append({
             'vehicle_number': vehicle.vehicle_number,
             'policy_due_date': policy_due_date,
+            'policy_number': policy_number,
+            'policy_file': policy_file,
+            'finance_bank': finance_bank,
+            'loan_account_no': loan_account_no,
             'emi_due_date': emi_due_date,
+            'emi_frequency': emi_frequency,
+            'emi_status': emi_status,
+            'emi_file': emi_file,
+            'total_installments': total_installments,
+            'paid_installments': paid_installments,
+            'remaining_installments': remaining_installments,
+            'insurance_bank': insurance_bank,
+            'insurance_amount': insurance_amount,
             'insurance_due_date': insurance_due_date,
+            'insurance_amount': insurance_amount,
             'tax_due_date': tax_due_date,
+            'tax_amount': tax_amount,
             'fitness_due_date': fitness_due_date,
             'permit_due_date': permit_due_date,
             'puc_due_date': puc_due_date,
@@ -495,8 +524,10 @@ def export_vehicle_for_finance(request):
 
     # Add header row with bold font
     header = [
-        'Vehicle Number', 'Policy Due Date', 'EMI Due Date', 'Insurance Due Date',
-        'Tax Due Date', 'Fitness Due Date', 'Permit Due Date', 'PUC Due Date'
+        'Vehicle Number', 'Policy Due Date', 'Policy Number', 'Policy File',
+        'EMI Finance Bank','Loan Account No','EMI Due Date', 'EMI Frequency', 'EMI Status', 'EMI File', 'Total Installments','Paid Installments','Remaining Installments',
+        'Insurance Bank','Insurance Amount','Insurance Due Date', 'Insurance Amount', 'Tax Due Date', 'Tax Amount',
+        'Fitness Due Date', 'Permit Due Date', 'PUC Due Date'
     ]
     for col_num, column_title in enumerate(header, 1):
         cell = sheet.cell(row=1, column=col_num)
@@ -505,14 +536,8 @@ def export_vehicle_for_finance(request):
 
     # Add vehicle data to rows
     for row_num, vehicle in enumerate(vehicles_data, 2):
-        sheet.cell(row=row_num, column=1).value = vehicle['vehicle_number']
-        sheet.cell(row=row_num, column=2).value = vehicle['policy_due_date']
-        sheet.cell(row=row_num, column=3).value = vehicle['emi_due_date']
-        sheet.cell(row=row_num, column=4).value = vehicle['insurance_due_date']
-        sheet.cell(row=row_num, column=5).value = vehicle['tax_due_date']
-        sheet.cell(row=row_num, column=6).value = vehicle['fitness_due_date']
-        sheet.cell(row=row_num, column=7).value = vehicle['permit_due_date']
-        sheet.cell(row=row_num, column=8).value = vehicle['puc_due_date']
+        for col_num, field in enumerate(header, 1):
+            sheet.cell(row=row_num, column=col_num).value = vehicle.get(field.lower().replace(' ', '_'))
 
     # Create HTTP response for download
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -520,3 +545,5 @@ def export_vehicle_for_finance(request):
     workbook.save(response)
 
     return response
+
+
