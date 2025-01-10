@@ -59,6 +59,13 @@ urlpatterns = [
     path('vehicle_model_update/<int:id>', views.vehicle_model_update , name="admin_vehicle_model_update"), 
     path('vehicle_model_delete/<int:id>', views.vehicle_model_delete , name="admin_vehicle_model_delete"), 
 
+
+    # Finance Section
+    path('finance_dashboard', views.finance_dashboard , name="admin_finance_dashboard"), 
+    path('finance_vehicle_list', views.finance_vehicle_list , name="admin_finance_vehicle_list"), 
+    path('finance_vehicle_dashboard/<int:id>', views.finance_vehicle_dashboard , name="admin_finance_vehicle_dashboard"), 
+
+
     path('export_filtered_job_cards', export_filtered_job_cards , name="export_filtered_job_cards"),
     path('export_purchase_data', export_purchase_data , name="export_purchase_data"),
     path('export_product_data', export_product_data , name="export_product_data"),

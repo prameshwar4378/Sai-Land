@@ -131,12 +131,6 @@ class EMIFilter(django_filters.FilterSet):
         ]
 
 from django import forms
-
-from django.db.models import Q
- 
-import django_filters
-from django.db.models import Q
-from .models import InsuranceTaxDue, EMI, Policy
  
 class VehicleFilterForFinance(forms.Form):
     start_date = forms.DateField(

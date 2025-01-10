@@ -12,7 +12,19 @@ from django.utils import timezone
 from datetime import timedelta 
 from collections import Counter
 from ERP_Admin.filters import VehicleFilterForFinance
+from functools import wraps
 
+def finance_required(function):
+    @wraps(function)
+    def _wrapped_view(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('/login')  # Redirect to login if not logged in
+        if not request.user.is_finance:
+            return redirect('/login')  # Redirect to login if user is not in Finance role
+        return function(request, *args, **kwargs)
+    return _wrapped_view
+
+@finance_required 
 def dashboard(request):
     today = date.today()
     thirty_days_date = today + timedelta(days=30)
@@ -94,6 +106,7 @@ def dashboard(request):
  
 
  
+@finance_required 
 def vehicle_list(request):
     # Instantiate the filter form
     filter_form = VehicleFilterForFinance(request.GET or None)
@@ -109,24 +122,22 @@ def vehicle_list(request):
         # Get related data for each vehicle
         policies = vehicle.policies.all()
         emis = vehicle.emis.all()
-        insurance_tax = vehicle.insurancetaxdue_set.first()  # Assuming one insurance/tax record
+        other_dues = vehicle.otherdues_set.first()   
 
         # Extract relevant due dates
         policy_due_date = policies[0].due_date if policies else None
         emi_due_date = emis[0].next_due_date if emis else None
-        insurance_due_date = insurance_tax.insurance_due_date if insurance_tax else None
-        tax_due_date = insurance_tax.tax_due_date if insurance_tax else None
-        fitness_due_date = insurance_tax.fitness_due_date if insurance_tax else None
-        permit_due_date = insurance_tax.permit_due_date if insurance_tax else None
-        puc_due_date = insurance_tax.puc_due_date if insurance_tax else None
+        tax_due_date = other_dues.tax_due_date if other_dues else None
+        fitness_due_date = other_dues.fitness_due_date if other_dues else None
+        permit_due_date = other_dues.permit_due_date if other_dues else None
+        puc_due_date = other_dues.puc_due_date if other_dues else None
 
         # Apply date filtering
         if start_date and not end_date:
             # Only dates greater than or equal to start_date
             if not (
                 (policy_due_date and policy_due_date >= start_date) or
-                (emi_due_date and emi_due_date >= start_date) or
-                (insurance_due_date and insurance_due_date >= start_date) or
+                (emi_due_date and emi_due_date >= start_date) or 
                 (tax_due_date and tax_due_date >= start_date) or
                 (fitness_due_date and fitness_due_date >= start_date) or
                 (permit_due_date and permit_due_date >= start_date) or
@@ -137,8 +148,7 @@ def vehicle_list(request):
             # Only dates less than or equal to end_date
             if not (
                 (policy_due_date and policy_due_date <= end_date) or
-                (emi_due_date and emi_due_date <= end_date) or
-                (insurance_due_date and insurance_due_date <= end_date) or
+                (emi_due_date and emi_due_date <= end_date) or 
                 (tax_due_date and tax_due_date <= end_date) or
                 (fitness_due_date and fitness_due_date <= end_date) or
                 (permit_due_date and permit_due_date <= end_date) or
@@ -149,8 +159,7 @@ def vehicle_list(request):
             # Dates within the range of start_date and end_date
             if not (
                 (policy_due_date and start_date <= policy_due_date <= end_date) or
-                (emi_due_date and start_date <= emi_due_date <= end_date) or
-                (insurance_due_date and start_date <= insurance_due_date <= end_date) or
+                (emi_due_date and start_date <= emi_due_date <= end_date) or 
                 (tax_due_date and start_date <= tax_due_date <= end_date) or
                 (fitness_due_date and start_date <= fitness_due_date <= end_date) or
                 (permit_due_date and start_date <= permit_due_date <= end_date) or
@@ -163,8 +172,7 @@ def vehicle_list(request):
             'id': vehicle.id,
             'vehicle_number': vehicle.vehicle_number,
             'policy_due_date': policy_due_date,
-            'emi_due_date': emi_due_date,
-            'insurance_due_date': insurance_due_date,
+            'emi_due_date': emi_due_date, 
             'tax_due_date': tax_due_date,
             'fitness_due_date': fitness_due_date,
             'permit_due_date': permit_due_date,
@@ -181,20 +189,21 @@ def vehicle_list(request):
 
 
 # View for the EMI section
+@finance_required 
 def vehicle_dashboard(request,id):
     emi_form=EMIForm()
     policy_form=PolicyForm()
 
     vehicle = Vehicle.objects.all() or None
     vehicle = Vehicle.objects.get(id=id)
-    insurance_tax_due_data=InsuranceTaxDue.objects.filter(vehicle=vehicle) 
+    other_dues_data=OtherDues.objects.filter(vehicle=vehicle) 
 
-    insurance_tax_due=InsuranceTaxDue.objects.filter(vehicle=vehicle).first() 
-    insurance_tax_due_id=0 
-    if insurance_tax_due:
-        insurance_tax_due_id=insurance_tax_due.id 
+    other_dues=OtherDues.objects.filter(vehicle=vehicle).first() 
+    other_dues_id=0
+    if other_dues:
+        other_dues_id=other_dues.id 
 
-    is_data_exist=insurance_tax_due_data.exists()
+    is_data_exist=other_dues_data.exists()
 
     emi=EMI.objects.filter(vehicle=vehicle).first()
     emi_amount=None
@@ -202,12 +211,13 @@ def vehicle_dashboard(request,id):
         emi_amount=int(emi.loan_amount)/int(emi.total_installments)
 
     policy=Policy.objects.filter(vehicle=vehicle).first()
-    insurance_tax_due=InsuranceTaxDue.objects.filter(vehicle=vehicle).first()
 
 
-    form=InsuranceTaxDueForm() 
+    form=OtherDuesForm() 
     context={
         'vehicle_id':id,
+        'other_dues_id':other_dues_id,
+        'other_dues':other_dues,
         'vehicle':vehicle,
         'form':form,
         'emi_form':emi_form,
@@ -215,27 +225,22 @@ def vehicle_dashboard(request,id):
         'is_data_exist':is_data_exist,
         'emi':emi,
         'emi_amount':emi_amount,
-        'policy':policy,
-        'insurance_tax_due':insurance_tax_due,
-        'insurance_tax_due_id':insurance_tax_due_id
+        'policy':policy, 
     }
     return render(request, 'finance_vehicle_dashboard.html',context)
 
 
 
-def create_insurance_tax_due(request):
+def create_other_dues(request):
     if request.method == 'POST':
-        form = InsuranceTaxDueForm(request.POST, request.FILES)
+        form = OtherDuesForm(request.POST, request.FILES)
 
         if form.is_valid():
             try:
                 vehicle_id=request.POST.get('vehicle_id') 
 
                 vehicle=Vehicle.objects.get(id=vehicle_id)
-                if vehicle and InsuranceTaxDue.objects.filter(vehicle=vehicle).exists():
-                    print("this is test")
-                    print("this is test")
-                    print("this is test")
+                if vehicle and OtherDues.objects.filter(vehicle=vehicle).exists(): 
                     return JsonResponse({'success': False, 'errors': {'non_field_errors': "A record for this vehicle already exists."}}, status=400)
                 
                 fm=form.save(commit=False)
@@ -257,16 +262,16 @@ def create_insurance_tax_due(request):
 
 
 
-def update_insurance_tax_due(request, id): 
-    vehicle = get_object_or_404(InsuranceTaxDue, id=id)  # Safely retrieve the Driver instance or return a 404 error
+def update_other_dues(request, id): 
+    vehicle = get_object_or_404(OtherDues, id=id)  # Safely retrieve the Driver instance or return a 404 error
     if request.method == 'POST':
-        form = InsuranceTaxDueForm(request.POST, request.FILES, instance=vehicle)  # Populate the form with the instance data
+        form = OtherDuesForm(request.POST, request.FILES, instance=vehicle)  # Populate the form with the instance data
         if form.is_valid():
             form.save() 
             messages.success(request, 'Record Updated Successfully.')
     else:
-        form = InsuranceTaxDueForm(instance=vehicle)  # Populate the form with the existing driver data on GET request
-    return render(request, 'finance_update_insurance_tax_due.html', {'form': form,'data':vehicle})
+        form = OtherDuesForm(instance=vehicle)  # Populate the form with the existing driver data on GET request
+    return render(request, 'finance_update_other_dues.html', {'form': form,'data':vehicle})
 
 
 def update_policy(request, id):
@@ -274,7 +279,7 @@ def update_policy(request, id):
     if request.method == 'POST':
         form = PolicyForm(request.POST, request.FILES, instance=policy)  # Populate the form with the instance data
         if form.is_valid():
-            print(form.cleaned_data['policy_file'])
+            # print(form.cleaned_data['policy_file'])
             form.save() 
             messages.success(request, 'Policy Updated Successfully.')
     else:
@@ -284,6 +289,7 @@ def update_policy(request, id):
 
 
 # View for the EMI section
+@finance_required 
 def emi_list(request):
     emi=EMI.objects.select_related('vehicle').order_by('next_due_date')
     filter = EMIFilter(request.GET, queryset=emi)
@@ -325,6 +331,12 @@ def update_emi(request, id):
         if form.is_valid():
             form.save() 
             messages.success(request, 'EMI Updated Successfully.')
+        else:
+            errors = {
+                field: [str(error) for error in error_list]
+                for field, error_list in form.errors.items()
+            }
+            messages.error(request, f'EMI Not Updated.{errors}')
     else:
         form = EMIForm(instance=emi)  # Populate the form with the existing driver data on GET request
     return render(request, 'finance_update_emi.html', {'form': form})
@@ -341,6 +353,7 @@ def delete_emi(request, id):
 
 
 
+@finance_required 
 def emi_item_list(request, id):
     # Fetch the EMI object
     emi = get_object_or_404(EMI, id=id)
@@ -454,7 +467,7 @@ def update_policy(request, id):
     if request.method == 'POST':
         form = PolicyForm(request.POST, request.FILES, instance=policy)  # Populate the form with the instance data
         if form.is_valid():
-            print(form.cleaned_data['policy_file'])
+            # print(form.cleaned_data['policy_file'])
             form.save() 
             messages.success(request, 'Policy Updated Successfully.')
     else:
@@ -463,12 +476,14 @@ def update_policy(request, id):
 
 
 # View for the Reports section
+@finance_required 
 def reports_list(request):
     return render(request, 'finance_reports_list.html')
 
 
 
 
+@finance_required 
 def insurance_bank_list(request):
     rec = Insurance_Bank.objects.all()
     if request.method == 'POST':
@@ -500,6 +515,7 @@ def insurance_bank_delete(request, id):
 
 
 
+@finance_required 
 def finance_bank_list(request):
     rec = Finance_Bank.objects.all()
     if request.method == 'POST':

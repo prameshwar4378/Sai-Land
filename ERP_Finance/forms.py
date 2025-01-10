@@ -1,5 +1,5 @@
 from django import forms
-from ERP_Admin.models import Policy,EMI,EMI_Item,InsuranceTaxDue,Insurance_Bank,Finance_Bank
+from ERP_Admin.models import Policy,EMI,EMI_Item,Insurance_Bank,Finance_Bank,OtherDues
 from django.core.exceptions import ValidationError
 from datetime import date
 
@@ -71,14 +71,13 @@ class EMIItemForm(forms.ModelForm):
                 raise ValidationError("The due date cannot be in the past. Please enter a future date.")
         return next_due_date
     
+ 
 
-class InsuranceTaxDueForm(forms.ModelForm):
+
+class OtherDuesForm(forms.ModelForm):
     class Meta:
-        model =  InsuranceTaxDue
-        fields = [
-            'insurance_amount', 
-            'insurance_due_date',
-            'insurance_bank', 
+        model =  OtherDues
+        fields = [ 
             'tax_frequency', 
             'tax_amount', 
             'tax_due_date',  
@@ -87,7 +86,6 @@ class InsuranceTaxDueForm(forms.ModelForm):
             'puc_due_date'
         ]
         widgets = {
-            'insurance_due_date': forms.DateInput(attrs={'type': 'date'}), 
             'tax_due_date': forms.DateInput(attrs={'type': 'date'}), 
             'fitness_due_date': forms.DateInput(attrs={'type': 'date'}), 
             'permit_due_date': forms.DateInput(attrs={'type': 'date'}), 
@@ -98,7 +96,6 @@ class InsuranceTaxDueForm(forms.ModelForm):
 
         # List of fields to validate for future dates
         date_fields = [
-            'insurance_date',
             'tax_due_date',
             'fitness_due_date',
             'permit_due_date',

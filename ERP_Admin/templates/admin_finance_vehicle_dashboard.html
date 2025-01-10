@@ -1,0 +1,264 @@
+{% extends "admin_base.html" %}
+{% block title %}Finance Vehicle Dashboard{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+<style>
+  #id_vehicle {
+    pointer-events: none; /* Prevents user interaction */
+    background-color: #f5f5f5; /* Optional: Makes it look like a read-only field */
+    color: #6c757d; /* Optional: Gray out text for a read-only appearance */
+  }
+ 
+.details {
+    background-color: #f9f9f9;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.record {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #ddd;
+    font-size: 1.2rem;
+}
+
+.record:last-child {
+    border-bottom: none;
+}
+
+.label {
+    font-weight: 500;
+    color: #555;
+}
+
+.value {
+    font-weight: 700;
+    color: #000;
+}
+
+.text-muted {
+    font-size: 1rem;
+    color: #6c757d;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.card{
+    height:90%;
+}
+
+fieldset {
+    border: 2px solid #b9b9b9; /* Green border */
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    background-color: #f8f8f8;
+}
+
+legend {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #73472a; /* Green text */
+    padding-top: 0 10px;
+}
+
+</style>
+<main id="main" class="main">
+
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="pagetitle">
+                    <h1>Finance Vehicle Dashboard</h1>
+                    <nav>
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                            <li class="breadcrumb-item"><a href="#">Vehicle Dashboard </a></li>
+                        </ol>
+                    </nav>
+                </div>
+            </div> 
+        </div>
+
+        <section class="section dashboard">
+            <div class="row">
+                <div class="col-lg-4  p-3" > 
+                    <p class="alert alert-primary" style="width: 100%; margin-bottom:-20px;">Vehicle Number : <b>{{ vehicle.vehicle_number }}</b></p>
+                </div>
+                <div class="col-lg-8  p-3" > 
+                    <p class="alert alert-primary" style="width: 100%; margin-bottom:-20px;">Vehicle Number : <b>{{ vehicle.vehicle_name }}</b></p>
+                </div>
+            </div>
+            <hr>
+             
+
+
+            <div class="row mt-3">
+                
+                <div class="col-sm-4">
+                    <div class="card recent-sales overflow-auto">
+                        <div class="card-body">
+                            <h4 class="card-title">EMI 
+                            </h4>
+                            <div class="mt-2 details">
+                                {% if emi %}
+                                <div class="record">
+                                    <span class="label">File:</span>
+                                    <span class="value"> <a href="/media/{{emi.file}}" download>Download</a> </span>
+                                </div>
+                                <div class="record">
+                                    <span class="label">EMI Amount:</span>
+                                    <span class="value">{{ emi_amount }}</span>
+                                </div>
+                                <div class="record">
+                                    <span class="label">Due Date:</span>
+                                    <span class="value">{{ emi.next_due_date }}</span>
+                                </div> 
+                                {% else %}
+                                    <p>No EMI Record Found. <a href="#" data-toggle="modal" data-target="#model_create_emi">create new</a></p>
+                                {% endif %}  
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- End Card -->
+             
+                
+                
+                
+                <div class="col-sm-4">
+                    <div class="card recent-sales overflow-auto">
+                        <div class="card-body">
+                            <h4 class="card-title">Policy  
+
+                            </h4>
+                            <div class="mt-2 details">
+                                {% if policy %}
+                                <div class="record">
+                                    <span class="label">Policy File:</span>
+                                    <span class="value"> <a href="/media/{{policy.policy_file}}" download>Download</a> </span>
+                                </div>
+                                <div class="record">
+                                    <span class="label">Due Date:</span>
+                                    <span class="value">{{ policy.due_date }}</span>
+                                </div> 
+                                {% else %}
+                                    <p>No Policy Record Found. <a href="#" data-toggle="modal" data-target="#model_create_policy">create new</a></p>
+                                {% endif %}  
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- End Card -->
+             
+                
+                <div class="col-sm-4">
+                    <div class="card recent-sales overflow-auto">
+                        <div class="card-body">
+                            <h4 class="card-title">Tax   
+                             </h4>
+                            <div class="mt-2 details">
+                                {% if other_dues.tax_due_date %}
+                                <div class="record">
+                                    <span class="label">Tax Amount:</span>
+                                    <span class="value">{{ other_dues.tax_amount }}</span>
+                                </div>
+                                <div class="record">
+                                    <span class="label">Due Date:</span>
+                                    <span class="value">{{ other_dues.tax_due_date }}</span>
+                                </div> 
+                                <div class="record">
+                                    <span class="label">Frequency:</span>
+                                    <span class="value">{{ other_dues.tax_frequency }}</span>
+                                </div> 
+                                {% else %}
+                                    <p>No Tax Record Found.</p>
+                                {% endif %}  
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- End Card -->
+             
+
+                
+                <div class="col-sm-4">
+                    <div class="card recent-sales overflow-auto">
+                        <div class="card-body">
+                            <h4 class="card-title">Fitness Due   
+                             </h4>
+                            <div class="mt-2 details">
+                                {% if other_dues.fitness_due_date %}
+                                <div class="record">
+                                    <span class="label">Due Date:</span>
+                                    <span class="value">{{ other_dues.fitness_due_date }}</span>
+                                </div> 
+                                {% else %}
+                                    <p>No Fitness Due Record Found.</p>
+                                {% endif %}  
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- End Card -->
+             
+                
+                <div class="col-sm-4">
+                    <div class="card recent-sales overflow-auto">
+                        <div class="card-body">
+                            <h4 class="card-title">Permit Due  
+                             </h4>
+                            <div class="mt-2 details">
+                                {% if other_dues.permit_due_date %}
+                                <div class="record">
+                                    <span class="label">Due Date:</span>
+                                    <span class="value">{{ other_dues.permit_due_date }}</span>
+                                </div> 
+                                {% else %}
+                                    <p>No Permit Due Record Found.</p>
+                                {% endif %}  
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- End Card -->
+             
+                
+                <div class="col-sm-4">
+                    <div class="card recent-sales overflow-auto">
+                        <div class="card-body">
+                            <h4 class="card-title">PUC Due   
+                             </h4>
+                            <div class="mt-2 details">
+                                {% if other_dues.puc_due_date %}
+                                <div class="record">
+                                    <span class="label">PUC Amount:</span>
+                                    <span class="value">{{ other_dues.puc_due_date }}</span>
+                                </div> 
+                                {% else %}
+                                    <p>No PUC Due Record Found.</p>
+                                {% endif %}  
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- End Card -->
+            </div>
+        </section>
+</main><!-- End #main -->
+
+   
+
+<script>
+    function confirmDelete(button) {
+        // Get the Job Card Number from the data-url attribute
+        var Vehicle_number = button.closest('tr').querySelector('td:nth-child(2)').textContent.trim();
+        var deleteUrl = button.getAttribute('href');  // The delete URL
+        
+        // Set the Job Card Number in the modal
+        document.getElementById('Vehicle_number').textContent = Vehicle_number;
+        
+        // Set the delete URL in the modal's delete button
+        document.getElementById('deleteButton').setAttribute('href', deleteUrl);
+        
+        // Show the modal
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
+</script>
+ 
+{% endblock content %}

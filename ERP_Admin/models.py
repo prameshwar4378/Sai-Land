@@ -19,6 +19,7 @@ class CustomUser(AbstractUser):
     is_driver = models.BooleanField(default=False)
     is_finance = models.BooleanField(default=False)
     emp_id = models.OneToOneField(EMP_ID, on_delete=models.CASCADE, null=True)
+    profile_photo=models.ImageField(upload_to="profile_images", max_length=None, null=True, blank=True)
     groups = models.ManyToManyField(
         Group,
         related_name='customuser_groups',  # Custom reverse relation name
@@ -347,6 +348,15 @@ class InsuranceTaxDue(models.Model):
     insurance_bank = models.ForeignKey(Insurance_Bank, on_delete=models.CASCADE, null=True, blank=True)
     insurance_amount = models.FloatField(null=True,blank=True)
     insurance_due_date = models.DateField(null=True,blank=True) 
+    tax_frequency = models.CharField(max_length=255, choices=FREQUENCY_CHOICES,null=True, blank=True)
+    tax_amount = models.FloatField(null=True, blank=True)
+    tax_due_date = models.DateField(null=True, blank=True) 
+    fitness_due_date = models.DateField(null=True,blank=True)
+    permit_due_date = models.DateField(null=True,blank=True)
+    puc_due_date = models.DateField(null=True,blank=True)
+
+class OtherDues(models.Model):
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE) 
     tax_frequency = models.CharField(max_length=255, choices=FREQUENCY_CHOICES,null=True, blank=True)
     tax_amount = models.FloatField(null=True, blank=True)
     tax_due_date = models.DateField(null=True, blank=True) 

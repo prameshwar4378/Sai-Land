@@ -36,21 +36,7 @@ legend {
                     </div>  
                                  
                    <form method="POST" enctype="multipart/form-data"  > {% csrf_token %} 
-                        <div class="row  mt-1"> 
-                            <fieldset>
-                                <legend>Insurance Details</legend>
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        {{ form.insurance_amount|as_crispy_field }}
-                                    </div>
-                                    <div class="col-sm-4">
-                                        {{ form.insurance_bank|as_crispy_field }}
-                                    </div> 
-                                    <div class="col-sm-4">
-                                        {{ form.insurance_due_date|as_crispy_field }}
-                                    </div>
-                                </div>
-                            </fieldset>
+                        <div class="row  mt-1">  
 
                             <fieldset>
                                 <legend>Tax Details</legend>

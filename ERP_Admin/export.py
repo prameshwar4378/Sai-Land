@@ -429,7 +429,7 @@ def export_vehicle_for_finance(request):
         # Get related data for each vehicle
         policies = vehicle.policies.all()
         emis = vehicle.emis.all()
-        insurance_tax = vehicle.insurancetaxdue_set.first()  # Assuming one insurance/tax record
+        other_dues = vehicle.otherdues_set.first()  # Assuming one insurance/tax record
 
         # Extract relevant data
         policy_due_date = policies[0].due_date if policies else None
@@ -444,21 +444,18 @@ def export_vehicle_for_finance(request):
         total_installments = emis[0].total_installments if emis else None
         paid_installments = emis[0].paid_installments if emis else None
         remaining_installments = emis[0].remaining_installments if emis else None
- 
-        insurance_due_date = insurance_tax.insurance_due_date if insurance_tax else None
-        insurance_amount = insurance_tax.insurance_amount if insurance_tax else None
-        tax_due_date = insurance_tax.tax_due_date if insurance_tax else None
-        tax_amount = insurance_tax.tax_amount if insurance_tax else None
-        fitness_due_date = insurance_tax.fitness_due_date if insurance_tax else None
-        permit_due_date = insurance_tax.permit_due_date if insurance_tax else None
-        puc_due_date = insurance_tax.puc_due_date if insurance_tax else None
+  
+        tax_due_date = other_dues.tax_due_date if other_dues else None
+        tax_amount = other_dues.tax_amount if other_dues else None
+        fitness_due_date = other_dues.fitness_due_date if other_dues else None
+        permit_due_date = other_dues.permit_due_date if other_dues else None
+        puc_due_date = other_dues.puc_due_date if other_dues else None
 
         # Apply date filtering
         if start_date and not end_date:
             if not (
                 (policy_due_date and policy_due_date >= start_date) or
-                (emi_due_date and emi_due_date >= start_date) or
-                (insurance_due_date and insurance_due_date >= start_date) or
+                (emi_due_date and emi_due_date >= start_date) or 
                 (tax_due_date and tax_due_date >= start_date) or
                 (fitness_due_date and fitness_due_date >= start_date) or
                 (permit_due_date and permit_due_date >= start_date) or
@@ -468,8 +465,7 @@ def export_vehicle_for_finance(request):
         elif end_date and not start_date:
             if not (
                 (policy_due_date and policy_due_date <= end_date) or
-                (emi_due_date and emi_due_date <= end_date) or
-                (insurance_due_date and insurance_due_date <= end_date) or
+                (emi_due_date and emi_due_date <= end_date) or 
                 (tax_due_date and tax_due_date <= end_date) or
                 (fitness_due_date and fitness_due_date <= end_date) or
                 (permit_due_date and permit_due_date <= end_date) or
@@ -479,8 +475,7 @@ def export_vehicle_for_finance(request):
         elif start_date and end_date:
             if not (
                 (policy_due_date and start_date <= policy_due_date <= end_date) or
-                (emi_due_date and start_date <= emi_due_date <= end_date) or
-                (insurance_due_date and start_date <= insurance_due_date <= end_date) or
+                (emi_due_date and start_date <= emi_due_date <= end_date) or 
                 (tax_due_date and start_date <= tax_due_date <= end_date) or
                 (fitness_due_date and start_date <= fitness_due_date <= end_date) or
                 (permit_due_date and start_date <= permit_due_date <= end_date) or
@@ -501,10 +496,7 @@ def export_vehicle_for_finance(request):
             'emi_file': emi_file,
             'total_installments': total_installments,
             'paid_installments': paid_installments,
-            'remaining_installments': remaining_installments,
-            'insurance_amount': insurance_amount,
-            'insurance_due_date': insurance_due_date,
-            'insurance_amount': insurance_amount,
+            'remaining_installments': remaining_installments, 
             'tax_due_date': tax_due_date,
             'tax_amount': tax_amount,
             'fitness_due_date': fitness_due_date,
@@ -521,7 +513,7 @@ def export_vehicle_for_finance(request):
     header = [
         'Vehicle Number', 'Policy Due Date', 'Policy Number', 'Policy File',
         'Loan Account No','EMI Due Date', 'EMI Frequency', 'EMI Status', 'EMI File', 'Total Installments','Paid Installments','Remaining Installments',
-        'Insurance Amount','Insurance Due Date', 'Insurance Amount', 'Tax Due Date', 'Tax Amount',
+        'Tax Due Date', 'Tax Amount',
         'Fitness Due Date', 'Permit Due Date', 'PUC Due Date'
     ]
     for col_num, column_title in enumerate(header, 1):

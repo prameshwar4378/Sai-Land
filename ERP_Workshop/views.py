@@ -11,8 +11,22 @@ from django.db.models import Count
 from django.db.models import F
 from django.core.paginator import Paginator
 
+ 
+from functools import wraps
+ 
 
-def dashboard(request):
+def workshop_required(function):
+    @wraps(function)
+    def _wrapped_view(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('/login')  # Redirect to login if not logged in
+        if not request.user.is_workshop:
+            return redirect('/login')  # Redirect to login if user is not in workshop role
+        return function(request, *args, **kwargs)
+    return _wrapped_view
+
+@workshop_required
+def dashboard(request): 
     total_products = Product.objects.count()
 
     out_of_stock_count = Product.objects.filter(available_stock__lt=F('minimum_stock_alert')).count()
@@ -38,6 +52,7 @@ def breakdown_alerts(request):
 
 
 
+@workshop_required
 def job_card_list(request):
     form = JobCardForm()
     queryset = JobCard.objects.all().order_by('-id') 
@@ -62,6 +77,7 @@ def job_card_list(request):
     })
 
 
+ 
 def create_job_card(request):
     if request.method == 'POST':
         form = JobCardForm(request.POST, request.FILES)
@@ -73,11 +89,9 @@ def create_job_card(request):
                 # return redirect('/workshop/jobcard-list/')
             except ValidationError as e:
                 # Handle explicit model-level validation errors
-                print("SUcess 3")
                 return JsonResponse({'success': False, 'errors': {'non_field_errors': str(e)}}, status=400)
         else:
             # Handle form errors, including unique constraint violations
-            print("SUcess 4")
             errors = {
                 field: [str(error) for error in error_list]
                 for field, error_list in form.errors.items()
@@ -112,6 +126,7 @@ def delete_job_card(request, id):
     return redirect('/workshop/job_card_list')
 
 
+@workshop_required
 def job_card_item_list(request, id):
     job_card = get_object_or_404(JobCard, id=id)
     close_job_card_form=CloseJobCardForm(instance=job_card)
@@ -174,9 +189,7 @@ def delete_job_card_item(request, id):
         messages.success(request, 'Item deleted successfully.')
     return redirect(f'/workshop/job_card_item_list/{job_card_id}')
 
-from django.utils.timezone import now
-from django.utils.timezone import make_aware
-from datetime import datetime
+from django.utils.timezone import now 
 
 # Get the current date (naive)
 
@@ -231,6 +244,7 @@ def maintenance_logs(request):
 def maintenance_schedule(request):
     return render(request, "workshop_maintenance_schedule.html")
 
+@workshop_required
 def product_list(request):
     # products = Product.objects.all().delete()
     form = ProductForm()
@@ -250,9 +264,9 @@ def create_product(request):
         if form.is_valid():
             try:
                 product_instance = form.save()
-                if product_instance.product_image:
-                    file_path = product_instance.product_image.path
-                    print(f"Received file path: {file_path}")
+                # if product_instance.product_image:
+                #     file_path = product_instance.product_image.path
+                #     print(f"Received file path: {file_path}")
                     
                 return JsonResponse({'success': True, 'message': 'Product created successfully!'})
             except ValidationError as e:
@@ -346,11 +360,8 @@ def delete_product(request, id):
     return redirect('/workshop/product-list')
 
 
-def purchase_list(request):
-    form= PurchaseForm()
-    purchase=Purchase.objects.all().order_by('-id')
-    return render(request, "workshop_purchase_list.html",{'form':form,'purchase':purchase})
-
+ 
+@workshop_required
 def purchase_list(request):
     form = PurchaseForm()
     queryset = Purchase.objects.all().order_by('-id') 
@@ -440,6 +451,7 @@ def delete_purchase(request, id):
     return redirect('/workshop/purchase-list')
 
 
+@workshop_required
 def purchase_item_list(request,id):
     purchase=get_object_or_404(Purchase, id=id)
 
@@ -462,7 +474,7 @@ def purchase_item_list(request,id):
             purchase.total_cost = int(total_amount)
             purchase.save()
         else:
-            print("Form errors:", form.errors)
+            messages.error(request, form.errors)
     else:
             item=PurchaseItem.objects.filter(purchase=purchase).order_by('-id')
             total_amount = item.aggregate(Sum('total_amount'))['total_amount__sum']

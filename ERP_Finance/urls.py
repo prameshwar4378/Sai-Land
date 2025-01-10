@@ -5,8 +5,8 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='finance_dashboard'),
     path('vehicle_list/', views.vehicle_list, name='finance_vehicle_list'),
     path('vehicle_dashboard/<int:id>', views.vehicle_dashboard, name='finance_vehicle_dashboard'),
-    path('create_insurance_tax_due/', views.create_insurance_tax_due, name='finance_create_insurance_tax_due'),
-    path('update_insurance_tax_due/<int:id>', views.update_insurance_tax_due, name='finance_update_insurance_tax_due'),
+    path('create_other_dues/', views.create_other_dues, name='finance_create_other_dues'),
+    path('update_other_dues/<int:id>', views.update_other_dues, name='finance_update_other_dues'),
 
     path('emi_list/', views.emi_list, name='finance_emi_list'),
     path('create_emi/', views.create_emi, name='finance_create_emi'),

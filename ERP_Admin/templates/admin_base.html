@@ -14026,7 +14026,11 @@
 
                 <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
            
-                    <img src="https://t4.ftcdn.net/jpg/03/64/21/11/360_F_364211147_1qgLVxv1Tcq0Ohz3FawUfrtONzz8nq3e.jpg" alt="Profile" class="rounded-circle">
+                    {% if request.user.profile_photo %}
+                    <img src="/media/{{request.user.profile_photo}}" alt="Profile" class="rounded-circle" style="width: 40px; height: 40px;">
+                    {% else %}
+                    <img src="/media/default-profile.webp" alt="Profile" class="rounded-circle"  style="width: 40px; height: 40px;">
+                    {% endif %}
                     
                     <span class="d-none d-md-block dropdown-toggle ps-2">{{request.user}}</span>
                 </a><!-- End Profile Iamge Icon -->
@@ -14068,20 +14072,35 @@
         </li>
         <li class="nav-item">
             <a class="nav-link" href="{% url "admin_notifications" %}">
-                <i class="bi bi-wallet"></i>
+                <i class="bi bi-bell"></i>
                 <span>Notifications</span>
             </a>
         </li>
-        
+         
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'admin_financial_management' %}">
-                <i class="bi bi-wallet"></i>
-                <span>Financial Management</span>
+            <a class="nav-link collapsed" data-bs-target="#finance-nav" data-bs-toggle="collapse" href="#">
+              <i class="bi bi-wallet"></i><span>Financial Management</span><i class="bi bi-chevron-down ms-auto"></i>
             </a>
-        </li> 
+            <ul id="finance-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+              <li>
+                <a href="{% url "admin_finance_dashboard" %}" style="text-decoration:none;">
+                    <i class="bi bi-grid" style="font-size:15px;"></i><span>Dashboard</span>
+                </a>
+              </li>
+              <li>
+                <a href="{% url "admin_finance_vehicle_list" %}" style="text-decoration:none;">
+                    <i class="bi bi-truck" style="font-size:15px;"></i><span>Vehicle List</span>
+                </a>
+              </li> 
+       
+      
+            </ul>
+        </li><!-- End Tables Nav -->
+
+
         <li class="nav-item">
             <a class="nav-link collapsed" data-bs-target="#workshop" data-bs-toggle="collapse" href="#">
-                <i class="bi bi-gear-fill"></i><span>Workshop</span><i class="bi bi-chevron-down ms-auto"></i>
+                <i class="bi bi-gear-fill"></i><span>Workshop Management</span><i class="bi bi-chevron-down ms-auto"></i>
             </a>
             <ul id="workshop" class="nav-content collapse" data-bs-parent="#sidebar-nav">
                 <!-- Job Card -->
@@ -14138,30 +14157,9 @@
        
       
             </ul>
-          </li><!-- End Tables Nav -->
+        </li><!-- End Tables Nav -->
 
-          
-        <li class="nav-item">
-            <a class="nav-link" href="{% url "admin_drivers_list" %}">
-                <i class="bi bi-person-bounding-box"></i>
-                <span>Driver List</span>
-            </a>
-        </li> 
-
-        <li class="nav-item">
-            <a class="nav-link" href="{% url "admin_technician_list" %}">
-                <i class="bi bi-tools"></i>
-                <span>Technician List</span>
-            </a>
-        </li> 
-
-        <li class="nav-item">
-            <a class="nav-link" href="{% url "admin_party_list" %}">
-                <i class="bi bi-people"></i>
-                <span>Party List</span>
-            </a>
-        </li> 
-
+           
 
 
     <li class="nav-item">
@@ -14178,13 +14176,25 @@
         </a>
         <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
    
-          <li>
-            <a href="{% url "admin_drivers_list" %}" style="text-decoration:none;">
-                <i class="bi bi-person-bounding-box" style="font-size:15px;"></i><span>Driver List</span>
-            </a>
-          </li>
-   
-  
+            <li>
+                <a href="{% url "admin_drivers_list" %}" style="text-decoration:none;">
+                    <i class="bi bi-person-bounding-box" style="font-size:15px;"></i><span>Driver List</span>
+                </a>
+            </li>
+          
+            <li>
+                <a href="{% url "admin_technician_list" %}" style="text-decoration:none;">
+                    <i class="bi bi-tools" style="font-size:15px;"></i><span>Technician List</span>
+                </a>
+            </li>
+          
+            <li>
+                <a href="{% url "admin_party_list" %}" style="text-decoration:none;">
+                    <i class="bi bi-people" style="font-size:15px;"></i><span>Party List</span>
+                </a>
+            </li>
+           
+    
         </ul>
     </li><!-- End Tables Nav -->
   

@@ -85,7 +85,7 @@ legend {
                         {% if not is_data_exist %}
                         <a href="#" class="btn text-light" data-toggle="modal" data-target="#model_create_record" style="background: linear-gradient(90deg, rgb(3, 32, 0) 0%,   rgb(0, 80, 141) 100%);" data-toggle="modal"><i class="bi bi-file-earmark-spreadsheet"></i> | Create</a> 
                         {% else %}
-                        <a href="javascript:void(0);" data-url="{% url 'finance_update_insurance_tax_due' insurance_tax_due_id %}" class="btn btn-primary " onclick="mini_window_1(this)" style="background: linear-gradient(90deg, rgb(3, 32, 0) 0%,   rgb(141, 87, 0) 100%);">Update</a>
+                        <a href="javascript:void(0);" data-url="{% url 'finance_update_other_dues' other_dues_id %}" class="btn btn-primary " onclick="mini_window_1(this)" style="background: linear-gradient(90deg, rgb(3, 32, 0) 0%,   rgb(141, 87, 0) 100%);">Update</a>
                         {% endif %}
                     </div>
 
@@ -96,10 +96,10 @@ legend {
         <section class="section dashboard">
             <div class="row">
                 <div class="col-lg-4  p-3" > 
-                    <p class="alert alert-primary" style="width: 100%; margin-bottom:-20px;">Vehicle Number : <b>{{ emi.vehicle.vehicle_number }}</b></p>
+                    <p class="alert alert-primary" style="width: 100%; margin-bottom:-20px;">Vehicle Number : <b>{{ vehicle.vehicle_number }}</b></p>
                 </div>
                 <div class="col-lg-8  p-3" > 
-                    <p class="alert alert-primary" style="width: 100%; margin-bottom:-20px;">Vehicle Number : <b>{{ emi.vehicle.vehicle_name }}</b></p>
+                    <p class="alert alert-primary" style="width: 100%; margin-bottom:-20px;">Vehicle Number : <b>{{ vehicle.vehicle_name }}</b></p>
                 </div>
             </div>
             <hr>
@@ -146,73 +146,6 @@ legend {
                 <div class="col-sm-4">
                     <div class="card recent-sales overflow-auto">
                         <div class="card-body">
-                            <h4 class="card-title">Insurance  | 
-                                {% if insurance_tax_due.insurance_due_date %} 
-                                <span style="font-weight: 200; ">
-                                    <a href="javascript:void(0);" style="text-decoration: none;" data-url="{% url 'finance_update_insurance_tax_due' insurance_tax_due_id %}"   onclick="mini_window_1(this)"  >Update</a>
-                                </span> 
-                                {% endif %}   
-                            </h4>
-
-                            <div class="mt-2 details">
-                                {% if insurance_tax_due.insurance_due_date %}
-                                <div class="record">
-                                    <span class="label">Insurance Amount:</span>
-                                    <span class="value">{{ insurance_tax_due.insurance_amount }}</span>
-                                </div>
-                                <div class="record">
-                                    <span class="label">Due Date:</span>
-                                    <span class="value">{{ insurance_tax_due.insurance_due_date }}</span>
-                                </div> 
-                                <div class="record">
-                                    <span class="label">Insurance Bank:</span>
-                                    <span class="value">{{ insurance_tax_due.insurance_bank }}</span>
-                                </div> 
-                                {% else %}
-                                    <p>No Insurance Record Found. </p>
-                                {% endif %}  
-                            </div>
-                        </div>
-                    </div>
-                </div><!-- End Card -->
-             
-                
-                <div class="col-sm-4">
-                    <div class="card recent-sales overflow-auto">
-                        <div class="card-body">
-                            <h4 class="card-title">Tax  | 
-                                {% if insurance_tax_due.tax_due_date %} 
-                                <span style="font-weight: 200; ">
-                                    <a href="javascript:void(0);" style="text-decoration: none;" data-url="{% url 'finance_update_insurance_tax_due' insurance_tax_due_id %}"   onclick="mini_window_1(this)"  >Update</a>
-                                </span> 
-                                {% endif %}   
-                             </h4>
-                            <div class="mt-2 details">
-                                {% if insurance_tax_due.tax_due_date %}
-                                <div class="record">
-                                    <span class="label">Tax Amount:</span>
-                                    <span class="value">{{ insurance_tax_due.tax_amount }}</span>
-                                </div>
-                                <div class="record">
-                                    <span class="label">Due Date:</span>
-                                    <span class="value">{{ insurance_tax_due.tax_due_date }}</span>
-                                </div> 
-                                <div class="record">
-                                    <span class="label">Frequency:</span>
-                                    <span class="value">{{ insurance_tax_due.tax_frequency }}</span>
-                                </div> 
-                                {% else %}
-                                    <p>No Tax Record Found.</p>
-                                {% endif %}  
-                            </div>
-                        </div>
-                    </div>
-                </div><!-- End Card -->
-             
-
-                <div class="col-sm-4">
-                    <div class="card recent-sales overflow-auto">
-                        <div class="card-body">
                             <h4 class="card-title">Policy |
                                                              
                                 {% if policy %} 
@@ -244,18 +177,52 @@ legend {
                 <div class="col-sm-4">
                     <div class="card recent-sales overflow-auto">
                         <div class="card-body">
-                            <h4 class="card-title">Fitness Due  | 
-                                {% if insurance_tax_due.fitness_due_date %} 
+                            <h4 class="card-title">Tax  | 
+                                {% if other_dues.tax_due_date %} 
                                 <span style="font-weight: 200; ">
-                                    <a href="javascript:void(0);" style="text-decoration: none;" data-url="{% url 'finance_update_insurance_tax_due' insurance_tax_due_id %}"   onclick="mini_window_1(this)"  >Update</a>
+                                    <a href="javascript:void(0);" style="text-decoration: none;" data-url="{% url 'finance_update_other_dues' other_dues_id %}"   onclick="mini_window_1(this)"  >Update</a>
                                 </span> 
                                 {% endif %}   
                              </h4>
                             <div class="mt-2 details">
-                                {% if insurance_tax_due.fitness_due_date %}
+                                {% if other_dues.tax_due_date %}
+                                <div class="record">
+                                    <span class="label">Tax Amount:</span>
+                                    <span class="value">{{ other_dues.tax_amount }}</span>
+                                </div>
                                 <div class="record">
                                     <span class="label">Due Date:</span>
-                                    <span class="value">{{ insurance_tax_due.fitness_due_date }}</span>
+                                    <span class="value">{{ other_dues.tax_due_date }}</span>
+                                </div> 
+                                <div class="record">
+                                    <span class="label">Frequency:</span>
+                                    <span class="value">{{ other_dues.tax_frequency }}</span>
+                                </div> 
+                                {% else %}
+                                    <p>No Tax Record Found.</p>
+                                {% endif %}  
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- End Card -->
+             
+
+                
+                <div class="col-sm-4">
+                    <div class="card recent-sales overflow-auto">
+                        <div class="card-body">
+                            <h4 class="card-title">Fitness Due  | 
+                                {% if other_dues.fitness_due_date %} 
+                                <span style="font-weight: 200; ">
+                                    <a href="javascript:void(0);" style="text-decoration: none;" data-url="{% url 'finance_update_other_dues' other_dues_id %}"   onclick="mini_window_1(this)"  >Update</a>
+                                </span> 
+                                {% endif %}   
+                             </h4>
+                            <div class="mt-2 details">
+                                {% if other_dues.fitness_due_date %}
+                                <div class="record">
+                                    <span class="label">Due Date:</span>
+                                    <span class="value">{{ other_dues.fitness_due_date }}</span>
                                 </div> 
                                 {% else %}
                                     <p>No Fitness Due Record Found.</p>
@@ -270,17 +237,17 @@ legend {
                     <div class="card recent-sales overflow-auto">
                         <div class="card-body">
                             <h4 class="card-title">Permit Due  | 
-                                {% if insurance_tax_due.permit_due_date %} 
+                                {% if other_dues.permit_due_date %} 
                                 <span style="font-weight: 200; ">
-                                    <a href="javascript:void(0);" style="text-decoration: none;" data-url="{% url 'finance_update_insurance_tax_due' insurance_tax_due_id %}"   onclick="mini_window_1(this)"  >Update</a>
+                                    <a href="javascript:void(0);" style="text-decoration: none;" data-url="{% url 'finance_update_other_dues' other_dues_id %}"   onclick="mini_window_1(this)"  >Update</a>
                                 </span> 
                                 {% endif %}   
                              </h4>
                             <div class="mt-2 details">
-                                {% if insurance_tax_due.permit_due_date %}
+                                {% if other_dues.permit_due_date %}
                                 <div class="record">
                                     <span class="label">Due Date:</span>
-                                    <span class="value">{{ insurance_tax_due.permit_due_date }}</span>
+                                    <span class="value">{{ other_dues.permit_due_date }}</span>
                                 </div> 
                                 {% else %}
                                     <p>No Permit Due Record Found.</p>
@@ -295,17 +262,17 @@ legend {
                     <div class="card recent-sales overflow-auto">
                         <div class="card-body">
                             <h4 class="card-title">PUC Due  | 
-                                {% if insurance_tax_due.puc_due_date %} 
+                                {% if other_dues.puc_due_date %} 
                                 <span style="font-weight: 200; ">
-                                    <a href="javascript:void(0);" style="text-decoration: none;" data-url="{% url 'finance_update_insurance_tax_due' insurance_tax_due_id %}"   onclick="mini_window_1(this)"  >Update</a>
+                                    <a href="javascript:void(0);" style="text-decoration: none;" data-url="{% url 'finance_update_other_dues' other_dues_id %}"   onclick="mini_window_1(this)"  >Update</a>
                                 </span> 
                                 {% endif %}   
                              </h4>
                             <div class="mt-2 details">
-                                {% if insurance_tax_due.puc_due_date %}
+                                {% if other_dues.puc_due_date %}
                                 <div class="record">
                                     <span class="label">PUC Amount:</span>
-                                    <span class="value">{{ insurance_tax_due.puc_due_date }}</span>
+                                    <span class="value">{{ other_dues.puc_due_date }}</span>
                                 </div> 
                                 {% else %}
                                     <p>No PUC Due Record Found.</p>
@@ -428,24 +395,10 @@ legend {
             </div>
             <div class="modal-body text-left">
                 <div class="alert alert-danger d-none" id="createError"></div>
-                <form id="createForm" method="POST" enctype="multipart/form-data" action="{% url 'finance_create_insurance_tax_due' %}">
+                <form id="createForm" method="POST" enctype="multipart/form-data" action="{% url 'finance_create_other_dues' %}">
                     {% csrf_token %} 
                     <input type="hidden" name="vehicle_id" id="vehicle_id" value="{{ vehicle_id }}">
-                    <fieldset>
-                        <legend>Insurance Details</legend>
-                        <div class="row">
-                            <div class="col-sm-4">
-                                {{ form.insurance_amount|as_crispy_field }}
-                            </div>
-                            <div class="col-sm-4">
-                                {{ form.insurance_bank|as_crispy_field }}
-                            </div> 
-                            <div class="col-sm-4">
-                                {{ form.insurance_due_date|as_crispy_field }}
-                            </div>
-                        </div>
-                    </fieldset>
-
+ 
                     <fieldset>
                         <legend>Tax Details</legend>
                         <div class="row">

@@ -14024,8 +14024,11 @@
             <li class="nav-item dropdown pe-3 text-center  ">
 
                 <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-           
-                    <img src="https://t4.ftcdn.net/jpg/03/64/21/11/360_F_364211147_1qgLVxv1Tcq0Ohz3FawUfrtONzz8nq3e.jpg" alt="Profile" class="rounded-circle">
+                    {% if request.user.profile_photo %}
+                    <img src="/media/{{request.user.profile_photo}}" alt="Profile" class="rounded-circle" style="width: 40px; height: 40px;">
+                    {% else %}
+                    <img src="/media/default-profile.webp" alt="Profile" class="rounded-circle"  style="width: 40px; height: 40px;">
+                    {% endif %}
                     
                     <span class="d-none d-md-block dropdown-toggle ps-2">{{request.user}}</span>
                 </a><!-- End Profile Iamge Icon -->
@@ -14033,7 +14036,7 @@
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                     <li class="dropdown-header">
                         <h6>{{user.first_name}} {{user.last_name}}</h6>
-                        <span>Account</span>
+                        <span>Finance</span>
                     </li>
                     <li>
                         <hr class="dropdown-divider">

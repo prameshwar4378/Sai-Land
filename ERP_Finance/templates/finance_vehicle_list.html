@@ -75,8 +75,7 @@
                                         <th scope="col" class="text-center text-white">Sr.No</th>
                                         <th scope="col" class="text-center text-white">Vehicle Number</th>
                                         <th scope="col" class="text-center text-white">Policy Due Date</th>
-                                        <th scope="col" class="text-center text-white">EMI Due Date</th>
-                                        <th scope="col" class="text-center text-white">Insurance Due Date</th>
+                                        <th scope="col" class="text-center text-white">EMI Due Date</th> 
                                         <th scope="col" class="text-center text-white">Tax Due Date</th>
                                         <th scope="col" class="text-center text-white">Fitness Due Date</th>
                                         <th scope="col" class="text-center text-white">Permit Due Date</th>
@@ -111,16 +110,7 @@
                                                     ---
                                                 {% endif %}
                                             </td>
-                            
-                                            <!-- Insurance Due Date -->
-                                            <td>
-                                                {% if r.insurance_due_date %}
-                                                    {{ r.insurance_due_date }}
-                                                {% else %}
-                                                    ---
-                                                {% endif %}
-                                            </td>
-                            
+                             
                                             <!-- Tax Due Date -->
                                             <td>
                                                 {% if r.tax_due_date %}
