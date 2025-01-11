@@ -218,6 +218,7 @@ def logout(request):
     DeleteSession(request)
     return redirect('/login')
 
+
 @admin_required
 def dashboard(request):
     today = date.today()
@@ -278,6 +279,16 @@ def dashboard(request):
 
     job_total_count=int(job_pending_count)+int(job_in_progress_count)+int(job_completed_count)
     # Pass data to the template
+    
+    stock=Product.objects.all()
+    total_products = stock.count()
+    
+    # Near to Out of Stock (available_stock < minimum_stock_alert and available_stock > 0)
+    low_stock = stock.filter(available_stock__lt=models.F('minimum_stock_alert'), available_stock__gt=0).count()
+    
+    # Out of Stock (available_stock <= 0)
+    out_of_stock = stock.filter(available_stock__lte=0).count()
+
     context = {
         'roles': roles,
         'counts': counts,
@@ -291,8 +302,12 @@ def dashboard(request):
         'thirty_days_counts': thirty_days_counts,
         'two_days_counts': two_days_counts,
         'expire_dues_counts': expire_dues_counts,
+        'low_stock': low_stock,
+        'out_of_stock': out_of_stock,
+        'total_products':total_products,
     }
     return render(request, "admin_dashboard.html", context)
+
 
 
 @admin_required
@@ -1101,8 +1116,8 @@ def finance_vehicle_list(request):
     context = []
     for vehicle in queryset:
         # Get related data for each vehicle
-        policies = vehicle.policies.all()
-        emis = vehicle.emis.all()
+        policies = vehicle.policies.select_related()
+        emis = vehicle.emis.select_related()
         other_dues = vehicle.otherdues_set.first()   
 
         # Extract relevant due dates

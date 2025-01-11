@@ -41,4 +41,4 @@ urlpatterns = [
     path('delete_user/<int:id>', ERP_Admin_View.delete_user, name="delete_user"),  
 
     path('api/', include(ERP_Admin_API_urls)),
-]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT) 
