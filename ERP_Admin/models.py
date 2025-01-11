@@ -342,19 +342,7 @@ class EMI_Item(models.Model):
     def __str__(self):
         return f"Installment for EMI {self.emi.id} - Amount: {self.installment_amount}"
     
-
-class InsuranceTaxDue(models.Model):
-    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
-    insurance_bank = models.ForeignKey(Insurance_Bank, on_delete=models.CASCADE, null=True, blank=True)
-    insurance_amount = models.FloatField(null=True,blank=True)
-    insurance_due_date = models.DateField(null=True,blank=True) 
-    tax_frequency = models.CharField(max_length=255, choices=FREQUENCY_CHOICES,null=True, blank=True)
-    tax_amount = models.FloatField(null=True, blank=True)
-    tax_due_date = models.DateField(null=True, blank=True) 
-    fitness_due_date = models.DateField(null=True,blank=True)
-    permit_due_date = models.DateField(null=True,blank=True)
-    puc_due_date = models.DateField(null=True,blank=True)
-
+ 
 class OtherDues(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE) 
     tax_frequency = models.CharField(max_length=255, choices=FREQUENCY_CHOICES,null=True, blank=True)

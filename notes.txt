@@ -1,19 +1,23 @@
-work on Admin Driver List 
-show image and emp_id, need to test cache data
-
-Job card photo not loading while uploading data
-
+ 
 
 port: 5432
 password : rood
 
 
-
-need to make CRUD operation on Provided Table
-
-Model
-Insurance_Bank
-Finance_Bank
+VEHICLE_STATUS = (
+    ('active', 'Active'),
+    ('inactive', 'Inactive'),
+    ('on_maintenance', 'On Maintenance'),
+    ('for_sale', 'For Sale'),
+    ('sold', 'Sold'),
+    ('scrapped', 'Scrapped'),
+    ('under_inspection', 'Under Inspection'),
+    ('reserved', 'Reserved'),
+    ('retired', 'Retired'),
+    ('in_transit', 'In Transit'),
+    ('operational', 'Operational'),
+)
+  
  
 
 Get Pass Feature Need to add 

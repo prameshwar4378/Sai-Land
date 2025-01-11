@@ -14078,6 +14078,13 @@
         </li>
          
         <li class="nav-item">
+            <a class="nav-link" href="{% url 'admin_user_management' %}">
+                <i class="bi bi-person"></i>
+                <span>User Management</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
             <a class="nav-link collapsed" data-bs-target="#finance-nav" data-bs-toggle="collapse" href="#">
               <i class="bi bi-wallet"></i><span>Financial Management</span><i class="bi bi-chevron-down ms-auto"></i>
             </a>
@@ -14136,7 +14143,7 @@
 
         <li class="nav-item">
             <a class="nav-link collapsed" data-bs-target="#vehicle-nav" data-bs-toggle="collapse" href="#">
-              <i class="bi bi-layout-text-window-reverse"></i><span>Vehicle List</span><i class="bi bi-chevron-down ms-auto"></i>
+              <i class="bi bi-truck"></i><span>Vehicle List</span><i class="bi bi-chevron-down ms-auto"></i>
             </a>
             <ul id="vehicle-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
               <li>
@@ -14146,12 +14153,12 @@
               </li>
               <li>
                 <a href="{% url 'admin_vehicle_model_list' %}" style="text-decoration:none;">
-                    <i class="bi bi-grid" style="font-size:15px;"></i><span>Vehicle Model</span>
+                    <i class="bi bi-truck" style="font-size:15px;"></i><span>Vehicle Model</span>
                 </a>
               </li>
               <li>
                 <a href="{% url 'admin_vehicle_dashboard' %}" style="text-decoration:none;">
-                    <i class="bi bi-grid" style="font-size:15px;"></i><span>Vehicle Dashboard</span>
+                    <i class="bi bi-truck" style="font-size:15px;"></i><span>Vehicle Dashboard</span>
                 </a>
               </li>
        
@@ -14161,13 +14168,6 @@
 
            
 
-
-    <li class="nav-item">
-        <a class="nav-link" href="{% url 'admin_user_management' %}">
-            <i class="bi bi-person"></i>
-            <span>User Management</span>
-        </a>
-    </li>
 
      
     <li class="nav-item">

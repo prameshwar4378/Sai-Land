@@ -118,34 +118,36 @@ Dashboard
   <!-- End Page Title -->
 
   <section class="section dashboard">
-    <div class="row">
-      <div class="container">
+    <div class="row mt-1 p-2">
+
+      <div class="container pt-3 mt-2" style="background-color:rgb(209, 231, 223); border-radius: 10px;">
+        <h5 style="color: #096157;"><b>Dues</b> | <span><a href="{% url 'admin_finance_dashboard' %}" style="text-decoration: none; font-weight: 300; font-size: 15px; background-color: rgb(255, 255, 255); border-radius: 20px;" class="px-2 py-1 ">read more</a></span></h5>
         <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3">
           <div class="col">
-            <div class="card radius-10 border-start border-0 border-3 border-info">
-              <div class="card-body " style="padding-top: 20px;">
+            <div class="card radius-10 border-start border-0 border-3 border-danger">
+              <div class="card-body"  style="padding-top: 20px;">
                 <div class="d-flex align-items-center">
                   <div>
-                    <p class="mb-0 text-secondary">Total Employees</p>
-                    <h4 class="my-1 text-info">{{user_count}}</h4>
+                    <p class="mb-0 text-secondary">Expire Dues </p>
+                    <h4 class="my-1 text-danger">{{expire_dues_counts}}</h4>
                   </div>
-                  <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
-                    <i class="bi bi-book"></i>
+                  <div class="widgets-icons-2 rounded-circle bg-gradient-bloody text-white ms-auto">
+                    ₹
                   </div>
                 </div>
               </div>
             </div>
           </div>
           <div class="col">
-            <div class="card radius-10 border-start border-0 border-3 border-danger">
-              <div class="card-body"  style="padding-top: 20px;">
+            <div class="card radius-10 border-start border-0 border-3 border-info">
+              <div class="card-body " style="padding-top: 20px;">
                 <div class="d-flex align-items-center">
                   <div>
-                    <p class="mb-0 text-secondary">Total Products</p>
-                    <h4 class="my-1 text-danger">{{product_count}}</h4>
+                    <p class="mb-0 text-secondary">Upcomming Dues | 2 Days</p>
+                    <h4 class="my-1 text-info">{{two_days_counts}}</h4>
                   </div>
-                  <div class="widgets-icons-2 rounded-circle bg-gradient-bloody text-white ms-auto">
-                    <i class="bi bi-book"></i>
+                  <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                    ₹
                   </div>
                 </div>
               </div>
@@ -156,11 +158,11 @@ Dashboard
               <div class="card-body"  style="padding-top: 20px;">
                 <div class="d-flex align-items-center">
                   <div>
-                    <p class="mb-0 text-secondary">Total Vehicles</p>
-                    <h4 class="my-1 text-success">{{vehicle_count}}</h4>
+                    <p class="mb-0 text-secondary">Upcomming Dues | 30 Days</p>
+                    <h4 class="my-1 text-success">{{thirty_days_counts}}</h4>
                   </div>
                   <div class="widgets-icons-2 rounded-circle bg-gradient-ohhappiness text-white ms-auto">
-                    <i class="bi bi-book"></i>
+                    ₹
                   </div>
                 </div>
               </div>
@@ -168,6 +170,76 @@ Dashboard
           </div>
         </div>
       </div>
+
+
+      <div class="container pt-3 mt-2" style="background-color:rgb(240, 224, 224); border-radius: 10px;">
+        <h5 style="color: #610909;"><b>Job Card</b> | <span><a href="{% url 'admin_job_card_list' %}" style="text-decoration: none; font-weight: 300; font-size: 15px; background-color: rgb(255, 255, 255); border-radius: 20px;" class="px-2 py-1 ">read more</a></span></h5>
+        <div class="row row-cols-1 row-cols-md-1 row-cols-xl-4">
+          <div class="col">
+            <div class="card radius-10 border-start border-0 border-3 border-danger">
+              <div class="card-body"  style="padding-top: 20px;">
+                <div class="d-flex align-items-center">
+                  <div>
+                    <p class="mb-0 text-secondary">Pending</p>
+                    <h4 class="my-1 text-danger">{{job_pending_count}}</h4>
+                  </div>
+                  <div class="widgets-icons-2 rounded-circle bg-gradient-bloody text-white ms-auto">
+                    <i class="bi bi-hourglass"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card radius-10 border-start border-0 border-3 border-info">
+              <div class="card-body " style="padding-top: 20px;">
+                <div class="d-flex align-items-center">
+                  <div>
+                    <p class="mb-0 text-secondary">In Progress</p>
+                    <h4 class="my-1 text-info">{{job_in_progress_count}}</h4>
+                  </div>
+                  <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                    <i class="bi bi-arrow-up-right-circle"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card radius-10 border-start border-0 border-3 border-success">
+              <div class="card-body"  style="padding-top: 20px;">
+                <div class="d-flex align-items-center">
+                  <div>
+                    <p class="mb-0 text-secondary">Completed</p>
+                    <h4 class="my-1 text-success">{{job_completed_count}}</h4>
+                  </div>
+                  <div class="widgets-icons-2 rounded-circle bg-gradient-ohhappiness text-white ms-auto">
+                    <i class="bi bi-check-circle"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col">
+            <div class="card radius-10 border-start border-0 border-3 border-success">
+              <div class="card-body"  style="padding-top: 20px;">
+                <div class="d-flex align-items-center">
+                  <div>
+                    <p class="mb-0 text-secondary">Total</p>
+                    <h4 class="my-1 text-success">{{job_total_count}}</h4>
+                  </div>
+                  <div class="widgets-icons-2 rounded-circle bg-gradient-ohhappiness text-white ms-auto">
+                    <i class="bi bi-file-earmark-diff"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
     </div>
 
         <div class="row">
