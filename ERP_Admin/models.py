@@ -367,3 +367,16 @@ class AllocateDriverToVehicle(models.Model):
 
     def __str__(self):
         return f"Driver {self.driver} assigned to Vehicle {self.vehicle}"
+    
+
+
+class Enquiry(models.Model):
+    name = models.CharField(max_length=100)
+    mobile = models.CharField(max_length=15)
+    email = models.EmailField()
+    subject = models.CharField(max_length=200)
+    message = models.TextField()
+    date = models.DateField(auto_now_add=True,null=True)
+
+    def __str__(self):
+        return f"{self.name} - {self.subject}"

@@ -143,3 +143,32 @@ class VehicleFilterForFinance(forms.Form):
         required=False,
         label="End Date"
     )
+
+  
+
+class EnquiryFilter(django_filters.FilterSet):
+    start_date = django_filters.DateFilter(
+        field_name='date',
+        lookup_expr='gte',
+        widget=DateInput(attrs={'type': 'date'}),
+        label='Start Date'
+    )
+    end_date = django_filters.DateFilter(
+        field_name='date',
+        lookup_expr='lte',
+        widget=DateInput(attrs={'type': 'date'}),
+        label='End Date'
+    ) 
+
+    def __init__(self, *args, **kwargs):
+        super(EnquiryFilter, self).__init__(*args, **kwargs)
+        self.filters['start_date'].label = "Start Date - MM/DD/YYYY"
+        self.filters['end_date'].label = "End Date - MM/DD/YYYY"
+
+    class Meta:
+        model = Enquiry
+        fields = ['start_date', 'end_date','date']
+
+
+
+

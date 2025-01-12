@@ -17,6 +17,7 @@
 						<p>If you have any questions please fell free to contact with us.</p>
 						<!-- Form -->
 						<form class="form" method="post">
+							{% csrf_token %}
 							<div class="row">
 								<div class="col-lg-6">
 									<div class="form-group">
@@ -30,7 +31,7 @@
 								</div>
 								<div class="col-lg-6">
 									<div class="form-group">
-										<input type="text" name="phone" placeholder="Phone" required="">
+										<input type="text" name="mobile" placeholder="mobile" required="">
 									</div>
 								</div>
 								<div class="col-lg-6">

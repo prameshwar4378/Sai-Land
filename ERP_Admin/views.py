@@ -311,6 +311,19 @@ def dashboard(request):
 
 
 @admin_required
+def enquiry_list(request):
+    queryset = Enquiry.objects.all().order_by('-id') 
+    filter = EnquiryFilter(request.GET, queryset=queryset)
+    filtered_enquiry = filter.qs  # Filtered queryset
+    return render(request, 'admin_enquiry_list.html', {'filtered_enquiry': filtered_enquiry,'filter':filter})
+
+
+def delete_enquiry(request,id):
+    Enquiry.objects.get(id=id).delete()
+    return redirect("/admin/enquiry_list")
+
+
+@admin_required
 def vehicle_model_list(request):
     rec = Model.objects.all()
     if request.method == 'POST':
