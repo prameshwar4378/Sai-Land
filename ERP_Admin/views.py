@@ -541,6 +541,7 @@ def delete_user(request, id):
 def drivers_list(request):
     drivers = Driver.objects.select_related('user').all()
     form = DriverRegistrationForm()
+    # Driver.objects.all().delete()
     incomplete_profile = CustomUser.objects.filter(driver__isnull=True, is_driver=True).delete()[0]
     return render(request, "admin_drivers_list.html", {'form': form, 'drivers': drivers})
 
@@ -598,42 +599,46 @@ def delete_driver(request, id):
     return redirect('/admin/drivers-list')
 
 
+from django.db import IntegrityError
+
 def import_drivers(request):
     if request.method == "POST":
         excel_file = request.FILES.get('Driver_file')
-        password=make_password('Pass@123')
+        password = make_password('Pass@123')
         if excel_file:
             try:
                 # Load the Excel file
                 workbook = openpyxl.load_workbook(excel_file)
                 worksheet = workbook.active
                 
-                # List to hold the data to insert into the database
+                # List to hold successfully created Driver instances
                 data_to_insert = []
-                
+                skipped_rows = []  # To track skipped rows with reasons
+
                 # Iterate over each row in the Excel sheet (skipping header row)
-                for row in worksheet.iter_rows(min_row=2, values_only=True):
-                    driver_name = row[1]  # Assuming driver_name is in the first column
-                    adhaar_number = row[2] if row[2] else None  # Assuming adhaar_number is in the second column
-                    license_number = row[3] if row[3] else None  # Assuming license_number is in the third column
-                    date_of_birth = row[4] if row[4] else None  # Assuming date_of_birth is in the fourth column
-                    mobile_number = row[5] if row[5] else None  # Assuming mobile_number is in the fifth column
-                    date_joined = row[6] if row[6] else None  # Assuming date_joined is in the seventh column
-                 
-                    # Check if the Aadhaar number is already used as a username in CustomUser
-                    if adhaar_number:
-                        if CustomUser.objects.filter(username=adhaar_number).exists():
-                            # print(f"Aadhaar number {adhaar_number} is already registered.")  # Print the error
-                            messages.error(request, f"Aadhaar number {adhaar_number} is already registered.")
-                            continue  # Skip to the next row if Aadhaar number exists
-                        username = adhaar_number  # Use Aadhaar number as the username
-                    else:
-                        # If Aadhaar number is not available, use mobile number as the username
-                        if CustomUser.objects.filter(username=mobile_number).exists():
-                            # print(f"Mobile number {mobile_number} is already registered.")  # Print the error
-                            messages.error(request, f"Mobile number {mobile_number} is already registered.")
-                            continue  # Skip to the next row if mobile number exists
-                        username = mobile_number  # Use mobile number as the username
+                for row_index, row in enumerate(worksheet.iter_rows(min_row=2, values_only=True), start=2):
+                    driver_name = row[0]  # Driver Name (index 0)
+                    adhaar_number = row[1] if row[1] else None  # Aadhaar Number (index 1)
+                    license_number = row[2] if row[2] else None  # License Number (index 2)
+                    date_of_birth = row[3] if row[3] else None  # Date of Birth (index 3)
+                    mobile_number = row[4] if row[4] else None  # Mobile Number (index 4)
+                    date_joined = row[5] if row[5] else None  # Date Joined (index 5)
+
+                    # Validate essential fields
+                    if not driver_name or not (adhaar_number or mobile_number):
+                        skipped_rows.append(
+                            f"Row {row_index}: Missing essential fields (Driver Name: {driver_name}, Aadhaar: {adhaar_number}, Mobile: {mobile_number})."
+                        )
+                        continue
+
+                    # Check if Aadhaar or Mobile number already exists
+                    if adhaar_number and CustomUser.objects.filter(username=adhaar_number).exists():
+                        skipped_rows.append(f"Row {row_index}: Aadhaar number {adhaar_number} is already registered.")
+                        continue
+
+                    if not adhaar_number and CustomUser.objects.filter(username=mobile_number).exists():
+                        skipped_rows.append(f"Row {row_index}: Mobile number {mobile_number} is already registered.")
+                        continue
 
                     # Create the EMP_ID instance if it doesn't exist
                     last_emp_id = EMP_ID.objects.order_by('-id').first()
@@ -643,48 +648,65 @@ def import_drivers(request):
                     else:
                         new_emp_id = EMP_ID.objects.create(emp_id="SLD-1")
 
-
                     # Create or update the user (CustomUser)
+                    username = adhaar_number or mobile_number
                     user, created = CustomUser.objects.get_or_create(
-                        username=username,  # Set the username to Aadhaar number or mobile number
-                        # defaults={'is_driver': True, 'password': make_password('Pass@123')}  # Mark as driver if creating a new user
-                        is_driver=True,
-                        password=password,
-                        emp_id=new_emp_id
+                        username=username,
+                        defaults={
+                            'is_driver': True,
+                            'password': password,
+                            'emp_id': new_emp_id
+                        }
                     )
-                    
-                    if not created:  # If user already exists, update is_driver to True
+
+                    if not created:
+                        if user.is_driver:
+                            skipped_rows.append(f"Row {row_index}: User {username} already exists as a driver.")
+                            continue
                         user.is_driver = True
                         user.save()
 
                     # Create the Driver instance
                     driver = Driver(
-                        user=user,  # Set the user
-                        driver_name=driver_name,  # Set driver name
-                        license_number=license_number,  # Set driving license number
-                        adhaar_number=adhaar_number,  # Set Adhaar number
-                        mobile_number=mobile_number,  # Set mobile number
-                        date_of_birth=date_of_birth,  # Set date of birth
-                        date_joined=date_joined  # Set date joined
+                        user=user,
+                        driver_name=driver_name,
+                        license_number=license_number,
+                        adhaar_number=adhaar_number,
+                        mobile_number=mobile_number,
+                        date_of_birth=date_of_birth,
+                        date_joined=date_joined
                     )
-                    data_to_insert.append(driver)
- 
+
+                    try:
+                        driver.save()  # Save the driver instance
+                        data_to_insert.append(driver)  # Add to the list of successfully created records
+                    except IntegrityError as e:
+                        skipped_rows.append(
+                            f"Row {row_index}: UNIQUE constraint failed (License Number: {license_number})."
+                        )
+                        continue  # Skip this row and continue to the next
+
+                # Provide feedback to the user
                 if data_to_insert:
-                    Driver.objects.bulk_create(data_to_insert)
                     messages.success(request, 'Drivers data imported and updated successfully.')
                 else:
-                    messages.error(request, 'No data to import.')
+                    messages.error(request, 'No data imported. Check skipped rows for errors.')
+
+                # Debugging: Log skipped rows
+                if skipped_rows:
+                    print("Skipped rows with reasons:")
+                    for reason in skipped_rows:
+                        print(reason)
+                    messages.error(request, f"Skipped rows: {len(skipped_rows)}. Check logs for details.")
 
             except Exception as e:
-                # print(f"Error occurred during import: {str(e)}")  # Print the exception error
+                print(f"Error occurred during import: {str(e)}")
                 messages.error(request, f'Error occurred during import: {str(e)}')
         else:
-            # print("No file selected.")  # Print error if no file selected
             messages.error(request, 'No file selected.')
 
-        return redirect('/admin/drivers-list')  # Redirect to the admin driver list page
-    return redirect('/admin/drivers-list')  # Redirect if not a POST request
-
+        return redirect('/admin/drivers-list')
+    return redirect('/admin/drivers-list')
 
 
 # vehical data start
