@@ -3,21 +3,6 @@
 port: 5432
 password : rood
 
-
-VEHICLE_STATUS = (
-    ('active', 'Active'),
-    ('inactive', 'Inactive'),
-    ('on_maintenance', 'On Maintenance'),
-    ('for_sale', 'For Sale'),
-    ('sold', 'Sold'),
-    ('scrapped', 'Scrapped'),
-    ('under_inspection', 'Under Inspection'),
-    ('reserved', 'Reserved'),
-    ('retired', 'Retired'),
-    ('in_transit', 'In Transit'),
-    ('operational', 'Operational'),
-)
-  
  
 
 Get Pass Feature Need to add 

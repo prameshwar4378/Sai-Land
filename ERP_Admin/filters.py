@@ -49,9 +49,9 @@ class JobCardFilter(django_filters.FilterSet):
 
     def __init__(self, *args, **kwargs):
         super(JobCardFilter, self).__init__(*args, **kwargs)
-        self.filters['start_date'].label = "Start Date - MM/DD/YYYY"
-        self.filters['end_date'].label = "End Date - MM/DD/YYYY"
-
+        self.filters['start_date'].label = "Start Date"
+        self.filters['end_date'].label = "End Date"
+ 
     class Meta:
         model = JobCard
         fields = ['start_date', 'end_date', 'technician', 'party', 'vehicle', 'driver','job_card_number','status']
@@ -86,8 +86,8 @@ class PurchaseFilter(django_filters.FilterSet):
 
     def __init__(self, *args, **kwargs):
         super(PurchaseFilter, self).__init__(*args, **kwargs)
-        self.filters['start_date'].label = "Start Date - MM/DD/YYYY"
-        self.filters['end_date'].label = "End Date - MM/DD/YYYY"
+        self.filters['start_date'].label = "Start Date"
+        self.filters['end_date'].label = "End Date"
 
     class Meta:
         model = Purchase
@@ -162,12 +162,12 @@ class EnquiryFilter(django_filters.FilterSet):
 
     def __init__(self, *args, **kwargs):
         super(EnquiryFilter, self).__init__(*args, **kwargs)
-        self.filters['start_date'].label = "Start Date - MM/DD/YYYY"
-        self.filters['end_date'].label = "End Date - MM/DD/YYYY"
+        self.filters['start_date'].label = "Start Date"
+        self.filters['end_date'].label = "End Date"
 
     class Meta:
         model = Enquiry
-        fields = ['start_date', 'end_date','date']
+        fields = ['start_date', 'end_date']
 
 
 

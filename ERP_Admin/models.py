@@ -48,7 +48,7 @@ class Vehicle(models.Model):
     vehicle_number = models.CharField(max_length=50, unique=True)
     status=models.CharField(max_length=50,default='active',choices=VEHICLE_STATUS)
     def __str__(self):
-        return f"{self.vehicle_name} ({self.vehicle_number})"
+        return f"{self.vehicle_name} ({self.vehicle_number[:-5]} {self.vehicle_number[-4:]})"
 
 
 class Driver(models.Model):

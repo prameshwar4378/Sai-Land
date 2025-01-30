@@ -23,6 +23,7 @@ from .models import *
 from django.core.paginator import Paginator
 from .filters import *
 from functools import wraps
+
 def admin_required(function):
     @wraps(function)
     def _wrapped_view(request, *args, **kwargs):

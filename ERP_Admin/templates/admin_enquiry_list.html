@@ -18,7 +18,7 @@
             <div class="row">
                 <div class="container" style="max-width:97%;">
                     <div class="text-lg-end text-start"> 
-                                <a href="#" class="btn text-light"  data-toggle="modal"  data-target="#model_filter"  style="background: linear-gradient(90deg, rgb(3, 32, 0) 0%,   rgb(31, 141, 0) 100%);"><i class="bi bi-file-earmark-spreadsheet"></i> | Filter</a> 
+                                <a href="#" class="btn text-light"  data-toggle="modal"  data-target="#model_filter"  style="background: linear-gradient(90deg, rgb(3, 32, 0) 0%,   rgb(0, 183, 255) 100%);"><i class="bi bi-filter"></i> | Filter</a> 
 
                     </div>
                 </div>
@@ -183,7 +183,14 @@
                 <form  method="get">
                     {% csrf_token %} 
                         <div class="row" >
-                                {{ filter.as_p }}
+                               
+                            <div class="col-sm-12">
+                                {{ filter.form.start_date|as_crispy_field }}
+                            </div>
+                            <div class="col-sm-12">
+                                {{ filter.form.end_date|as_crispy_field }}
+                            </div>
+
                         </div> 
  
                     <div class="modal-footer">
