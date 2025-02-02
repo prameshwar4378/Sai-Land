@@ -211,6 +211,10 @@ def redirect_user_based_on_role(request, user):
         return redirect('/driver/dashboard')
     elif user.is_finance:
         return redirect('/finance/dashboard')
+    elif user.is_fuel:
+        DeleteSession(request)
+        messages.info(request, 'Fuel role not available for web. Try to use Android Application....!')
+        return redirect('/login')
     else:
         messages.error(request, 'Unauthorized user role.')
         return redirect('login')
@@ -326,30 +330,30 @@ def delete_enquiry(request,id):
 
 @admin_required
 def vehicle_model_list(request):
-    rec = Model.objects.all()
+    rec = VehicleModel.objects.all()
     if request.method == 'POST':
-        form = ModelForm(request.POST)
+        form = VehicleModelForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, 'Model Created Success.')
             return redirect('/admin/vehicle_model_list')
     else: 
-        form = ModelForm()
+        form = VehicleModelForm()
     return render(request, 'admin_vehicle_model_list.html', {'rec': rec,'form': form})
  
 def vehicle_model_update(request, id):
-    model_instance = get_object_or_404(Model, id=id)
+    model_instance = get_object_or_404(VehicleModel, id=id)
     if request.method == 'POST':
-        form = ModelForm(request.POST, instance=model_instance)
+        form = VehicleModelForm(request.POST, instance=model_instance)
         if form.is_valid():
             form.save()
             messages.success(request, 'Model Updated Success.')
     else:
-        form = ModelForm(instance=model_instance)
+        form = VehicleModelForm(instance=model_instance)
     return render(request, 'admin_vehicle_model_update.html', {'form': form})
 
 def vehicle_model_delete(request, id):
-    model_instance = get_object_or_404(Model, id=id)
+    model_instance = get_object_or_404(VehicleModel, id=id)
     model_instance.delete()
     messages.success(request, 'Model Deleted Success.')
     return redirect('/admin/vehicle_model_list')
@@ -713,7 +717,7 @@ def import_drivers(request):
 # vehical data start
 @admin_required
 def vehicle_list(request):
-    vehicle = Vehicle.objects.select_related()
+    vehicle = Vehicle.objects.select_related() 
     form = VehicleForm()  # Pass the form for vehicle creation
     return render(request, "admin_vehicle_list.html", {'vehicle': vehicle, 'form': form})
 
@@ -750,35 +754,52 @@ def update_vehicle(request, id):
     return render(request, 'admin_update_vehicle.html', {'form': form})
 
 
-
 def import_vehicles(request):
     if request.method == "POST":
         excel_file = request.FILES.get('vehicle_file')
         if excel_file:
             try:
+                import openpyxl
                 workbook = openpyxl.load_workbook(excel_file)
                 worksheet = workbook.active
                 data_to_insert = []
+
                 for row in worksheet.iter_rows(min_row=2, values_only=True):
                     vehicle_number = row[0]
-                    vehicle_name = row[1]
+                    model_name = row[1]
+                    owner_name = row[2] if len(row) > 2 else None  # Optional Owner Name
 
+                    if not vehicle_number or not model_name:
+                        continue  # Skip incomplete rows
+
+                    # Get or Create the VehicleModel
+                    vehicle_model, _ = VehicleModel.objects.get_or_create(model_name=model_name)
+
+                    # Skip if Vehicle already exists
                     if Vehicle.objects.filter(vehicle_number=vehicle_number).exists():
-                        messages.error(request, f"Vehicle with number {vehicle_number} already exists")
-                        return redirect('/admin/vehicle-list')
-                    
-                    if vehicle_number and vehicle_name:
-                        data_to_insert.append(Vehicle(vehicle_number=vehicle_number,vehicle_name=vehicle_name))
-                
-                Vehicle.objects.bulk_create(data_to_insert)
-                messages.success(request, 'Data Imported and Updated Successfully')
+                        messages.warning(request, f"Vehicle with number {vehicle_number} already exists. Skipping.")
+                        continue
+
+                    # Create Vehicle Object
+                    new_vehicle = Vehicle(
+                        vehicle_number=vehicle_number,
+                        model_name=vehicle_model,
+                        owner_name=owner_name
+                    )
+                    data_to_insert.append(new_vehicle)
+                # Bulk Insert Vehicles
+                if data_to_insert:
+                    Vehicle.objects.bulk_create(data_to_insert)
+                    messages.success(request, f'Data Imported Successfully. {len(data_to_insert)} vehicles added.')
+                else:
+                    messages.info(request, 'No new vehicles were added.')
             except Exception as e:
                 messages.error(request, f'Error occurred during import: {str(e)}')
         else:
             messages.error(request, 'No file selected.')
-        
         return redirect('/admin/vehicle-list')
     return redirect('/admin/vehicle-list')
+
 
 def delete_vehicle(request, id):
     vehicle = get_object_or_404(Vehicle, id=id)

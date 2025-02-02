@@ -1,0 +1,264 @@
+{% extends "finance_base.html" %}
+{% block title %}Purchase List{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+<style>
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 100px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        border-radius: 10px;
+    }
+
+    .dropdown-content a {
+        color: black;
+        padding: 5px 10px;
+        text-decoration: none;
+        display: block;
+        text-align: left;
+    }
+
+    .dropdown-content a:hover {
+        background-color: #f1f1f1;
+    }
+
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+</style>
+<main id="main" class="main">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="pagetitle">
+                <h1>Purchase List</h1>
+                <nav>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item"><a href="#">Purchase List </a></li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+ 
+                    
+        <div class="col-sm-6">
+            <div class="container" style="max-width:97%;">
+                <div class="text-lg-end text-start">  
+                    <a href="#" class="btn btn-primary" data-toggle="modal"
+                        data-target="#model_filter"><i class="mdi mdi-filter"></i> <i class="bi bi-funnel"></i> | Filter</a>
+                    <a href="#" class="btn text-light" data-toggle="modal"
+                        data-target="#model_export" style="background: linear-gradient(90deg, rgb(3, 32, 0) 0%,   rgb(31, 141, 0) 100%);"><i class="bi bi-file-earmark-spreadsheet"></i> | Export</a> 
+                </div>
+            </div>
+        </div>
+    </div>
+        <section class="section dashboard">
+            <hr>
+            <div class="row">
+                <!-- Left side columns -->
+                <div class="col-lg-12">
+                    <div class="row">
+                        <div class="container" style=" overflow:scroll;">
+                            <table id="purchase" class="table table-striped "
+                                style="overflow:scroll; width:100%;min-width: max-content;">
+                                <thead>
+                                    <tr style="background:#9c4b2e;">
+                                        <th scope="col" class="text-center text-white" style="">Sr.No</th>
+                                        <th scope="col" class="text-center text-white" style="">Bill Number</th>
+                                        <th scope="col" class="text-center text-white" style="">Supplier Name</th>
+                                        <th scope="col" class="text-center text-white" style="">Billing Date</th>
+                                        <th scope="col" class="text-center text-white" style="">Total Cost</th>
+                                        <th scope="col" class="text-center text-white" style="">Bill</th>
+                                        <th scope="col" class="text-center text-white" style="">Paid/UnPaid</th>
+                                        <th scope="col" class="text-center text-white" style="">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if purchase %}
+                                    {% for r in purchase %}
+                                    <tr>
+                                        <td class="text-center">{{forloop.counter}}</td>
+                                        <td class="text-center">{{r.bill_no}}</td>
+                                        <td class="text-center">{{r.supplier_name}}</td>
+                                        <td class="text-center">{{r.bill_date}}</td>
+                                        <td class="text-center">{{r.total_cost}}</td>
+                                        <td class="text-center">
+                                            {% if r.paid_status %}
+                                            <span class="badge bg-success text-light">
+                                                <a href="{{r.bill_file.url}}" class="text-light" style="text-decoration:none;" download>download</a>
+                                            </span>
+                                            {% else %}
+                                                <span class="badge bg-danger">---</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            {% if r.paid_status == "Paid" %}
+                                            <span class="badge bg-success">Paid</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Un-Paid</span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td class="text-center">
+                                            <center>
+                                                <a href="javascript:void(0);" data-url="{% url 'finance_purchase_item_list' r.id %}" class="btn btn-primary px-2 py-1" onclick="mini_window(this)">Read More</a>
+                                                <a href="javascript:void(0);" data-url="{% url 'finance_update_purchase' r.id %}" class="btn btn-warning px-2 py-2" onclick="mini_window_2(this)"><i class="bi bi-pencil-square"></i></a>
+                                            </center>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% else %}
+                                    {% endif %}
+                                </tbody>
+                            </table>
+
+                            <div class="pagination-container">
+                                <div class="pagination">
+                                    {% if purchase.has_previous %}
+                                        <a href="?page=1&{{ filter_params }}">« First</a>
+                                        <a href="?page={{ purchase.previous_page_number }}&{{ filter_params }}">Previous</a>
+                                    {% endif %}
+                                    
+                                    <span class="current-page">Page {{ purchase.number }} of {{ purchase.paginator.num_pages }}</span>
+                    
+                                    {% if purchase.has_next %}
+                                        <a href="?page={{ purchase.next_page_number }}&{{ filter_params }}">Next</a>
+                                        <a href="?page={{ purchase.paginator.num_pages }}&{{ filter_params }}">Last »</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div><!-- End Left side columns -->
+        </section>
+
+</main><!-- End #main -->
+
+ 
+
+<div class="modal fade" id="model_filter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+ aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#9c4b2e;">
+                <h4 class="modal-title text-white" id="exampleModalLongTitle">Filter Purchase</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left">
+                <form method="GET" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row"> 
+                        <div class="col-sm-6">
+                            {{ filter.form.start_date|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.end_date|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.amount_less_than|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.amount_greater_than|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.bill_type|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ filter.form.bill_no|as_crispy_field }}
+                        </div>  
+                        <div class="col-sm-12">
+                            {{ filter.form.paid_status|as_crispy_field }}
+                        </div>  
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+ 
+ 
+<div class="modal fade" id="model_export" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 400px;">
+       <div class="modal-content">
+           <div class="modal-header" style="background:#9c4b2e;">
+               <h4 class="modal-title text-white" id="exampleModalLongTitle">Filter Purchase</h4>
+               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                   <span aria-hidden="true">&times;</span>
+               </button>
+           </div>
+           <div class="modal-body text-left">
+               <form method="GET" enctype="multipart/form-data"  action="{% url "export_purchase_data" %}">
+                   {% csrf_token %}
+                   <div class="row"> 
+                       <div class="col-sm-12">
+                           {{ filter.form.paid_status|as_crispy_field }}
+                       </div> 
+                   </div>
+                   <div class="modal-footer">
+                       <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                       <button type="submit" class="btn btn-primary">Submit</button>
+                   </div>
+               </form>
+           </div>
+       </div>
+   </div>
+</div>
+
+
+ 
+    
+<script>
+    function mini_window(element) { 
+        const url = element.dataset.url;
+        var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+        var newWidth = screenWidth * 0.9;  // 90% of the screen width
+        var newHeight = screenHeight * 0.9;  // 90% of the screen height
+        var left = (screenWidth - newWidth) / 2;
+        var top = (screenHeight - newHeight) / 2;
+        var windowFeatures = `width=${newWidth},height=${newHeight},scrollbars=yes,resizable=yes,top=${top},left=${left}`;
+        var newWindow = window.open(url, "miniWindow", windowFeatures);
+        newWindow.onload = function() {
+            newWindow.location.replace(url);
+        };
+    }
+
+    
+    function mini_window_2(element) { 
+        const url = element.dataset.url;
+        var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+        var newWidth = screenWidth * 0.3;  // 90% of the screen width
+        var newHeight = screenHeight * 0.4;  // 90% of the screen height
+        var left = (screenWidth - newWidth) / 2;
+        var top = (screenHeight - newHeight) / 2;
+        var windowFeatures = `width=${newWidth},height=${newHeight},scrollbars=yes,resizable=yes,top=${top},left=${left}`;
+        var newWindow = window.open(url, "miniWindow", windowFeatures);
+        newWindow.onload = function() {
+            newWindow.location.replace(url);
+        };
+    }
+
+</script>
+
+ 
+{% endblock content %}

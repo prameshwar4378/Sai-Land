@@ -121,28 +121,41 @@
                 </div>
 
                 <!-- Bill Date -->
-                <div class="col-sm-4 mb-2">
+                <div class="col-sm-3 mb-2">
                     <div class="info-field">
                         <strong>Bill Date:</strong> {{ purchase.bill_date }}
                     </div>
                 </div>
 
                 <!-- Total Cost -->
-                <div class="col-sm-4 mb-2">
+                <div class="col-sm-3 mb-2">
                     <div class="info-field">
                         <strong>Total Cost:</strong> {{ purchase.total_cost }}
                     </div>
                 </div>
 
                 <!-- Total Cost -->
-                <div class="col-sm-4 mb-2">
+                <div class="col-sm-3 mb-2">
+                    <div class="info-field">
+                        <strong>Payment Status:</strong>  
+                        {% if purchase.paid_status == "Paid" %}
+                        <span class="badge bg-success">Paid</span>
+                        {% else %}
+                            <span class="badge bg-danger">Un Paid</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Total Cost -->
+                <div class="col-sm-3 mb-2">
                     <div class="info-field">
                         {% if purchase.bill_file %}
                         <a href="{{purchase.bill_file.url}}" class="btn btn-success" download>Download Biil</a>
                         {% else %}
                         <a href="" class="btn btn-secondary" >Bill Not Available</a>
-
                         {% endif %}
+
+                        
                     </div>
                 </div>
                 <!-- Bill File -->

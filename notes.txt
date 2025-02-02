@@ -1,7 +1,25 @@
  
+Changes Done
 
-port: 5432
-password : rood
+EMI : 
+    - Automatic Calculations (installment wise)
+
+
+Policy : 
+	- Premium amount
+	- Insurance company (Foreign Key)
+	- RC Book (Upload Document)
+	- Invoice (Upload Document)
+
+
+Other Dues : 
+	- Fields Added (fitness_document, permit_document, fitness_document)
+
+
+ 
+
+
+
 
  
 

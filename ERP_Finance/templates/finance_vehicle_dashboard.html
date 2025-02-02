@@ -99,7 +99,7 @@ legend {
                     <p class="alert alert-primary" style="width: 100%; margin-bottom:-20px;">Vehicle Number : <b>{{ vehicle.vehicle_number }}</b></p>
                 </div>
                 <div class="col-lg-8  p-3" > 
-                    <p class="alert alert-primary" style="width: 100%; margin-bottom:-20px;">Vehicle Name : <b>{{ vehicle.vehicle_name }}</b></p>
+                    <p class="alert alert-primary" style="width: 100%; margin-bottom:-20px;">Vehicle Name : <b>{{ vehicle.model_name.model_name }}</b></p>
                 </div>
             </div>
             <hr>
@@ -219,13 +219,22 @@ legend {
                                 {% endif %}   
                              </h4>
                             <div class="mt-2 details">
-                                {% if other_dues.fitness_due_date %}
-                                <div class="record">
-                                    <span class="label">Due Date:</span>
-                                    <span class="value">{{ other_dues.fitness_due_date }}</span>
-                                </div> 
+                                {% if other_dues.fitness_document or other_dues.fitness_due_date %}                     
+                                    {% if other_dues.fitness_document %}
+                                    <div class="record">
+                                        <span class="label">Fitness Document:</span>
+                                        <span class="value"> <a href="/media/{{other_dues.fitness_document}}" download>Download</a>  </span>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if other_dues.fitness_due_date %}
+                                    <div class="record">
+                                        <span class="label">Due Date:</span>
+                                        <span class="value">{{ other_dues.fitness_due_date }}</span>
+                                    </div> 
+                                    {% endif %}  
                                 {% else %}
-                                    <p>No Fitness Due Record Found.</p>
+                                <p>No Fitness Due Record Found.</p>
                                 {% endif %}  
                             </div>
                         </div>
@@ -244,14 +253,25 @@ legend {
                                 {% endif %}   
                              </h4>
                             <div class="mt-2 details">
-                                {% if other_dues.permit_due_date %}
-                                <div class="record">
-                                    <span class="label">Due Date:</span>
-                                    <span class="value">{{ other_dues.permit_due_date }}</span>
-                                </div> 
+                                {% if other_dues.permit_document or other_dues.permit_due_date %}
+                                    {% if other_dues.permit_document %}
+                                    <div class="record">
+                                        <span class="label">Permit Document:</span>
+                                        <span class="value"> <a href="/media/{{other_dues.permit_document}}" download>Download</a>  </span>
+                                    </div>
+                                    {% endif %}
+                                    
+
+                                    {% if other_dues.permit_due_date %}
+                                    
+                                    <div class="record">
+                                        <span class="label">Due Date:</span>
+                                        <span class="value">{{ other_dues.permit_due_date }}</span>
+                                    </div> 
+                                    {% endif %}  
                                 {% else %}
                                     <p>No Permit Due Record Found.</p>
-                                {% endif %}  
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -269,18 +289,83 @@ legend {
                                 {% endif %}   
                              </h4>
                             <div class="mt-2 details">
-                                {% if other_dues.puc_due_date %}
-                                <div class="record">
-                                    <span class="label">PUC Amount:</span>
-                                    <span class="value">{{ other_dues.puc_due_date }}</span>
-                                </div> 
+                                {% if other_dues.puc_document or other_dues.puc_due_date %}
+                                    {% if other_dues.puc_document %}
+                                    <div class="record">
+                                        <span class="label">PUC Document:</span>
+                                        <span class="value"> <a href="/media/{{other_dues.puc_document}}" download>Download</a>  </span>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if other_dues.puc_due_date %}
+                                    <div class="record">
+                                        <span class="label">PUC Amount:</span>
+                                        <span class="value">{{ other_dues.puc_due_date }}</span>
+                                    </div> 
+                                    {% endif %}  
                                 {% else %}
                                     <p>No PUC Due Record Found.</p>
-                                {% endif %}  
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                 </div><!-- End Card -->
+
+                <div class="col-sm-4">
+                    <div class="card recent-sales overflow-auto">
+                        <div class="card-body">
+                            <h4 class="card-title">RC Book  | 
+                                {% if other_dues.rc_book %} 
+                                <span style="font-weight: 200; ">
+                                    <a href="javascript:void(0);" style="text-decoration: none;" data-url="{% url 'finance_update_other_dues' other_dues_id %}"   onclick="mini_window_1(this)"  >Update</a>
+                                </span> 
+                                {% endif %}   
+                             </h4>
+                            <div class="mt-2 details">
+                                {% if other_dues.rc_book %}
+                                    {% if other_dues.rc_book %}
+                                    <div class="record">
+                                        <span class="label">RC Book :</span>
+                                        <span class="value"> <a href="/media/{{other_dues.rc_book}}" download>Download</a>  </span>
+                                    </div>
+                                    {% endif %}
+   
+                                {% else %}
+                                    <p>No RC Book Record Found.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- End Card -->
+
+                <div class="col-sm-4">
+                    <div class="card recent-sales overflow-auto">
+                        <div class="card-body">
+                            <h4 class="card-title">Invoice  | 
+                                {% if other_dues.invoice %} 
+                                <span style="font-weight: 200; ">
+                                    <a href="javascript:void(0);" style="text-decoration: none;" data-url="{% url 'finance_update_other_dues' other_dues_id %}"   onclick="mini_window_1(this)"  >Update</a>
+                                </span> 
+                                {% endif %}   
+                             </h4>
+                            <div class="mt-2 details">
+                                {% if other_dues.invoice %}
+                                    {% if other_dues.invoice %}
+                                    <div class="record">
+                                        <span class="label">Invoice Document :</span>
+                                        <span class="value"> <a href="/media/{{other_dues.invoice}}" download>Download</a>  </span>
+                                    </div>
+                                    {% endif %}
+   
+                                {% else %}
+                                    <p>No Invoice Record Found.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- End Card -->
+
+
             </div>
         </section>
 </main><!-- End #main -->
@@ -318,7 +403,7 @@ legend {
                         </div>
                         <!-- Total Installments Field -->
                         <div class="col-sm-6">
-                            {{ emi_form.total_installments|as_crispy_field }}
+                            {{ emi_form.emi_amount|as_crispy_field }}
                         </div>
                         <!-- Paid Installments Field -->
                         <div class="col-sm-6">
@@ -363,13 +448,15 @@ legend {
             <div class="modal-body text-left">
                 <div class="alert alert-danger d-none" id="createPolicyFormError"></div>
                 <form id="createPolicyForm" method="POST" enctype="multipart/form-data" action="{% url 'finance_create_policy' %}">
-                    {% csrf_token %}
+                    {% csrf_token %} 
                     <div class="row">  
-                        <div class="col-sm-12">{{ policy_form.vehicle|as_crispy_field }}</div>
-                        <div class="col-sm-12">{{ policy_form.policy_number|as_crispy_field }}</div>
-                        <div class="col-sm-12">{{ policy_form.policy_file|as_crispy_field }}</div>
-                        <div class="col-sm-12">{{ policy_form.due_date|as_crispy_field }}</div>
-                    </div>
+                        <div class="col-sm-6">{{ policy_form.vehicle|as_crispy_field }}</div>
+                          <div class="col-sm-6">{{ policy_form.policy_number|as_crispy_field }}</div>
+                          <div class="col-sm-6">{{ policy_form.premium_amount|as_crispy_field }}</div>
+                          <div class="col-sm-6">{{ policy_form.insurance_company|as_crispy_field }}</div>
+                          <div class="col-sm-6">{{ policy_form.policy_file|as_crispy_field }}</div>
+                          <div class="col-sm-6">{{ policy_form.due_date|as_crispy_field }}</div>
+                      </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Submit</button>
@@ -417,18 +504,38 @@ legend {
                     <fieldset>
                         <legend>Other Due Dates</legend>
                         <div class="row">
-                            <div class="col-sm-4">
+                            <div class="col-sm-6">
                                 {{ form.fitness_due_date|as_crispy_field }}
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-6">
+                                {{ form.fitness_document|as_crispy_field }}
+                            </div>
+                            <div class="col-sm-6">
                                 {{ form.permit_due_date|as_crispy_field }}
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-6">
+                                {{ form.permit_document|as_crispy_field }}
+                            </div>
+                            <div class="col-sm-6">
                                 {{ form.puc_due_date|as_crispy_field }}
+                            </div>
+                            <div class="col-sm-6">
+                                {{ form.puc_document|as_crispy_field }}
                             </div>
                         </div>
                     </fieldset>
-                    
+                    <fieldset>
+                        <legend>Other Documents</legend>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                {{ form.rc_book|as_crispy_field }}
+                            </div>
+                            <div class="col-sm-6">
+                                {{ form.invoice|as_crispy_field }}
+                            </div> 
+                        </div>
+                    </fieldset>
+                                        
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Submit</button>

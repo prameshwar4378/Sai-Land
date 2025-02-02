@@ -77,10 +77,11 @@
                                     <tr style="background:#9c4b2e;">
                                         <th scope="col" class="text-center text-white" style="">Sr.No</th>
                                         <th scope="col" class="text-center text-white" style="">Bill Number</th>
-                                        <th scope="col" class="text-center text-white" style="">Bill Type</th>
                                         <th scope="col" class="text-center text-white" style="">Supplier Name</th>
                                         <th scope="col" class="text-center text-white" style="">Billing Date</th>
                                         <th scope="col" class="text-center text-white" style="">Total Cost</th>
+                                        <th scope="col" class="text-center text-white" style="">Bill</th>
+                                        <th scope="col" class="text-center text-white" style="">Paid/UnPaid</th>
                                         <th scope="col" class="text-center text-white" style="">Action</th>
                                     </tr>
                                 </thead>
@@ -88,20 +89,36 @@
                                     {% if purchase %}
                                     {% for r in purchase %}
                                     <tr>
-                                        <td>{{forloop.counter}}</td>
-                                        <td>{{r.bill_no}}</td>
-                                        <td>{{r.bill_type}}</td>
-                                        <td>{{r.supplier_name}}</td>
-                                        <td>{{r.bill_date}}</td>
-                                        <td>{{r.total_cost}}</td>
-                                        <td>
+                                        <td class="text-center">{{forloop.counter}}</td>
+                                        <td class="text-center">{{r.bill_no}}</td>
+                                        <td class="text-center">{{r.supplier_name}}</td>
+                                        <td class="text-center">{{r.bill_date}}</td>
+                                        <td class="text-center">{{r.total_cost}}</td>
+                                        <td class="text-center">
+                                            {% if r.paid_status %}
+                                            <span class="badge bg-success text-light">
+                                                <a href="{{r.bill_file.url}}" class="text-light" style="text-decoration:none;" download>download</a>
+                                            </span>
+                                            {% else %}
+                                                <span class="badge bg-danger">---</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            {% if r.paid_status == "Paid" %}
+                                            <span class="badge bg-success">Paid</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Un-Paid</span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td class="text-center">
                                             <center>
                                                  
  
-                                                <a href="javascript:void(0);" data-url="{% url 'workshop_purchase_item_list' r.id %}" class="btn btn-primary px-2 py-2" onclick="mini_window(this)">Manage</a>
+                                                <a href="javascript:void(0);" data-url="{% url 'workshop_purchase_item_list' r.id %}" class="btn btn-primary px-2 py-1" onclick="mini_window(this)">Manage</a>
                                                 <a href="javascript:void(0);" data-url="{% url 'workshop_update_purchase' r.id %}" class="btn btn-warning px-2 py-2" onclick="mini_window_2(this)"><i class="bi bi-pencil-square"></i></a>
 
-                                                <a href="{% url 'workshop_delete_purchase' r.id %}" class="btn btn-danger px-2 py-2" onclick="confirmDelete(this); return false;">Delete</a>
+                                                <a href="{% url 'workshop_delete_purchase' r.id %}" class="btn btn-danger px-2 py-1" onclick="confirmDelete(this); return false;">Delete</a>
                                                           
                                             </center>
                                         </td>
@@ -270,51 +287,7 @@
     </div>
 </div>
 
-
-<div class="modal fade" id="model_filter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
- aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
-        <div class="modal-content">
-            <div class="modal-header" style="background:#9c4b2e;">
-                <h4 class="modal-title text-white" id="exampleModalLongTitle">Filter Purchase</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body text-left">
-                <form method="GET" enctype="multipart/form-data" action="export_purchase_data">
-                    {% csrf_token %}
-                    <div class="row"> 
-                        <div class="col-sm-6">
-                            {{ filter.form.start_date|as_crispy_field }}
-                        </div>
-                        <div class="col-sm-6">
-                            {{ filter.form.end_date|as_crispy_field }}
-                        </div>
-                        <div class="col-sm-6">
-                            {{ filter.form.amount_less_than|as_crispy_field }}
-                        </div>
-                        <div class="col-sm-6">
-                            {{ filter.form.amount_greater_than|as_crispy_field }}
-                        </div>
-                        <div class="col-sm-6">
-                            {{ filter.form.bill_type|as_crispy_field }}
-                        </div>
-                        <div class="col-sm-6">
-                            {{ filter.form.bill_no|as_crispy_field }}
-                        </div>  
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-
+ 
 
 <div class="modal fade" id="model_export_excel" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
  aria-hidden="true">

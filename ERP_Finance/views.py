@@ -1,11 +1,11 @@
 from django.shortcuts import render,get_object_or_404,redirect
-from ERP_Admin.models import Policy,EMI,EMI_Item,Vehicle,Insurance_Bank,Finance_Bank
+from ERP_Admin.models import Policy,EMI,EMI_Item,Vehicle,Insurance_Bank,Finance_Bank,EMI_Installment,Purchase,Product,PurchaseItem
 from .forms import *
 from django.http import JsonResponse
 from django.contrib import messages
 from django.core.paginator import Paginator
 from datetime import date
-from ERP_Admin.filters import EMIFilter
+from ERP_Admin.filters import EMIFilter,PurchaseFilter
 from django.db.models import Sum, F, Q
 from django.db.models import Count, Case, When, F, IntegerField,ExpressionWrapper
 from django.utils import timezone
@@ -202,7 +202,7 @@ def vehicle_dashboard(request,id):
     emi=EMI.objects.filter(vehicle=vehicle).first()
     emi_amount=None
     if emi:
-        emi_amount=int(emi.loan_amount)/int(emi.total_installments)
+        emi_amount=int(emi.loan_amount)/int(emi.emi_amount)
 
     policy=Policy.objects.filter(vehicle=vehicle).first()
 
@@ -288,7 +288,7 @@ def emi_list(request):
     emi=EMI.objects.select_related('vehicle').order_by('next_due_date')
     filter = EMIFilter(request.GET, queryset=emi)
     filtered_data = filter.qs  # Filtered queryset
-    
+    # EMI_Installment.objects.all().delete()
     form=EMIForm()
     context={
         'form':form,
@@ -401,6 +401,73 @@ def delete_emi_item(request, id):
         messages.success(request, 'EMI Item deleted successfully.')
     return redirect(f'/finance/emi_item_list/{id}')
 
+
+@finance_required
+def emi_installments_list(request, id):
+    from datetime import date
+
+    emi = get_object_or_404(EMI, id=id)
+    remaining_days = (emi.next_due_date - date.today()).days
+
+    emi_installments = EMI_Installment.objects.filter(emi=emi).order_by('-id')
+
+    total_outstanding_principal = sum(installment.outstanding_amount for installment in emi_installments)
+    total_principal = sum(installment.principal_amount for installment in emi_installments)
+    total_interest = sum(installment.interest_amount for installment in emi_installments)
+    total_installment_amount = sum(installment.emi_amount for installment in emi_installments)
+
+    # Correct Monthly Interest Rate
+    monthly_interest_rate = (emi.interest_rate / 100) / 12
+
+    # Initial Outstanding Principal
+    outstanding_principal = emi.loan_amount
+
+    if emi_installments.exists():
+        latest_installment = emi_installments.first()
+        outstanding_principal = latest_installment.outstanding_amount
+
+    # Calculate Interest and Principal
+    interest_amount = outstanding_principal * monthly_interest_rate
+    principal_amount = emi.emi_amount - interest_amount
+
+    # Prevent Negative Principal (if EMI < Interest)
+    if principal_amount < 0:
+        principal_amount = 0
+        interest_amount = emi.emi_amount  # Entire EMI goes to interest
+
+    outstanding_principal = outstanding_principal - principal_amount
+
+    form = EMI_InstallmentForm(
+        request.POST or None,
+        initial={
+            'emi_amount': emi.emi_amount,
+            'principal_amount': round(principal_amount, 2),
+            'interest_amount': round(interest_amount, 2),
+            'outstanding_amount': round(outstanding_principal, 2),
+        }
+    )
+
+    # Handle Form Submission
+    if request.method == 'POST' and form.is_valid():
+        new_emi_installment = form.save(commit=False)
+        new_emi_installment.emi = emi
+        new_emi_installment.save()
+        messages.success(request, 'Installment Added successfully.')
+        return redirect(f'/finance/emi_item_list/{emi.id}')
+
+    # Pass Data to Template
+    context = {
+        'form': form,
+        'emi_items': emi_installments,
+        'total_outstanding_principal': round(total_outstanding_principal, 2),
+        'total_principal': round(total_principal, 2),
+        'total_interest': round(total_interest, 2),
+        'total_installment_amount': round(total_installment_amount, 2),
+        'remaining_days': remaining_days,
+        'emi': emi
+    }
+
+    return render(request, 'finance_emi_installments_list.html', context)
 
 
 
@@ -522,6 +589,7 @@ def finance_bank_list(request):
         form = FinanceBankForm()
     return render(request, 'finance_finance_bank_list.html', {'rec': rec,'form': form})
  
+@finance_required 
 def finance_bank_update(request, id):
     model_instance = get_object_or_404(Finance_Bank, id=id)
     if request.method == 'POST':
@@ -533,8 +601,64 @@ def finance_bank_update(request, id):
         form = FinanceBankForm(instance=model_instance)
     return render(request, 'finance_finance_bank_update.html', {'form': form})
 
+@finance_required 
 def finance_bank_delete(request, id): 
     model_instance = get_object_or_404(Finance_Bank, id=id)
     model_instance.delete()
     messages.success(request, 'Record Deleted Success.')
     return redirect('/finance/finance_bank_list')
+
+
+
+
+@finance_required 
+def purchase_list(request):
+    queryset = Purchase.objects.all().order_by('-id') 
+    filter = PurchaseFilter(request.GET, queryset=queryset)
+    filtered_purchase = filter.qs  # Filtered queryset
+    
+    # Pagination
+    paginator = Paginator(filtered_purchase, 10)  # Show 10 job cards per page.
+    page_number = request.GET.get('page')  # Get the page number from the GET request
+    page_obj = paginator.get_page(page_number)  # Get the corresponding page object
+    
+    # Include the filter parameters in the pagination context
+    filter_params = request.GET.copy()  # Copy the GET parameters
+    if 'page' in filter_params:
+        del filter_params['page']  # Remove the page parameter if it exists
+    
+    return render(request, "finance_purchase_list.html", {
+        'purchase': page_obj,  # Pass the paginated object to the template
+        'filter': filter,  # Pass the filter object for displaying the form
+        'filter_params': filter_params.urlencode(),  # Pass the filter parameters for pagination
+    })
+
+
+@finance_required 
+def update_purchase(request, id):
+    purchase = Purchase.objects.get(id=id)  # Retrieve the JobCard instance
+    if request.method == 'POST':
+        form = PurchaseUpdateForm(request.POST, request.FILES, instance=purchase)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Status Updated Successfully.')
+    else:
+        form = PurchaseUpdateForm(instance=purchase)
+    return render(request, 'finance_update_purchase.html', {'form': form})
+
+
+@finance_required 
+def purchase_item_list(request,id):
+    purchase=get_object_or_404(Purchase, id=id)
+    product_data = list(Product.objects.select_related('model'))
+    item=PurchaseItem.objects.filter(purchase=purchase).order_by('-id')
+    total_amount = item.aggregate(Sum('total_amount'))['total_amount__sum']
+
+    if request.method == 'POST':
+        form = PurchaseUpdateForm(request.POST, request.FILES, instance=purchase)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Status Updated Successfully.')
+    else:
+        form = PurchaseUpdateForm(instance=purchase)
+    return render(request, "finance_purchase_item_list.html",{'form':form,'item':item,'purchase':purchase,'product_data':product_data,'total_amount':total_amount})

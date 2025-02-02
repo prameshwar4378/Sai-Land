@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from .forms import *
 from django.http import JsonResponse
-from ERP_Admin.models import Product,Model,Purchase,JobCard
+from ERP_Admin.models import Product,VehicleModel,Purchase,JobCard
 import openpyxl
 from django.contrib import messages
 from django.core.cache import cache
@@ -322,7 +322,7 @@ def import_products(request):
                         return redirect('/workshop/product-list')
                     # Retrieve or create the model instance
                     if model_name not in model_cache:
-                        model_instance, created = Model.objects.get_or_create(model_name=model_name)
+                        model_instance, created = VehicleModel.objects.get_or_create(model_name=model_name)
                         model_cache[model_name] = model_instance
                     else:
                         model_instance = model_cache[model_name]

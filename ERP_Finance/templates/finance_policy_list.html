@@ -112,10 +112,12 @@
                 <form id="createPolicyForm" method="POST" enctype="multipart/form-data" action="{% url 'finance_create_policy' %}">
                     {% csrf_token %}
                     <div class="row">  
-                        <div class="col-sm-12">{{ form.policy_number|as_crispy_field }}</div>
-                        <div class="col-sm-12">{{ form.vehicle|as_crispy_field }}</div>
-                        <div class="col-sm-12">{{ form.policy_file|as_crispy_field }}</div>
-                        <div class="col-sm-12">{{ form.due_date|as_crispy_field }}</div>
+                      <div class="col-sm-6">{{ form.vehicle|as_crispy_field }}</div>
+                        <div class="col-sm-6">{{ form.policy_number|as_crispy_field }}</div>
+                        <div class="col-sm-6">{{ form.premium_amount|as_crispy_field }}</div>
+                        <div class="col-sm-6">{{ form.insurance_company|as_crispy_field }}</div>
+                        <div class="col-sm-6">{{ form.policy_file|as_crispy_field }}</div>
+                        <div class="col-sm-6">{{ form.due_date|as_crispy_field }}</div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>

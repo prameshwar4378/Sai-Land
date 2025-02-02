@@ -87,7 +87,8 @@
                                     <tr style="background:#9c4b2e;">
                                         <th scope="col" class="text-center text-white" style="">Sr.No</th>
                                         <th scope="col" class="text-center text-white" style="">Vehicle Number</th>
-                                        <th scope="col" class="text-center text-white" style="">Vehicle Name</th>
+                                        <th scope="col" class="text-center text-white" style="">Vehicle Model</th>
+                                        <th scope="col" class="text-center text-white" style="">Owner Name</th>
                                         <th scope="col" class="text-center text-white" style="">Download QR</th>
                                         <th scope="col" class="text-center text-white" style="">Action</th>
                                     </tr>
@@ -98,7 +99,8 @@
                                     <tr>
                                         <td>{{forloop.counter}}</td>
                                         <td>{{r.vehicle_number}}</td>
-                                        <td>{{r.vehicle_name}}</td>
+                                        <td>{{r.model_name.model_name}}</td>
+                                        <td>{% if r.owner_name %}{{r.owner_name}} {% else %}---{% endif %}</td>
                                         <td class="text-center">
                                             <a href="{% url 'generate_and_download_qr' r.vehicle_number %}" class="btn btn-primary" target="__blank"><i class="bi bi-qr-code"></i></a>
                                         </td>

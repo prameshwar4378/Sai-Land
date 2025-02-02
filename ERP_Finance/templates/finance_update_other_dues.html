@@ -56,18 +56,38 @@ legend {
                             <fieldset>
                                 <legend>Other Due Dates</legend>
                                 <div class="row">
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-6">
                                         {{ form.fitness_due_date|as_crispy_field }}
                                     </div>
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-6">
+                                        {{ form.fitness_document|as_crispy_field }}
+                                    </div>
+                                    <div class="col-sm-6">
                                         {{ form.permit_due_date|as_crispy_field }}
                                     </div>
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-6">
+                                        {{ form.permit_document|as_crispy_field }}
+                                    </div>
+                                    <div class="col-sm-6">
                                         {{ form.puc_due_date|as_crispy_field }}
+                                    </div>
+                                    <div class="col-sm-6">
+                                        {{ form.puc_document|as_crispy_field }}
                                     </div>
                                 </div>
                             </fieldset>
                             
+                            <fieldset>
+                                <legend>Other Documents</legend>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        {{ form.rc_book|as_crispy_field }}
+                                    </div>
+                                    <div class="col-sm-6">
+                                        {{ form.invoice|as_crispy_field }}
+                                    </div> 
+                                </div>
+                            </fieldset>
                         </div>
                         <center><button type="submit" class="btn btn-primary mt-1 px-5">Submit</button></center>
                     </form>

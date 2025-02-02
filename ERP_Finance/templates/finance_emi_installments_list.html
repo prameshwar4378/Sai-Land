@@ -1,0 +1,383 @@
+{% extends "base_window.html" %}
+{% block title %} EMI List{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+<style>
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 100px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        border-radius: 10px;
+    }
+
+    .dropdown-content a {
+        color: black;
+        padding: 5px 10px;
+        text-decoration: none;
+        display: block;
+        text-align: left;
+    }
+
+    .dropdown-content a:hover {
+        background-color: #f1f1f1;
+    }
+
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+
+
+
+    .bill-info-header {
+        background-color: #f9f9f9;
+        border-radius: 12px;
+        box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-top: 20px;
+    }
+
+    .info-field {
+        background-color: #f1f1f1;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        font-size: 1rem;
+        color: #555;
+        width: 100%;
+        text-align: left;
+    }
+
+    .info-field strong {
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .col-sm-3 {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .col-sm-4 {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    @media (max-width: 768px) {
+
+        .col-sm-3,
+        .col-sm-4 {
+            margin-bottom: 15px;
+        }
+    }
+
+
+    .form-header {
+        background-color: #f9f9f9;
+        border-radius: 12px;
+        box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-top: 20px;
+    }
+</style>
+
+<div class="alert alert-warning text-center mt-2 p-1">
+    <h2>EMI Installment Management Dashboard </h2>
+</div>
+
+<main id="main" class="main">
+    <div class="row">
+        <div class="col-sm-12  ">
+            <div class="container mt-2" style="max-width:97%;">
+                <div class="text-lg-end text-start">
+                    <!-- Use text-lg-end for right alignment in large screens --> 
+                        <!-- Use text-lg-end for right alignment in large screens -->
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+ 
+    <section class="section dashboard">
+
+        <div class="container-fluid mb-3 emi-info-header">
+            <div class="row">
+                <!-- Loan Amount -->
+                <div class="col-sm-3 mb-2">
+                    <div class="info-field">
+                        <span>Loan Amount:</span> <strong>₹ {{ emi.loan_amount }}</strong>
+                    </div>
+                </div>
+        
+                <!-- Total Installments -->
+                <div class="col-sm-3 mb-2">
+                    <div class="info-field">
+                        <span>Total Installments:</span> <strong>{{ emi.total_installments }}</strong>
+                    </div>
+                </div>
+        
+                <!-- Paid Installments -->
+                <div class="col-sm-3 mb-2">
+                    <div class="info-field">
+                        <span>Paid Installments:</span> <strong>{{ emi.paid_installments }}</strong>
+                    </div>
+                </div>
+        
+                <!-- Remaining Installments -->
+                <div class="col-sm-3 mb-2">
+                    <div class="info-field">
+                        <span>Remaining Installments:</span> <strong>{{ emi.remaining_installments}}</strong>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="row">
+                <!-- EMI File -->
+                <div class="col-sm-3 mb-2">
+                    <div class="info-field">
+                        <span>EMI Document:</span> <a href="{{ emi.file.url }}" download><strong>View Document</strong></a>
+                    </div>
+                </div>
+        
+                <!-- Frequency -->
+                <div class="col-sm-3 mb-2">
+                    <div class="info-field">
+                        <span>Frequency:</span> <strong>{{ emi.frequency }}</strong>
+                    </div>
+                </div>
+                
+                <!-- Next Due Date -->
+                <div class="col-sm-3 mb-2">
+                    <div class="info-field">
+                        <span>Next Due Date:</span> <strong>
+                            {% if emi.status == "pending" %}
+                                {{ emi.next_due_date }}
+                            {% else %}
+                                ---
+                            {% endif %}
+                        </strong>
+                    </div>
+                </div>
+        
+                
+                <!-- Next Due Date -->
+                <div class="col-sm-3 mb-2">
+                    <div class="info-field">
+                        <span>Days Remain for Due :</span> <strong>{{ remaining_days }}</strong>
+                    </div>
+                </div>
+                <div class="col-sm-3 mb-2">
+                    <div class="info-field">
+                        <span>Days Remain for Due :</span> <strong>
+                            {% if emi.status == "pending" %}
+                                {{ remaining_days }}
+                            {% else %}
+                                ---
+                            {% endif %}
+                        </strong>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        
+        {% if emi.status == "pending" %}
+          
+        <div class="container-fluid mb-3 form-header">
+            <div class="row">
+                <div class="col-sm-12">
+ 
+                   <form method="POST"> {% csrf_token %} 
+                    <div class="row mt-1 mb-3">
+                        <div class="row">
+                            
+                        <div class="col-md">
+                            {{ form.emi_amount|as_crispy_field }}
+                        </div>
+                        <div class="col-md">
+                            {{ form.principal_amount|as_crispy_field }}
+                        </div>
+                        <div class="col-md">
+                            {{ form.interest_amount|as_crispy_field }}
+                        </div>
+                        </div>
+
+                        <div class="row">
+                            
+                        <div class="col-md">
+                            {{ form.outstanding_amount|as_crispy_field }}
+                        </div>
+                        <div class="col-md">
+                            {{ form.paid_date|as_crispy_field }}
+                        </div>
+                        <div class="col-md">
+                            {{ form.next_due_date|as_crispy_field }}
+                        </div>
+                        </div>
+                    </div>
+                    
+                        <center><button type="submit" class="btn btn-primary mt-1 px-5">Submit</button></center>
+                    </form>
+
+                </div>  
+            </div>
+        </div>
+
+        {% else %}
+        <div class="alert alert-secondary" role="alert">
+            The EMI status is marked as "Closed", which is why you are unable to manage the installments.
+        </div>
+        {% endif %}
+
+
+        <div class="container mt-3" style=" overflow:scroll;">
+                 
+
+            <table id="example" class="table table-striped" style="overflow:scroll; width:100%; min-width: max-content;">
+                <thead class="bg-danger">
+                    <tr class="bg-gradient-primary text-light">
+                        <th scope="col" class="text-center text-white" style="">Sr.No</th>
+                        <th scope="col" class="text-center text-white" style="">Installment Amount</th>
+                        <th scope="col" class="text-center text-white" style="">Principal</th>
+                        <th scope="col" class="text-center text-white" style="">Interest</th>
+                        <th scope="col" class="text-center text-white" style="">Outstanding Principal</th>
+                        <th scope="col" class="text-center text-white" style="">Installment Date</th>
+                        <th scope="col" class="text-center text-white" style="">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="emi_table_body">
+                    {% if emi_items %}
+                    {% for emi_item in emi_items %}
+                    <tr>
+                        <td class="text-center">{{ forloop.counter }}</td>
+                        <td class="text-center">&#8377; {{ emi_item.installment_amount }}.00</td>
+                        <td class="text-center">&#8377; {{ emi_item.principal }}.00</td>
+                        <td class="text-center">&#8377; {{ emi_item.interest }}.00</td>
+                        <td class="text-center">&#8377; {{ emi_item.outstanding_principal }}.00</td>
+                        <td class="text-center"> {{ emi_item.installment_date }} </td>
+                        <td>
+                            <center>
+                                {% if emi_item.emi.status == "pending" %}
+                                <a href="{% url 'finance_delete_emi_item' emi_item.id %}" class="btn btn-danger px-2 py-2" onclick="confirmDelete(this); return false;">Delete</a>
+                                {% else %}
+                                <a href="#" class="btn btn-secondary px-2 py-2">Delete</a>
+
+                                {% endif %}
+                            </center>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    
+                    <tr>
+                        <td class="text-center"><b>Total</b></td>
+                        <td class="text-center"><b>&#8377; {{ total_installment_amount }}.00</b></td>
+                        <td class="text-center"><b>&#8377; {{ total_principal }}.00</b></td>
+                        <td class="text-center"><b>&#8377; {{ total_interest }}.00</b></td>
+                        <td class="text-center"><b>&#8377; {{ total_outstanding_principal }}.00</b></td>
+                        <td></td>
+                    </tr>
+             
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">No EMI Items Available</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            
+
+            
+        </div>
+
+
+
+    </section>
+
+
+
+    <div class="modal fade" id="model_close_job_card" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#9c4b2e;">
+                <h4 class="modal-title text-white" id="exampleModalLongTitle">Close Job Card</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left">
+                <div class="alert alert-danger d-none" id="createJobCardError"></div>
+                <div>
+                    {% if job_card.completed_date %}
+                    <p  class="alert alert-warning"><b>Closing Date : </b> {{ job_card.completed_date }}</p>
+                    {% endif %}
+                </div>
+                <form id="createJobCardForm" method="POST" enctype="multipart/form-data" action="{% url 'workshop_close_job_card' %}">
+                    {% csrf_token %}
+                    <div class="row"> 
+                        <div class="col-sm-12">
+                            {{ close_job_card_form|crispy }}
+                            <input type="hidden" name="job_card_id" id="job_card_id" value="{{job_card.id}}">
+                        </div> 
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+</main><!-- End #main -->
+
+ 
+ <!-- Modal for Delete Confirmation -->
+ <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete the Installment?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <a id="deleteButton" href="#" class="btn btn-danger">Delete</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  
+
+  
+
+
+<script>
+    function confirmDelete(button) {
+        //var Vehicle_number = button.closest('tr').querySelector('td:nth-child(2)').textContent.trim();
+        var deleteUrl = button.getAttribute('href');  // The delete URL
+        //document.getElementById('Vehicle_number').textContent = Vehicle_number;
+        document.getElementById('deleteButton').setAttribute('href', deleteUrl);
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
+</script>
+
+
+{% endblock content %}

@@ -72,7 +72,7 @@
                         placeholder="Search by Vehicle Number" id="vehicleSearch">
                     <datalist id="vehicleNumbers">
                         {% for vehicle in vehicle_data %}
-                        <option value="{{ vehicle.vehicle_number }}">{{ vehicle.vehicle_name }} - {{vehicle.vehicle_number}}</option>
+                        <option value="{{ vehicle.vehicle_number }}">{{ vehicle.model_name.model_name }} - {{vehicle.vehicle_number}}</option>
                         {% endfor %}
                     </datalist>
                     <button type="submit" class="btn btn-primary ms-2">Search</button>
@@ -93,7 +93,7 @@
                     <div class="card-content">
                         <h5 class="card-title">Vehicle Job Card Details</h5>
                         {% if vehicle %}
-                        <p class="card-text">Vehicle: <strong>{{ vehicle.vehicle_name }} - {{ vehicle.vehicle_number}}</strong></p>
+                        <p class="card-text">Vehicle: <strong>{{ vehicle.model_name.model_name }} - {{ vehicle.vehicle_number}}</strong></p>
                         <p class="card-text">Total Job Cards: <strong>{{ job_card_count }}</strong></p>
                         <p class="card-text">Labour Cost: <strong>&#8377;{{ total_labour_cost }}</strong></p>
                         <p class="card-text">Item Cost: <strong>&#8377;{{ total_item_cost }}</strong></p>

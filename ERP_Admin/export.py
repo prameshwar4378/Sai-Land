@@ -45,7 +45,7 @@ def export_filtered_job_cards(request):
             job_card.reported_defect,
             job_card.completed_action,
             completed_datetime,
-            job_card.vehicle.vehicle_name if job_card.vehicle else "",
+            job_card.vehicle.model_name.model_name if job_card.vehicle else "",
             job_card.status,
             total_cost,
             labour_cost,
@@ -75,7 +75,7 @@ def export_purchase_data(request):
     ws.title = "Purchase Data"
 
     # Define the header row for the Excel sheet
-    headers = ['Bill Number', 'Supplier Name', 'Bill Type', 'Bill Date',  'Total Amount']
+    headers = ['Bill Number', 'Supplier Name', 'Bill Type', 'Bill Date',  'Total Amount',  'Paid Status By Finance Dept']
     ws.append(headers)
 
     # Add data rows to the Excel sheet for each filtered job card
@@ -89,6 +89,7 @@ def export_purchase_data(request):
             data.bill_type,
             data.bill_date,
             data.total_cost,
+            data.paid_status,
         ]
         ws.append(row)
 
@@ -159,7 +160,7 @@ def export_vehicle_data(request):
     for vehicle in queryset:
         row = [
             vehicle.id,
-            vehicle.vehicle_name,
+            vehicle.model_name.model_name,
             vehicle.vehicle_number,
         ]
         ws.append(row)
@@ -325,7 +326,7 @@ def export_policy_data(request):
     policy_data = [
         {
             'policy_number': policy.policy_number,
-            'vehicle_name': policy.vehicle.vehicle_name,
+            'vehicle_name': policy.vehicle.model_name.model_name,
             'vehicle_number': policy.vehicle.vehicle_number,
             'due_date': policy.due_date,
             'remaining_days': (policy.due_date - date.today()).days
@@ -486,6 +487,7 @@ def export_vehicle_for_finance(request):
         # Add vehicle info to the export data
         vehicles_data.append({
             'vehicle_number': vehicle.vehicle_number,
+            'vehicle_model': vehicle.model_name.model_name, 
             'policy_due_date': policy_due_date,
             'policy_number': policy_number,
             'policy_file': policy_file,
@@ -511,7 +513,7 @@ def export_vehicle_for_finance(request):
 
     # Add header row with bold font
     header = [
-        'Vehicle Number', 'Policy Due Date', 'Policy Number', 'Policy File',
+        'Vehicle Number','Vehicle Model', 'Policy Due Date', 'Policy Number', 'Policy File',
         'Loan Account No','EMI Due Date', 'EMI Frequency', 'EMI Status', 'EMI File', 'Total Installments','Paid Installments','Remaining Installments',
         'Tax Due Date', 'Tax Amount',
         'Fitness Due Date', 'Permit Due Date', 'PUC Due Date'
@@ -530,7 +532,6 @@ def export_vehicle_for_finance(request):
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename=vehicles.xlsx'
     workbook.save(response)
-
     return response
 
 

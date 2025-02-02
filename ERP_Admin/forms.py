@@ -21,14 +21,20 @@ class UserRegistrationForm(UserCreationForm):
         ('account', 'Account'),
         ('workshop', 'Workshop'),
         ('finance', 'Finance'),
+        ('fuel', 'Fuel'),
     ]
-    
-    role = forms.ChoiceField(choices=ROLE_CHOICES, widget=forms.RadioSelect, label="Role")
+
+    role = forms.ChoiceField(
+        choices=ROLE_CHOICES,
+        widget=forms.RadioSelect,
+        label="Select User Role",
+        required=True  # Makes the role field mandatory
+    )
+
 
     class Meta:
         model = CustomUser
         fields = ['username', 'first_name', 'last_name', 'password1', 'password2', 'role','is_active','profile_photo']
-  
 
     def clean_username(self):
         username = self.cleaned_data.get('username')
@@ -40,12 +46,12 @@ class UserRegistrationForm(UserCreationForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         role = self.cleaned_data.get('role')
-
         # Reset all roles to False
         user.is_admin = False
         user.is_account = False
         user.is_workshop = False
         user.is_finance = False
+        user.is_fuel = False
 
         # Set the selected role to True
         if role == 'admin':
@@ -56,6 +62,8 @@ class UserRegistrationForm(UserCreationForm):
             user.is_workshop = True
         elif role == 'finance':
             user.is_finance = True
+        elif role == 'fuel':
+            user.is_fuel = True
 
         if commit:
             user.save()
@@ -85,16 +93,16 @@ class UpdatePasswordForm(forms.Form):
         return cleaned_data
 
 
-class ModelForm(forms.ModelForm):
+class VehicleModelForm(forms.ModelForm):
     class Meta:
-        model = Model
+        model = VehicleModel
         fields = ['model_name']
 
 
 class VehicleForm(forms.ModelForm):
     class Meta:
         model = Vehicle
-        fields = ['vehicle_number', 'vehicle_name','status']  # Fields to include in the form
+        fields = ['vehicle_number', 'model_name','owner_name', 'status']  # Fields to include in the form
 
     def clean_vehicle_number(self):
         vehicle_number = self.cleaned_data.get('vehicle_number') 

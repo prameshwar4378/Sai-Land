@@ -91,9 +91,10 @@
                                         <th scope="col" class="text-center text-white">Sr.No</th>
                                         <th scope="col" class="text-center text-white">Vehicle No</th>
                                         <th scope="col" class="text-center text-white">Loan Amt</th>
-                                        <th scope="col" class="text-center text-white">Total Insta</th>
+                                        <th scope="col" class="text-center text-white">Tenure</th>
                                         <th scope="col" class="text-center text-white">Paid Insta</th>
                                         <th scope="col" class="text-center text-white">Remaining Insta</th>
+                                        <th scope="col" class="text-center text-white">EMI Amount</th>
                                         <th scope="col" class="text-center text-white">Next Due</th>
                                         <th scope="col" class="text-center text-white">Status</th>
                                         <th scope="col" class="text-center text-white">Action</th>
@@ -106,9 +107,10 @@
                                         <td class="text-center">{{ forloop.counter }}</td>
                                         <td class="text-center">{{ r.vehicle.vehicle_number }}</td>
                                         <td class="text-center">{{ r.loan_amount }}</td>
-                                        <td class="text-center">{{ r.total_installments }}</td>
+                                        <td class="text-center">{{ r.tenure }}</td>
                                         <td class="text-center">{{ r.paid_installments }}</td>
                                         <td class="text-center">{% if r.status == "pending" %}{{ r.remaining_installments }}{% else %}---{% endif %}</td>
+                                        <td class="text-center">{{ r.emi_amount }}</td>
                                         <td class="text-center">{% if r.status == "pending" %}{{ r.next_due_date|date:"d-m-Y" }}{% else %}---{% endif %}</td>
                                         <td class="text-center">
                                             {% if r.status == "pending" %}
@@ -119,7 +121,7 @@
                                         </td>
                                         <td>
                                             <center>
-                                                <a href="javascript:void(0);" data-url="{% url 'finance_emi_item_list' r.id %}" class="btn btn-primary px-2 py-2" onclick="mini_window_1(this)">Dashboard</a>
+                                                <a href="javascript:void(0);" data-url="{% url 'finance_emi_installments_list' r.id %}" class="btn btn-primary px-2 py-2" onclick="mini_window_1(this)">Dashboard</a>
                                                 <a href="javascript:void(0);" data-url="{% url 'finance_update_emi' r.id %}" class="btn btn-warning px-2 py-2" onclick="mini_window_2(this)">Update</a>
                                                 <a href="{% url 'finance_delete_emi' r.id %}" class="btn btn-danger px-2 py-2" onclick="confirmDelete(this); return false;">Delete</a>
                                             </center>
@@ -168,19 +170,26 @@
                         <div class="col-sm-6">
                             {{ form.loan_amount|as_crispy_field }}
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-4">
                             {{ form.loan_account_no|as_crispy_field }}
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-4">
+                            {{ form.emi_amount|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-4">
                             {{ form.finance_bank|as_crispy_field }}
                         </div>
                         <!-- Total Installments Field -->
-                        <div class="col-sm-6">
-                            {{ form.total_installments|as_crispy_field }}
+                        <div class="col-sm-4">
+                            {{ form.tenure|as_crispy_field }}
                         </div>
                         <!-- Paid Installments Field -->
-                        <div class="col-sm-6">
+                        <div class="col-sm-4">
                             {{ form.paid_installments|as_crispy_field }}
+                        </div>
+                        <!-- Paid Installments Field -->
+                        <div class="col-sm-4">
+                            {{ form.interest_rate|as_crispy_field }}
                         </div>
                         <!-- Next Due Date Field -->
                         <div class="col-sm-6">
@@ -460,7 +469,7 @@ document.getElementById('createEMIForm').addEventListener('submit', function (e)
         const url = element.dataset.url;
         var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
         var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-        var newWidth = screenWidth * 0.5;  // 90% of the screen width
+        var newWidth = screenWidth * 0.8;  // 90% of the screen width
         var newHeight = screenHeight * 0.8;  // 90% of the screen height
         var left = (screenWidth - newWidth) / 2;
         var top = (screenHeight - newHeight) / 2;

@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from ERP_Admin.models import Purchase, PurchaseItem,Product,Model,JobCard,JobCardItem
+from ERP_Admin.models import Purchase, PurchaseItem,Product,VehicleModel,JobCard,JobCardItem
 
 class PurchaseForm(forms.ModelForm):
     class Meta:

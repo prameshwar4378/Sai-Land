@@ -1,5 +1,5 @@
 from django import forms
-from ERP_Admin.models import Policy,EMI,EMI_Item,Insurance_Bank,Finance_Bank,OtherDues
+from ERP_Admin.models import Policy,EMI,EMI_Item,Insurance_Bank,Finance_Bank,OtherDues,EMI_Installment,Purchase
 from django.core.exceptions import ValidationError
 from datetime import date
 
@@ -7,7 +7,7 @@ from datetime import date
 class PolicyForm(forms.ModelForm):
     class Meta:
         model = Policy
-        fields = ['policy_number', 'vehicle', 'policy_file', 'due_date']
+        fields = ['policy_number', 'vehicle', 'policy_file', 'due_date', 'insurance_company','premium_amount']
         widgets = {
             'due_date': forms.DateInput(attrs={'type': 'date'}),
         }
@@ -23,9 +23,9 @@ class PolicyForm(forms.ModelForm):
 class EMIForm(forms.ModelForm):
     class Meta:
         model = EMI
-        fields = ['vehicle', 'finance_bank','loan_account_no', 'loan_amount', 'total_installments', 'paid_installments', 'next_due_date', 'file','frequency','status']
+        fields = ['vehicle', 'finance_bank','loan_account_no', 'loan_amount','emi_amount', 'tenure', 'paid_installments','interest_rate', 'next_due_date', 'file','frequency','status']
         widgets = {
-            'next_due_date': forms.DateInput(attrs={'type': 'date'}),
+            'next_due_date': forms.DateInput(attrs={'type': 'date'}),  
             'loan_amount': forms.NumberInput(attrs={'placeholder': 'Enter Loan Amount'}),
             'total_installments': forms.NumberInput(attrs={'placeholder': 'Total Installments'}),
             'paid_installments': forms.NumberInput(attrs={'placeholder': 'Paid Installments'}),
@@ -49,6 +49,15 @@ class EMIForm(forms.ModelForm):
             raise ValidationError({'vehicle': "A record for this vehicle already exists."})
         return cleaned_data
         
+
+class EMI_InstallmentForm(forms.ModelForm): 
+    class Meta:
+        model = EMI_Installment
+        fields = ['next_due_date', 'paid_date', 'emi_amount', 'principal_amount','interest_amount','outstanding_amount']
+        widgets = {
+            'installment_date': forms.DateInput(attrs={'type': 'date'}), 
+        }
+ 
 
 class EMIItemForm(forms.ModelForm):
     next_due_date = forms.DateField(
@@ -83,7 +92,12 @@ class OtherDuesForm(forms.ModelForm):
             'tax_due_date',  
             'fitness_due_date', 
             'permit_due_date', 
-            'puc_due_date'
+            'puc_due_date',
+            'puc_document',
+            'permit_document',
+            'fitness_document',
+            'rc_book',
+            'invoice'
         ]
         widgets = {
             'tax_due_date': forms.DateInput(attrs={'type': 'date'}), 
@@ -106,7 +120,6 @@ class OtherDuesForm(forms.ModelForm):
             value = cleaned_data.get(field)
             if value and value < date.today():
                 raise ValidationError({field: f'{field.replace("_", " ").title()} must be in the future.'})
-
         return cleaned_data
     
 
@@ -120,3 +133,9 @@ class FinanceBankForm(forms.ModelForm):
     class Meta:
         model = Finance_Bank
         fields = ['bank_name']
+
+
+class PurchaseUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Purchase
+        fields = ['paid_status']

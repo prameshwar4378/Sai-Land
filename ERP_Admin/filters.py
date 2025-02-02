@@ -91,16 +91,7 @@ class PurchaseFilter(django_filters.FilterSet):
 
     class Meta:
         model = Purchase
-        fields = ['start_date', 'end_date', 'amount_less_than', 'amount_greater_than', 'bill_type', 'bill_no']
-
-
-
-
-
-
-
-
-
+        fields = ['start_date', 'end_date', 'amount_less_than', 'amount_greater_than', 'bill_type', 'bill_no', 'paid_status']
 
 
 
@@ -170,5 +161,4 @@ class EnquiryFilter(django_filters.FilterSet):
         fields = ['start_date', 'end_date']
 
 
-
-
+ 

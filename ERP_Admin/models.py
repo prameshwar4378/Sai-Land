@@ -18,6 +18,7 @@ class CustomUser(AbstractUser):
     is_workshop = models.BooleanField(default=False)
     is_driver = models.BooleanField(default=False)
     is_finance = models.BooleanField(default=False)
+    is_fuel = models.BooleanField(default=False) 
     emp_id = models.OneToOneField(EMP_ID, on_delete=models.CASCADE, null=True)
     profile_photo=models.ImageField(upload_to="profile_images", max_length=None, null=True, blank=True)
     groups = models.ManyToManyField(
@@ -35,6 +36,27 @@ class CustomUser(AbstractUser):
         return self.username
 
 
+ 
+class VehicleModel(models.Model):
+    model_name = models.CharField(max_length=50, unique=True, db_index=True) 
+    def __str__(self):
+        return self.model_name
+ 
+class Insurance_Bank(models.Model):
+    bank_name = models.CharField(max_length=50, unique=True, db_index=True) 
+    def __str__(self):
+        return self.bank_name
+ 
+class Finance_Bank(models.Model):
+    bank_name = models.CharField(max_length=50, unique=True, db_index=True) 
+    def __str__(self):
+        return self.bank_name
+ 
+class PolicyInsurance_Company(models.Model):
+    name = models.CharField(max_length=50, unique=True, db_index=True) 
+    def __str__(self):
+        return self.name
+
 
 VEHICLE_STATUS = (
     ('active', 'active'),
@@ -44,11 +66,12 @@ VEHICLE_STATUS = (
 
 
 class Vehicle(models.Model):
-    vehicle_name = models.CharField(max_length=100)
+    owner_name = models.CharField(max_length=50,null=True,blank=True)
+    model_name = models.ForeignKey(VehicleModel, related_name='vehicle_model_name', null=True, blank=True, on_delete=models.CASCADE)
     vehicle_number = models.CharField(max_length=50, unique=True)
-    status=models.CharField(max_length=50,default='active',choices=VEHICLE_STATUS)
+    status=models.CharField(max_length=50, default='active', choices=VEHICLE_STATUS)
     def __str__(self):
-        return f"{self.vehicle_name} ({self.vehicle_number[:-5]} {self.vehicle_number[-4:]})"
+        return f"{self.model_name.model_name} ({self.vehicle_number[:-5]} {self.vehicle_number[-4:]})"
 
 
 class Driver(models.Model):
@@ -125,28 +148,12 @@ class Party(models.Model):
         return self.business_name
     
 
- 
-class Model(models.Model):
-    model_name = models.CharField(max_length=50, unique=True, db_index=True) 
-    def __str__(self):
-        return self.model_name
- 
-class Insurance_Bank(models.Model):
-    bank_name = models.CharField(max_length=50, unique=True, db_index=True) 
-    def __str__(self):
-        return self.bank_name
- 
-class Finance_Bank(models.Model):
-    bank_name = models.CharField(max_length=50, unique=True, db_index=True) 
-    def __str__(self):
-        return self.bank_name
-
 
 
 class Product(models.Model):
     product_code = models.CharField(max_length=20, unique=True, db_index=True)
     product_name = models.CharField(max_length=100, db_index=True)
-    model = models.ForeignKey(Model, related_name='items', null=True, blank=True, on_delete=models.CASCADE)
+    model = models.ForeignKey(VehicleModel, related_name='items', null=True, blank=True, on_delete=models.CASCADE)
     description = models.TextField(null=True, blank=True)
     sale_price = models.DecimalField(max_digits=10, decimal_places=2, null=True)  # Use DecimalField for monetary values
     minimum_stock_alert = models.PositiveIntegerField(default=0)
@@ -166,6 +173,10 @@ PURCHASE_GST=(
     ('Without GST BILL','Without GST BILL')
 )
 
+PURCHASE_PAID_STATUS=(
+    ('Paid','Paid'),
+    ('UnPaid','UnPaid')
+)
 class Purchase(models.Model):
     bill_no = models.CharField(max_length=50, db_index=True, unique=True, null=False, blank=False)
     supplier_name = models.CharField(max_length=100, db_index=True, null=True, blank=True)
@@ -173,6 +184,7 @@ class Purchase(models.Model):
     bill_date = models.DateField(auto_now_add=False, db_index=True)
     total_cost = models.DecimalField(max_digits=12, decimal_places=2, default=0.0)
     bill_file = models.FileField(upload_to="Purchase Bill", null=True, blank=False)
+    paid_status = models.CharField(max_length=20, choices=PURCHASE_PAID_STATUS, default='UnPaid')
     def __str__(self):
         return f"Purchase #{self.bill_no} on {self.bill_date}"
 
@@ -275,12 +287,14 @@ class JobCardItem(models.Model):
 
 class Policy(models.Model):
     policy_number=models.CharField(max_length=50) 
+    insurance_company = models.ForeignKey(Insurance_Bank, on_delete=models.CASCADE, related_name='Insurance',null=True, blank=True)
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='policies')
     policy_file = models.FileField(upload_to='policies/' )
     due_date = models.DateField()
+    premium_amount=models.BigIntegerField(null=True, blank=True) 
 
     def __str__(self):
-        return f"Policy for {self.vehicle.vehicle_name}"
+        return f"Policy for {self.vehicle.vehicle_number} - {self.vehicle.model_name.model_name}"
     
 
 FREQUENCY_CHOICES = (
@@ -301,21 +315,45 @@ class EMI(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='emis')
     finance_bank = models.ForeignKey(Finance_Bank, on_delete=models.CASCADE, related_name='emis',null=True, blank=True)
     loan_account_no=models.CharField(max_length=50,null=True)
+    emi_amount = models.DecimalField(max_digits=10,default=0, decimal_places=2)
     loan_amount=models.BigIntegerField()
-    total_installments = models.PositiveIntegerField()
+    total_installments = models.PositiveIntegerField(null=True, blank=True)
     paid_installments = models.PositiveIntegerField(default=0)
     next_due_date = models.DateField()
     file=models.FileField(upload_to='emi/', max_length=100)
     frequency = models.CharField( max_length=20, choices=FREQUENCY_CHOICES,  default='monthly' )
     status = models.CharField( max_length=20, choices=EMI_STATUS_CHOICES,  default='pending' )
-    
+
+    interest_rate = models.DecimalField(max_digits=5, decimal_places=2, help_text='Interest rate in percentage')
+    tenure = models.PositiveIntegerField()
+        
     @property
     def remaining_installments(self):
-        return self.total_installments - self.paid_installments
+        return self.tenure - self.paid_installments
 
     def __str__(self):
         return f"EMI for {self.vehicle.vehicle_number} ({self.remaining_installments} remaining)"
-    
+
+
+
+class EMI_Installment(models.Model):
+    emi = models.ForeignKey(EMI, on_delete=models.CASCADE, related_name='installments')
+    next_due_date = models.DateField()
+    paid_date = models.DateField(null=True, blank=True)
+    emi_amount = models.DecimalField(max_digits=10,default=0, decimal_places=2)
+    principal_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    interest_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    outstanding_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    # def save(self, *args, **kwargs):
+    #     if self.principal_amount and self.interest_amount:
+    #         self.outstanding_amount = self.emi_amount - (self.principal_amount + self.interest_amount)
+    #     else:
+    #         self.interest_amount = (self.emi_amount * self.emi.interest_rate) / 100
+    #         self.principal_amount = self.emi_amount - self.interest_amount
+    #         self.outstanding_amount = self.emi_amount - (self.principal_amount + self.interest_amount)
+    #     super().save(*args, **kwargs)
+ 
 
 class EMI_Item(models.Model):
     emi = models.ForeignKey('EMI', on_delete=models.CASCADE, related_name='emi_items')
@@ -351,7 +389,12 @@ class OtherDues(models.Model):
     fitness_due_date = models.DateField(null=True,blank=True)
     permit_due_date = models.DateField(null=True,blank=True)
     puc_due_date = models.DateField(null=True,blank=True)
-
+    fitness_document=models.ImageField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
+    permit_document=models.ImageField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
+    puc_document=models.ImageField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
+    rc_book=models.ImageField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
+    invoice=models.ImageField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
+ 
 class AllocateDriverToVehicle(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name="allocated_drivers")
     driver = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name="allocated_vehicles")

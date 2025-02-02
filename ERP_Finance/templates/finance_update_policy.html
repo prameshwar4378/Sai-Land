@@ -23,21 +23,15 @@
                                  
                    <form method="POST" enctype="multipart/form-data"  > {% csrf_token %} 
                         <div class="row  mt-1"> 
-                                <div class="row">  
-                                    <div class="col-sm-12">
-                                        {{ form.policy_number|as_crispy_field }}
-                                    </div>
-                                    <div class="col-sm-12">
-                                        {{ form.vehicle|as_crispy_field }}
-                                    </div>
-                                    <div class="col-sm-12">
-                                        {{ form.policy_file|as_crispy_field }}
-                                    </div>
-                                    <div class="col-sm-12">
-                                        {{ form.due_date|as_crispy_field }}
-                                    </div>   
-                                    </div> 
-                                </div> 
+  
+                            <div class="row">  
+                                <div class="col-sm-6">{{ form.vehicle|as_crispy_field }}</div>
+                                  <div class="col-sm-6">{{ form.policy_number|as_crispy_field }}</div>
+                                  <div class="col-sm-6">{{ form.premium_amount|as_crispy_field }}</div>
+                                  <div class="col-sm-6">{{ form.insurance_company|as_crispy_field }}</div>
+                                  <div class="col-sm-6">{{ form.policy_file|as_crispy_field }}</div>
+                                  <div class="col-sm-6">{{ form.due_date|as_crispy_field }}</div>
+                            </div>
                         </div>
                         <center><button type="submit" class="btn btn-primary mt-1 px-5">Submit</button></center>
                     </form>
