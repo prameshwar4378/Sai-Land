@@ -305,7 +305,6 @@ FREQUENCY_CHOICES = (
     ('bi-monthly', 'Bi-Monthly (2 months)'),
 )
 
-
 EMI_STATUS_CHOICES = (
     ('pending', 'Pending EMI'),
     ('closed', 'Closed EMI'), 
@@ -319,12 +318,12 @@ class EMI(models.Model):
     loan_amount=models.BigIntegerField()
     total_installments = models.PositiveIntegerField(null=True, blank=True)
     paid_installments = models.PositiveIntegerField(default=0)
-    next_due_date = models.DateField()
+    next_due_date = models.DateField(null=True, blank=True)
     file=models.FileField(upload_to='emi/', max_length=100)
     frequency = models.CharField( max_length=20, choices=FREQUENCY_CHOICES,  default='monthly' )
     status = models.CharField( max_length=20, choices=EMI_STATUS_CHOICES,  default='pending' )
 
-    interest_rate = models.DecimalField(max_digits=5, decimal_places=2, help_text='Interest rate in percentage')
+    interest_rate = models.DecimalField(null=True, blank=True,max_digits=5, decimal_places=2, help_text='Interest rate in percentage')
     tenure = models.PositiveIntegerField()
         
     @property
@@ -334,25 +333,23 @@ class EMI(models.Model):
     def __str__(self):
         return f"EMI for {self.vehicle.vehicle_number} ({self.remaining_installments} remaining)"
 
-
+INSTALLMENT_PAID_STATUS=(
+    ('Paid','Paid'),
+    ('Pending','Pending')
+)
 
 class EMI_Installment(models.Model):
     emi = models.ForeignKey(EMI, on_delete=models.CASCADE, related_name='installments')
+    installment_number = models.PositiveIntegerField(default=0)
     next_due_date = models.DateField()
     paid_date = models.DateField(null=True, blank=True)
     emi_amount = models.DecimalField(max_digits=10,default=0, decimal_places=2)
     principal_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     interest_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     outstanding_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    status = models.CharField( max_length=20, choices=INSTALLMENT_PAID_STATUS,  default='Pending' )
 
-    # def save(self, *args, **kwargs):
-    #     if self.principal_amount and self.interest_amount:
-    #         self.outstanding_amount = self.emi_amount - (self.principal_amount + self.interest_amount)
-    #     else:
-    #         self.interest_amount = (self.emi_amount * self.emi.interest_rate) / 100
-    #         self.principal_amount = self.emi_amount - self.interest_amount
-    #         self.outstanding_amount = self.emi_amount - (self.principal_amount + self.interest_amount)
-    #     super().save(*args, **kwargs)
+
  
 
 class EMI_Item(models.Model):

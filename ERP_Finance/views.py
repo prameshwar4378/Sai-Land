@@ -386,7 +386,6 @@ def emi_item_list(request, id):
         'total_installment_amount': total_installment_amount,
         'remaining_days': remaining_days,
         'emi': emi  # Optionally pass the EMI object if needed for display
-
     }
 
     return render(request, 'finance_emi_item_list.html', context)
@@ -401,14 +400,20 @@ def delete_emi_item(request, id):
         messages.success(request, 'EMI Item deleted successfully.')
     return redirect(f'/finance/emi_item_list/{id}')
 
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 @finance_required
 def emi_installments_list(request, id):
     from datetime import date
 
     emi = get_object_or_404(EMI, id=id)
-    remaining_days = (emi.next_due_date - date.today()).days
-
+    installments=EMI_Installment.objects.filter(emi=emi)
+    
+    if emi.next_due_date:
+        remaining_days = (emi.next_due_date - date.today()).days
+    else:
+        remaining_days=0
     emi_installments = EMI_Installment.objects.filter(emi=emi).order_by('-id')
 
     total_outstanding_principal = sum(installment.outstanding_amount for installment in emi_installments)
@@ -417,7 +422,7 @@ def emi_installments_list(request, id):
     total_installment_amount = sum(installment.emi_amount for installment in emi_installments)
 
     # Correct Monthly Interest Rate
-    monthly_interest_rate = (emi.interest_rate / 100) / 12
+    monthly_interest_rate = 10
 
     # Initial Outstanding Principal
     outstanding_principal = emi.loan_amount
@@ -440,6 +445,7 @@ def emi_installments_list(request, id):
     form = EMI_InstallmentForm(
         request.POST or None,
         initial={
+            'emi_installments':emi_installments,
             'emi_amount': emi.emi_amount,
             'principal_amount': round(principal_amount, 2),
             'interest_amount': round(interest_amount, 2),
@@ -448,17 +454,56 @@ def emi_installments_list(request, id):
     )
 
     # Handle Form Submission
-    if request.method == 'POST' and form.is_valid():
-        new_emi_installment = form.save(commit=False)
-        new_emi_installment.emi = emi
-        new_emi_installment.save()
-        messages.success(request, 'Installment Added successfully.')
-        return redirect(f'/finance/emi_item_list/{emi.id}')
+    # if request.method == 'POST' and form.is_valid():
+    #     new_emi_installment = form.save(commit=False)
+    #     new_emi_installment.emi = emi
+    #     new_emi_installment.save()
+    #     messages.success(request, 'Installment Added successfully.')
+    #     return redirect(f'/finance/emi_item_list/{emi.id}')
+    if request.method == 'POST':
+        first_interest_rate = request.POST.get("interest_rate")
+        first_isntallment_date = request.POST.get("first_isntallment_date")  # Expected format: 'YYYY-MM-DD'
+        loan_amount = emi.loan_amount
+        monthly_interest_rate = float(first_interest_rate) / float(loan_amount) 
+        annual_interest_rate = (monthly_interest_rate * 12) * 100
+        interest_amount = loan_amount * monthly_interest_rate
+        principal_outstanding_amount = loan_amount
+        installment_number = 1
+        
+        # Parse the first installment date from the POST request
+        first_isntallment_date = datetime.strptime(first_isntallment_date, "%Y-%m-%d")
+        
+        next_month_due_date = first_isntallment_date
+        
+        for i in range(emi.tenure):
+            monthly_interest_rate = float(first_interest_rate) / float(loan_amount)
+            interest_amount = principal_outstanding_amount * monthly_interest_rate
+            principal_amount = float(emi.emi_amount) - float(interest_amount)
+            principal_outstanding_amount -= principal_amount 
+            
+            # Calculate the next month's due date by adding one month
+            next_month_due_date = next_month_due_date + relativedelta(months=1)
+            
+            # Create the EMI record
+            EMI_Installment.objects.create(
+                emi=emi,
+                installment_number=installment_number,
+                next_due_date=next_month_due_date,
+                emi_amount=emi.emi_amount,
+                principal_amount=round(principal_amount),
+                interest_amount=round(interest_amount),
+                outstanding_amount=round(principal_outstanding_amount)
+            )
+            
+            print(f"{installment_number} - {round(principal_amount)} - {round(interest_amount)} - {round(principal_outstanding_amount)} - {next_month_due_date}")
+            print("-------------------------------------")
+            installment_number += 1
+
 
     # Pass Data to Template
     context = {
         'form': form,
-        'emi_items': emi_installments,
+        'installments': installments,
         'total_outstanding_principal': round(total_outstanding_principal, 2),
         'total_principal': round(total_principal, 2),
         'total_interest': round(total_interest, 2),

@@ -170,33 +170,26 @@
                         <div class="col-sm-6">
                             {{ form.loan_amount|as_crispy_field }}
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-6">
                             {{ form.loan_account_no|as_crispy_field }}
                         </div>
-                        <div class="col-sm-4">
-                            {{ form.emi_amount|as_crispy_field }}
-                        </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-6">
                             {{ form.finance_bank|as_crispy_field }}
                         </div>
                         <!-- Total Installments Field -->
                         <div class="col-sm-4">
                             {{ form.tenure|as_crispy_field }}
                         </div>
+                        
+                        <div class="col-sm-4">
+                            {{ form.emi_amount|as_crispy_field }}
+                        </div>
                         <!-- Paid Installments Field -->
                         <div class="col-sm-4">
                             {{ form.paid_installments|as_crispy_field }}
-                        </div>
-                        <!-- Paid Installments Field -->
-                        <div class="col-sm-4">
-                            {{ form.interest_rate|as_crispy_field }}
-                        </div>
-                        <!-- Next Due Date Field -->
-                        <div class="col-sm-6">
-                            {{ form.next_due_date|as_crispy_field }}
-                        </div>
+                        </div>  
                         <!-- File Upload Field -->
-                        <div class="col-sm-6">
+                        <div class="col-sm-12">
                             {{ form.file|as_crispy_field }}
                         </div>
                         <div class="col-sm-6">
