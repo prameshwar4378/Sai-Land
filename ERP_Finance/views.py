@@ -28,15 +28,26 @@ def finance_required(function):
 def dashboard(request):
     today = date.today()
     thirty_days_date = today + timedelta(days=30)
-    thirty_days_counts = Counter({
-        "policy_dues": Policy.objects.filter(due_date__range=[today, thirty_days_date],due_date__isnull=False,vehicle__status='active').count(),
-        "emi_dues": EMI.objects.filter(next_due_date__range=[today, thirty_days_date],next_due_date__isnull=False,vehicle__status='active').count(),
-        "tax_dues": OtherDues.objects.filter(tax_due_date__range=[today, thirty_days_date],tax_due_date__isnull=False,vehicle__status='active').count(),
-        "fitness_dues": OtherDues.objects.filter(fitness_due_date__range=[today, thirty_days_date],fitness_due_date__isnull=False,vehicle__status='active').count(),
-        "permit_dues": OtherDues.objects.filter(permit_due_date__range=[today, thirty_days_date],permit_due_date__isnull=False,vehicle__status='active').count(),
-        "puc_dues": OtherDues.objects.filter(puc_due_date__range=[today, thirty_days_date],puc_due_date__isnull=False,vehicle__status='active').count(),
-    })
-     
+
+    thirty_days_record = {
+        'policy_dues': Policy.objects.filter(due_date__range=[today, thirty_days_date], vehicle__status='active'),
+        'emi_dues': EMI.objects.filter(next_due_date__range=[today, thirty_days_date], vehicle__status='active'),
+        'tax_dues': OtherDues.objects.filter(tax_due_date__range=[today, thirty_days_date], vehicle__status='active'),
+        'fitness_dues': OtherDues.objects.filter(fitness_due_date__range=[today, thirty_days_date], vehicle__status='active'),
+        'permit_dues': OtherDues.objects.filter(permit_due_date__range=[today, thirty_days_date],permit_due_date__isnull=False, vehicle__status='active'),
+        'puc_dues': OtherDues.objects.filter(puc_due_date__range=[today, thirty_days_date], vehicle__status='active'),
+    }
+
+    # Count the records
+    thirty_days_counts = {
+        "policy_dues": thirty_days_record["policy_dues"].count(),
+        "emi_dues": thirty_days_record["emi_dues"].count(),
+        "tax_dues": thirty_days_record["tax_dues"].count(),
+        "fitness_dues": thirty_days_record["fitness_dues"].count(),
+        "permit_dues": thirty_days_record["permit_dues"].count(),
+        "puc_dues": thirty_days_record["puc_dues"].count(),
+    }
+ 
     
     # Count individual dues for upcoming and past
     expire_dues_counts = Counter({
@@ -48,14 +59,14 @@ def dashboard(request):
         "puc_dues": OtherDues.objects.filter(puc_due_date__lt=today,puc_due_date__isnull=False,vehicle__status='active').count(),
     })
 
-    two_days_later = today + timedelta(days=2)
+    three_days_later = today + timedelta(days=3)
     # Query the different dues in the next 2 days
-    emi_dues = EMI.objects.filter(next_due_date__range=[today, two_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'next_due_date')
-    policy_dues = Policy.objects.filter(due_date__range=[today, two_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'due_date')
-    tax_dues = OtherDues.objects.filter(tax_due_date__range=[today, two_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'tax_due_date')
-    fitness_dues = OtherDues.objects.filter(fitness_due_date__range=[today, two_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'fitness_due_date')
-    permit_dues = OtherDues.objects.filter(permit_due_date__range=[today, two_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'permit_due_date')
-    puc_dues = OtherDues.objects.filter(puc_due_date__range=[today, two_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'puc_due_date')
+    emi_dues = EMI.objects.filter(next_due_date__range=[today, three_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'next_due_date')
+    policy_dues = Policy.objects.filter(due_date__range=[today, three_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'due_date')
+    tax_dues = OtherDues.objects.filter(tax_due_date__range=[today, three_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'tax_due_date')
+    fitness_dues = OtherDues.objects.filter(fitness_due_date__range=[today, three_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'fitness_due_date')
+    permit_dues = OtherDues.objects.filter(permit_due_date__range=[today, three_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'permit_due_date')
+    puc_dues = OtherDues.objects.filter(puc_due_date__range=[today, three_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'puc_due_date')
 
     # Add the due type as a custom field for each query result
     emi_dues_2 = [{'vehicle_id': due['vehicle__id'], 'vehicle_number': due['vehicle__vehicle_number'], 'due_date': due['next_due_date'], 'due_name': 'EMI'} for due in emi_dues]
@@ -66,7 +77,7 @@ def dashboard(request):
     puc_dues_2 = [{'vehicle_id': due['vehicle__id'], 'vehicle_number': due['vehicle__vehicle_number'], 'due_date': due['puc_due_date'], 'due_name': 'PUC'} for due in puc_dues]
 
     # Combine all dues data
-    two_days_later_dues = emi_dues_2 + policy_dues_2 + tax_dues_2 + fitness_dues_2 + permit_dues_2 + puc_dues_2
+    three_days_later_dues = emi_dues_2 + policy_dues_2 + tax_dues_2 + fitness_dues_2 + permit_dues_2 + puc_dues_2
  
     fifteen_days_ago = today - timedelta(days=15)
     one_days_ago = today - timedelta(days=1)
@@ -92,8 +103,9 @@ def dashboard(request):
     # Pass data to template
     return render(request, 'finance_dashboard.html', { 
         'thirty_days_counts':thirty_days_counts,
+        'thirty_days_records':thirty_days_record,
         'expire_dues_counts':expire_dues_counts,
-        'two_days_later_dues':two_days_later_dues,
+        'three_days_later_dues':three_days_later_dues,
         'fifteen_days_ago_expire_dues':fifteen_days_ago_expire_dues
 
     })
@@ -402,112 +414,35 @@ def delete_emi_item(request, id):
 
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from datetime import date
 
 @finance_required
 def emi_installments_list(request, id):
-    from datetime import date
 
     emi = get_object_or_404(EMI, id=id)
     installments=EMI_Installment.objects.filter(emi=emi)
-    
+    form=EMI_InstallmentForm()
     if emi.next_due_date:
         remaining_days = (emi.next_due_date - date.today()).days
     else:
         remaining_days=0
-    emi_installments = EMI_Installment.objects.filter(emi=emi).order_by('-id')
 
-    total_outstanding_principal = sum(installment.outstanding_amount for installment in emi_installments)
-    total_principal = sum(installment.principal_amount for installment in emi_installments)
-    total_interest = sum(installment.interest_amount for installment in emi_installments)
-    total_installment_amount = sum(installment.emi_amount for installment in emi_installments)
-
-    # Correct Monthly Interest Rate
-    monthly_interest_rate = 10
-
-    # Initial Outstanding Principal
-    outstanding_principal = emi.loan_amount
-
-    if emi_installments.exists():
-        latest_installment = emi_installments.first()
-        outstanding_principal = latest_installment.outstanding_amount
-
-    # Calculate Interest and Principal
-    interest_amount = outstanding_principal * monthly_interest_rate
-    principal_amount = emi.emi_amount - interest_amount
-
-    # Prevent Negative Principal (if EMI < Interest)
-    if principal_amount < 0:
-        principal_amount = 0
-        interest_amount = emi.emi_amount  # Entire EMI goes to interest
-
-    outstanding_principal = outstanding_principal - principal_amount
-
-    form = EMI_InstallmentForm(
-        request.POST or None,
-        initial={
-            'emi_installments':emi_installments,
-            'emi_amount': emi.emi_amount,
-            'principal_amount': round(principal_amount, 2),
-            'interest_amount': round(interest_amount, 2),
-            'outstanding_amount': round(outstanding_principal, 2),
-        }
-    )
-
-    # Handle Form Submission
-    # if request.method == 'POST' and form.is_valid():
-    #     new_emi_installment = form.save(commit=False)
-    #     new_emi_installment.emi = emi
-    #     new_emi_installment.save()
-    #     messages.success(request, 'Installment Added successfully.')
-    #     return redirect(f'/finance/emi_item_list/{emi.id}')
     if request.method == 'POST':
-        first_interest_rate = request.POST.get("interest_rate")
-        first_isntallment_date = request.POST.get("first_isntallment_date")  # Expected format: 'YYYY-MM-DD'
-        loan_amount = emi.loan_amount
-        monthly_interest_rate = float(first_interest_rate) / float(loan_amount) 
-        annual_interest_rate = (monthly_interest_rate * 12) * 100
-        interest_amount = loan_amount * monthly_interest_rate
-        principal_outstanding_amount = loan_amount
-        installment_number = 1
-        
-        # Parse the first installment date from the POST request
-        first_isntallment_date = datetime.strptime(first_isntallment_date, "%Y-%m-%d")
-        
-        next_month_due_date = first_isntallment_date
-        
-        for i in range(emi.tenure):
-            monthly_interest_rate = float(first_interest_rate) / float(loan_amount)
-            interest_amount = principal_outstanding_amount * monthly_interest_rate
-            principal_amount = float(emi.emi_amount) - float(interest_amount)
-            principal_outstanding_amount -= principal_amount 
-            
-            # Calculate the next month's due date by adding one month
-            next_month_due_date = next_month_due_date + relativedelta(months=1)
-            
-            # Create the EMI record
-            EMI_Installment.objects.create(
-                emi=emi,
-                installment_number=installment_number,
-                next_due_date=next_month_due_date,
-                emi_amount=emi.emi_amount,
-                principal_amount=round(principal_amount),
-                interest_amount=round(interest_amount),
-                outstanding_amount=round(principal_outstanding_amount)
-            )
-            
-            print(f"{installment_number} - {round(principal_amount)} - {round(interest_amount)} - {round(principal_outstanding_amount)} - {next_month_due_date}")
-            print("-------------------------------------")
-            installment_number += 1
-
-
-    # Pass Data to Template
+        print("form called")
+        if form.is_valid():
+            fm=form.save(commit=False)
+            fm.emi=emi
+            fm.save()
+            messages.success(request, 'Installment Added successfully.') 
+        else:
+            print("Form is not valid")
+            print("Errors:", form.errors) 
+    else:
+        print("form Not called")
+ 
     context = {
         'form': form,
-        'installments': installments,
-        'total_outstanding_principal': round(total_outstanding_principal, 2),
-        'total_principal': round(total_principal, 2),
-        'total_interest': round(total_interest, 2),
-        'total_installment_amount': round(total_installment_amount, 2),
+        'installments': installments, 
         'remaining_days': remaining_days,
         'emi': emi
     }

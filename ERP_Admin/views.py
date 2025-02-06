@@ -230,87 +230,86 @@ def dashboard(request):
     thirty_days_date = today + timedelta(days=30)
     two_days_date = today + timedelta(days=2)
 
-    thirty_days_counts = Counter({
-        "policy_dues": Policy.objects.filter(due_date__range=[today, thirty_days_date],due_date__isnull=False,vehicle__status='active').count(),
-        "emi_dues": EMI.objects.filter(next_due_date__range=[today, thirty_days_date],next_due_date__isnull=False,vehicle__status='active').count(),
-        "tax_dues": OtherDues.objects.filter(tax_due_date__range=[today, thirty_days_date],tax_due_date__isnull=False,vehicle__status='active').count(),
-        "fitness_dues": OtherDues.objects.filter(fitness_due_date__range=[today, thirty_days_date],fitness_due_date__isnull=False,vehicle__status='active').count(),
-        "permit_dues": OtherDues.objects.filter(permit_due_date__range=[today, thirty_days_date],permit_due_date__isnull=False,vehicle__status='active').count(),
-        "puc_dues": OtherDues.objects.filter(puc_due_date__range=[today, thirty_days_date],puc_due_date__isnull=False,vehicle__status='active').count(),
-    })
-    print(thirty_days_counts)
-    thirty_days_counts=sum(thirty_days_counts.values())
-
-    two_days_counts = Counter({
-        "policy_dues": Policy.objects.filter(due_date__range=[today, two_days_date],due_date__isnull=False,vehicle__status='active').count(),
-        "emi_dues": EMI.objects.filter(next_due_date__range=[today, two_days_date],next_due_date__isnull=False,vehicle__status='active').count(),
-        "tax_dues": OtherDues.objects.filter(tax_due_date__range=[today, two_days_date],tax_due_date__isnull=False,vehicle__status='active').count(),
-        "fitness_dues": OtherDues.objects.filter(fitness_due_date__range=[today, two_days_date],fitness_due_date__isnull=False,vehicle__status='active').count(),
-        "permit_dues": OtherDues.objects.filter(permit_due_date__range=[today, two_days_date],permit_due_date__isnull=False,vehicle__status='active').count(),
-        "puc_dues": OtherDues.objects.filter(puc_due_date__range=[today, two_days_date],puc_due_date__isnull=False,vehicle__status='active').count(),
-    })
-    two_days_counts=sum(two_days_counts.values())
+    # Optimizing queries by reducing redundant filters
+    active_vehicles = Vehicle.objects.filter(status='active').values_list('id', flat=True)
     
-    # Count individual dues for upcoming and past
-    expire_dues_counts = Counter({
-        "policy_dues": Policy.objects.filter(due_date__lt=today,due_date__isnull=False,vehicle__status='active').count(),
-        "emi_dues": EMI.objects.filter(next_due_date__lt=today,next_due_date__isnull=False,vehicle__status='active').count(),
-        "tax_dues": OtherDues.objects.filter(tax_due_date__lt=today,tax_due_date__isnull=False).count(),
-        "fitness_dues": OtherDues.objects.filter(fitness_due_date__lt=today,fitness_due_date__isnull=False,vehicle__status='active').count(),
-        "permit_dues": OtherDues.objects.filter(permit_due_date__lt=today,permit_due_date__isnull=False,vehicle__status='active').count(),
-        "puc_dues": OtherDues.objects.filter(puc_due_date__lt=today,puc_due_date__isnull=False,vehicle__status='active').count(),
-    })
-    expire_dues_counts=sum(expire_dues_counts.values())
+    policy_dues = Policy.objects.filter(vehicle_id__in=active_vehicles)
+    emi_dues = EMI.objects.filter(vehicle_id__in=active_vehicles)
+    other_dues = OtherDues.objects.filter(vehicle_id__in=active_vehicles)
 
-    # Count users based on roles
-    admin_count = CustomUser.objects.filter(is_admin=True).count()
-    account_count = CustomUser.objects.filter(is_account=True).count()
-    workshop_count = CustomUser.objects.filter(is_workshop=True).count()
-    driver_count = CustomUser.objects.filter(is_driver=True).count()
+    def get_due_counts(queryset, date_field, date_range):
+        return queryset.filter(**{f'{date_field}__range': date_range, f'{date_field}__isnull': False}).count()
 
-    # Prepare data for the pie chart
-    roles = ['Admin', 'Account', 'Workshop', 'Driver']
-    counts = [admin_count, account_count, workshop_count, driver_count]
-    user_count = CustomUser.objects.filter(
-        Q(is_admin=True) | Q(is_account=True) | Q(is_workshop=True) | Q(is_driver=True)
-    ).count()
-    product_count=Product.objects.all().count()
-    vehicle_count=Vehicle.objects.all().count()
+    thirty_days_counts = sum([
+        get_due_counts(policy_dues, 'due_date', [today, thirty_days_date]),
+        get_due_counts(emi_dues, 'next_due_date', [today, thirty_days_date]),
+        get_due_counts(other_dues, 'tax_due_date', [today, thirty_days_date]),
+        get_due_counts(other_dues, 'fitness_due_date', [today, thirty_days_date]),
+        get_due_counts(other_dues, 'permit_due_date', [today, thirty_days_date]),
+        get_due_counts(other_dues, 'puc_due_date', [today, thirty_days_date])
+    ])
 
-    job_card = JobCard.objects.filter().order_by('-id')
-    job_pending_count=job_card.filter(status="pending").count()
-    job_in_progress_count=job_card.filter(status="in_progress").count()
-    job_completed_count=job_card.filter(status="completed").count()
+    two_days_counts = sum([
+        get_due_counts(policy_dues, 'due_date', [today, two_days_date]),
+        get_due_counts(emi_dues, 'next_due_date', [today, two_days_date]),
+        get_due_counts(other_dues, 'tax_due_date', [today, two_days_date]),
+        get_due_counts(other_dues, 'fitness_due_date', [today, two_days_date]),
+        get_due_counts(other_dues, 'permit_due_date', [today, two_days_date]),
+        get_due_counts(other_dues, 'puc_due_date', [today, two_days_date])
+    ])
 
-    job_total_count=int(job_pending_count)+int(job_in_progress_count)+int(job_completed_count)
-    # Pass data to the template
-    
-    stock=Product.objects.all()
+    expire_dues_counts = sum([
+        policy_dues.filter(due_date__lt=today, due_date__isnull=False).count(),
+        emi_dues.filter(next_due_date__lt=today, next_due_date__isnull=False).count(),
+        other_dues.filter(tax_due_date__lt=today, tax_due_date__isnull=False).count(),
+        other_dues.filter(fitness_due_date__lt=today, fitness_due_date__isnull=False).count(),
+        other_dues.filter(permit_due_date__lt=today, permit_due_date__isnull=False).count(),
+        other_dues.filter(puc_due_date__lt=today, puc_due_date__isnull=False).count()
+    ])
+
+    # Aggregate user counts
+    user_roles = CustomUser.objects.aggregate(
+        admin_count=Count('id', filter=Q(is_admin=True)),
+        account_count=Count('id', filter=Q(is_account=True)),
+        workshop_count=Count('id', filter=Q(is_workshop=True)),
+        driver_count=Count('id', filter=Q(is_driver=True))
+    )
+
+    user_count = sum(user_roles.values())
+    product_count = Product.objects.count()
+    vehicle_count = active_vehicles.count()
+
+    job_card_status_counts = JobCard.objects.values('status').annotate(count=Count('id'))
+    status_map = {item['status']: item['count'] for item in job_card_status_counts}
+
+    job_pending_count = status_map.get('pending', 0)
+    job_in_progress_count = status_map.get('in_progress', 0)
+    job_completed_count = status_map.get('completed', 0)
+    job_total_count = sum(status_map.values())
+
+    stock = Product.objects.all()
     total_products = stock.count()
-    
-    # Near to Out of Stock (available_stock < minimum_stock_alert and available_stock > 0)
-    low_stock = stock.filter(available_stock__lt=models.F('minimum_stock_alert'), available_stock__gt=0).count()
-    
-    # Out of Stock (available_stock <= 0)
+    low_stock = stock.filter(available_stock__lt=F('minimum_stock_alert'), available_stock__gt=0).count()
     out_of_stock = stock.filter(available_stock__lte=0).count()
 
     context = {
-        'roles': roles,
-        'counts': counts,
+        'roles': ['Admin', 'Account', 'Workshop', 'Driver'],
+        'counts': list(user_roles.values()),
         'user_count': user_count,
-        'product_count':product_count,
-        'vehicle_count':vehicle_count,
-        'job_pending_count':job_pending_count,
-        'job_in_progress_count':job_in_progress_count,
-        'job_completed_count':job_completed_count,
-        'job_total_count':job_total_count,
+        'product_count': product_count,
+        'vehicle_count': vehicle_count,
+        'job_pending_count': job_pending_count,
+        'job_in_progress_count': job_in_progress_count,
+        'job_completed_count': job_completed_count,
+        'job_total_count': job_total_count,
         'thirty_days_counts': thirty_days_counts,
         'two_days_counts': two_days_counts,
         'expire_dues_counts': expire_dues_counts,
         'low_stock': low_stock,
         'out_of_stock': out_of_stock,
-        'total_products':total_products,
+        'total_products': total_products,
     }
+
     return render(request, "admin_dashboard.html", context)
 
 
@@ -546,8 +545,6 @@ def delete_user(request, id):
 def drivers_list(request):
     drivers = Driver.objects.select_related('user').all()
     form = DriverRegistrationForm()
-    # Driver.objects.all().delete()
-    incomplete_profile = CustomUser.objects.filter(driver__isnull=True, is_driver=True).delete()[0]
     return render(request, "admin_drivers_list.html", {'form': form, 'drivers': drivers})
 
 
@@ -717,7 +714,7 @@ def import_drivers(request):
 # vehical data start
 @admin_required
 def vehicle_list(request):
-    vehicle = Vehicle.objects.select_related() 
+    vehicle = Vehicle.objects.select_related('model_name')
     form = VehicleForm()  # Pass the form for vehicle creation
     return render(request, "admin_vehicle_list.html", {'vehicle': vehicle, 'form': form})
 
@@ -940,7 +937,7 @@ from datetime import datetime, timedelta
 
 @admin_required
 def vehicle_dashboard(request):
-    vehicle_data = Vehicle.objects.all()
+    vehicle_data = Vehicle.objects.select_related('model_name').filter(status='active')
     vehicle_number = request.GET.get('vehicle_number', '').strip()
     vehicle = None
     job_cards = []
@@ -1163,7 +1160,7 @@ def finance_vehicle_list(request):
 
     # Instantiate the filter form
     filter_form = VehicleFilterForFinance(request.GET or None)
-    queryset = Vehicle.objects.all()
+    queryset = Vehicle.objects.select_related('model_name').filter(status='active')
 
     # Initialize filters
     start_date = filter_form.cleaned_data.get('start_date') if filter_form.is_valid() else None
@@ -1242,7 +1239,7 @@ def finance_vehicle_list(request):
 
 def finance_vehicle_dashboard(request,id):
 
-    vehicle = Vehicle.objects.all() or None
+    vehicle = Vehicle.objects.select_related('model_name').filter(status='active') or None
     vehicle = Vehicle.objects.get(id=id)
     other_dues_data=OtherDues.objects.filter(vehicle=vehicle) 
 

@@ -23,22 +23,22 @@ class PolicyForm(forms.ModelForm):
 class EMIForm(forms.ModelForm):
     class Meta:
         model = EMI
-        fields = ['vehicle', 'finance_bank','loan_account_no', 'loan_amount','emi_amount', 'tenure', 'paid_installments', 'file','frequency','status']
+        fields = ['vehicle', 'finance_bank','loan_account_no','next_due_date', 'loan_amount','emi_amount','tenure', 'paid_installments', 'file','frequency','status']
         widgets = {
-            # 'next_due_date': forms.DateInput(attrs={'type': 'date'}),  
+            'next_due_date': forms.DateInput(attrs={'type': 'date'}),  
             'loan_amount': forms.NumberInput(attrs={'placeholder': 'Enter Loan Amount'}),
             'total_installments': forms.NumberInput(attrs={'placeholder': 'Total Installments'}),
             'paid_installments': forms.NumberInput(attrs={'placeholder': 'Paid Installments'}),
             'file': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
 
-    # def clean_next_due_date(self):
-    #     next_due_date = self.cleaned_data.get('next_due_date')
-    #     if next_due_date:
-    #         # Ensure that the next_due_date is a future date
-    #         if next_due_date <= date.today():
-    #             raise ValidationError("The due date cannot be in the past. Please enter a future date.")
-    #     return next_due_date
+    def clean_next_due_date(self):
+        next_due_date = self.cleaned_data.get('next_due_date')
+        if next_due_date:
+            # Ensure that the next_due_date is a future date
+            if next_due_date <= date.today():
+                raise ValidationError("The due date cannot be in the past. Please enter a future date.")
+        return next_due_date
     
     def clean(self):
         cleaned_data = super().clean()
@@ -53,12 +53,29 @@ class EMIForm(forms.ModelForm):
 class EMI_InstallmentForm(forms.ModelForm): 
     class Meta:
         model = EMI_Installment
-        fields = ['next_due_date', 'paid_date', 'emi_amount', 'principal_amount','interest_amount','outstanding_amount']
+        fields = [ 'paid_date', 'emi_amount', 'principal_amount','interest_amount','outstanding_amount']
         widgets = {
-            'installment_date': forms.DateInput(attrs={'type': 'date'}), 
+            'paid_date': forms.DateInput(attrs={'type': 'date'}), 
+            # 'next_due_date': forms.DateInput(attrs={'type': 'date'}),  
         }
- 
-
+  
+    # def clean_next_due_date(self):
+    #     next_due_date = self.cleaned_data.get('next_due_date') 
+    #     if next_due_date:
+    #         # Ensure that the next_due_date is a future date
+    #         print(next_due_date)
+    #         if next_due_date <= date.today():
+    #             raise ValidationError("The due date cannot be in the past. Please enter a future date.")
+    #     return next_due_date
+    
+    def clean_paid_date(self):
+        paid_date = self.cleaned_data.get('paid_date') 
+        if paid_date:
+            # Ensure that the next_due_date is a future date
+            if paid_date > date.today():
+                raise ValidationError("The Paid date cannot be in the Future. Please enter a Past or Present date.")
+        return paid_date
+    
 class EMIItemForm(forms.ModelForm):
     next_due_date = forms.DateField(
         widget=forms.DateInput(attrs={'type': 'date'}),
