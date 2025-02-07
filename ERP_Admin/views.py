@@ -1081,38 +1081,48 @@ def generate_qr(request, vehicle_number):
 from collections import Counter
 from datetime import date
 
-
 def finance_dashboard(request):
     today = date.today()
     thirty_days_date = today + timedelta(days=30)
-    thirty_days_counts = Counter({
-        "policy_dues": Policy.objects.filter(due_date__range=[today, thirty_days_date],due_date__isnull=False,vehicle__status='active').count(),
-        "emi_dues": EMI.objects.filter(next_due_date__range=[today, thirty_days_date],next_due_date__isnull=False,vehicle__status='active').count(),
-        "tax_dues": OtherDues.objects.filter(tax_due_date__range=[today, thirty_days_date],tax_due_date__isnull=False,vehicle__status='active').count(),
-        "fitness_dues": OtherDues.objects.filter(fitness_due_date__range=[today, thirty_days_date],fitness_due_date__isnull=False,vehicle__status='active').count(),
-        "permit_dues": OtherDues.objects.filter(permit_due_date__range=[today, thirty_days_date],permit_due_date__isnull=False,vehicle__status='active').count(),
-        "puc_dues": OtherDues.objects.filter(puc_due_date__range=[today, thirty_days_date],puc_due_date__isnull=False,vehicle__status='active').count(),
-    })
-     
+
+    thirty_days_record = {
+        'policy_dues': Policy.objects.filter(due_date__range=[today, thirty_days_date], vehicle__status='active'),
+        'emi_dues': EMI.objects.filter(next_due_date__range=[today, thirty_days_date],status='pending', vehicle__status='active'),
+        'tax_dues': OtherDues.objects.filter(tax_due_date__range=[today, thirty_days_date], vehicle__status='active'),
+        'fitness_dues': OtherDues.objects.filter(fitness_due_date__range=[today, thirty_days_date], vehicle__status='active'),
+        'permit_dues': OtherDues.objects.filter(permit_due_date__range=[today, thirty_days_date],permit_due_date__isnull=False, vehicle__status='active'),
+        'puc_dues': OtherDues.objects.filter(puc_due_date__range=[today, thirty_days_date], vehicle__status='active'),
+    }
+   
+    # Count the records
+    thirty_days_counts = {
+        "policy_dues": thirty_days_record["policy_dues"].count(),
+        "emi_dues": thirty_days_record["emi_dues"].count(),
+        "tax_dues": thirty_days_record["tax_dues"].count(),
+        "fitness_dues": thirty_days_record["fitness_dues"].count(),
+        "permit_dues": thirty_days_record["permit_dues"].count(),
+        "puc_dues": thirty_days_record["puc_dues"].count(),
+    }
+ 
     
     # Count individual dues for upcoming and past
     expire_dues_counts = Counter({
         "policy_dues": Policy.objects.filter(due_date__lt=today,due_date__isnull=False,vehicle__status='active').count(),
-        "emi_dues": EMI.objects.filter(next_due_date__lt=today,next_due_date__isnull=False,vehicle__status='active').count(),
+        "emi_dues": EMI.objects.filter(next_due_date__lt=today,next_due_date__isnull=False, status='pending',vehicle__status='active').count(),
         "tax_dues": OtherDues.objects.filter(tax_due_date__lt=today,tax_due_date__isnull=False).count(),
         "fitness_dues": OtherDues.objects.filter(fitness_due_date__lt=today,fitness_due_date__isnull=False,vehicle__status='active').count(),
         "permit_dues": OtherDues.objects.filter(permit_due_date__lt=today,permit_due_date__isnull=False,vehicle__status='active').count(),
         "puc_dues": OtherDues.objects.filter(puc_due_date__lt=today,puc_due_date__isnull=False,vehicle__status='active').count(),
     })
 
-    two_days_later = today + timedelta(days=2)
+    three_days_later = today + timedelta(days=3)
     # Query the different dues in the next 2 days
-    emi_dues = EMI.objects.filter(next_due_date__range=[today, two_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'next_due_date')
-    policy_dues = Policy.objects.filter(due_date__range=[today, two_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'due_date')
-    tax_dues = OtherDues.objects.filter(tax_due_date__range=[today, two_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'tax_due_date')
-    fitness_dues = OtherDues.objects.filter(fitness_due_date__range=[today, two_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'fitness_due_date')
-    permit_dues = OtherDues.objects.filter(permit_due_date__range=[today, two_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'permit_due_date')
-    puc_dues = OtherDues.objects.filter(puc_due_date__range=[today, two_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'puc_due_date')
+    emi_dues = EMI.objects.filter(next_due_date__range=[today, three_days_later],status='pending').values('vehicle__id', 'vehicle__vehicle_number', 'next_due_date')
+    policy_dues = Policy.objects.filter(due_date__range=[today, three_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'due_date')
+    tax_dues = OtherDues.objects.filter(tax_due_date__range=[today, three_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'tax_due_date')
+    fitness_dues = OtherDues.objects.filter(fitness_due_date__range=[today, three_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'fitness_due_date')
+    permit_dues = OtherDues.objects.filter(permit_due_date__range=[today, three_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'permit_due_date')
+    puc_dues = OtherDues.objects.filter(puc_due_date__range=[today, three_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'puc_due_date')
 
     # Add the due type as a custom field for each query result
     emi_dues_2 = [{'vehicle_id': due['vehicle__id'], 'vehicle_number': due['vehicle__vehicle_number'], 'due_date': due['next_due_date'], 'due_name': 'EMI'} for due in emi_dues]
@@ -1123,12 +1133,12 @@ def finance_dashboard(request):
     puc_dues_2 = [{'vehicle_id': due['vehicle__id'], 'vehicle_number': due['vehicle__vehicle_number'], 'due_date': due['puc_due_date'], 'due_name': 'PUC'} for due in puc_dues]
 
     # Combine all dues data
-    two_days_later_dues = emi_dues_2 + policy_dues_2 + tax_dues_2 + fitness_dues_2 + permit_dues_2 + puc_dues_2
+    three_days_later_dues = emi_dues_2 + policy_dues_2 + tax_dues_2 + fitness_dues_2 + permit_dues_2 + puc_dues_2
  
     fifteen_days_ago = today - timedelta(days=15)
     one_days_ago = today - timedelta(days=1)
 
-    emi_dues = EMI.objects.filter(next_due_date__range=[fifteen_days_ago, one_days_ago]).values('vehicle__id', 'vehicle__vehicle_number', 'next_due_date')
+    emi_dues = EMI.objects.filter(next_due_date__range=[fifteen_days_ago, one_days_ago],status='pending').values('vehicle__id', 'vehicle__vehicle_number', 'next_due_date')
     policy_dues = Policy.objects.filter(due_date__range=[fifteen_days_ago, one_days_ago]).values('vehicle__id', 'vehicle__vehicle_number', 'due_date')
     tax_dues = OtherDues.objects.filter(tax_due_date__range=[fifteen_days_ago, one_days_ago]).values('vehicle__id', 'vehicle__vehicle_number', 'tax_due_date')
     fitness_dues = OtherDues.objects.filter(fitness_due_date__range=[fifteen_days_ago, one_days_ago]).values('vehicle__id', 'vehicle__vehicle_number', 'fitness_due_date')
@@ -1144,16 +1154,18 @@ def finance_dashboard(request):
     puc_dues = [{'vehicle_id': due['vehicle__id'], 'vehicle_number': due['vehicle__vehicle_number'], 'due_date': due['puc_due_date'], 'due_name': 'PUC'} for due in puc_dues]
 
     # Combine all dues data
-    fifteen_days_ago_expire_dues = emi_dues + policy_dues  + tax_dues + fitness_dues + permit_dues + puc_dues
+    fifteen_days_ago_expire_dues = emi_dues + policy_dues + tax_dues + fitness_dues + permit_dues + puc_dues
   
     # Pass data to template
     return render(request, 'admin_finance_dashboard.html', { 
         'thirty_days_counts':thirty_days_counts,
+        'thirty_days_records':thirty_days_record,
         'expire_dues_counts':expire_dues_counts,
-        'two_days_later_dues':two_days_later_dues,
+        'three_days_later_dues':three_days_later_dues,
         'fifteen_days_ago_expire_dues':fifteen_days_ago_expire_dues
 
     })
+ 
  
 
 def finance_vehicle_list(request):
@@ -1237,9 +1249,9 @@ def finance_vehicle_list(request):
 
 
 
-def finance_vehicle_dashboard(request,id):
+def finance_vehicle_dashboard(request,id): 
 
-    vehicle = Vehicle.objects.select_related('model_name').filter(status='active') or None
+    vehicle = Vehicle.objects.all() or None
     vehicle = Vehicle.objects.get(id=id)
     other_dues_data=OtherDues.objects.filter(vehicle=vehicle) 
 
@@ -1253,7 +1265,7 @@ def finance_vehicle_dashboard(request,id):
     emi=EMI.objects.filter(vehicle=vehicle).first()
     emi_amount=None
     if emi:
-        emi_amount=int(emi.loan_amount)/int(emi.total_installments)
+        emi_amount=int(emi.loan_amount)/int(emi.emi_amount)
 
     policy=Policy.objects.filter(vehicle=vehicle).first()
 
@@ -1269,4 +1281,3 @@ def finance_vehicle_dashboard(request,id):
         'policy':policy, 
     }
     return render(request, 'admin_finance_vehicle_dashboard.html',context)
-

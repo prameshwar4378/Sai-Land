@@ -24,6 +24,7 @@ def finance_required(function):
         return function(request, *args, **kwargs)
     return _wrapped_view
 
+
 @finance_required 
 def dashboard(request):
     today = date.today()
@@ -31,13 +32,13 @@ def dashboard(request):
 
     thirty_days_record = {
         'policy_dues': Policy.objects.filter(due_date__range=[today, thirty_days_date], vehicle__status='active'),
-        'emi_dues': EMI.objects.filter(next_due_date__range=[today, thirty_days_date], vehicle__status='active'),
+        'emi_dues': EMI.objects.filter(next_due_date__range=[today, thirty_days_date], status='pending', vehicle__status='active'),
         'tax_dues': OtherDues.objects.filter(tax_due_date__range=[today, thirty_days_date], vehicle__status='active'),
         'fitness_dues': OtherDues.objects.filter(fitness_due_date__range=[today, thirty_days_date], vehicle__status='active'),
         'permit_dues': OtherDues.objects.filter(permit_due_date__range=[today, thirty_days_date],permit_due_date__isnull=False, vehicle__status='active'),
         'puc_dues': OtherDues.objects.filter(puc_due_date__range=[today, thirty_days_date], vehicle__status='active'),
     }
-
+   
     # Count the records
     thirty_days_counts = {
         "policy_dues": thirty_days_record["policy_dues"].count(),
@@ -52,7 +53,7 @@ def dashboard(request):
     # Count individual dues for upcoming and past
     expire_dues_counts = Counter({
         "policy_dues": Policy.objects.filter(due_date__lt=today,due_date__isnull=False,vehicle__status='active').count(),
-        "emi_dues": EMI.objects.filter(next_due_date__lt=today,next_due_date__isnull=False,vehicle__status='active').count(),
+        "emi_dues": EMI.objects.filter(next_due_date__lt=today,next_due_date__isnull=False, status='pending', vehicle__status='active').count(),
         "tax_dues": OtherDues.objects.filter(tax_due_date__lt=today,tax_due_date__isnull=False).count(),
         "fitness_dues": OtherDues.objects.filter(fitness_due_date__lt=today,fitness_due_date__isnull=False,vehicle__status='active').count(),
         "permit_dues": OtherDues.objects.filter(permit_due_date__lt=today,permit_due_date__isnull=False,vehicle__status='active').count(),
@@ -61,7 +62,7 @@ def dashboard(request):
 
     three_days_later = today + timedelta(days=3)
     # Query the different dues in the next 2 days
-    emi_dues = EMI.objects.filter(next_due_date__range=[today, three_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'next_due_date')
+    emi_dues = EMI.objects.filter(next_due_date__range=[today, three_days_later], status='pending').values('vehicle__id', 'vehicle__vehicle_number', 'next_due_date')
     policy_dues = Policy.objects.filter(due_date__range=[today, three_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'due_date')
     tax_dues = OtherDues.objects.filter(tax_due_date__range=[today, three_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'tax_due_date')
     fitness_dues = OtherDues.objects.filter(fitness_due_date__range=[today, three_days_later]).values('vehicle__id', 'vehicle__vehicle_number', 'fitness_due_date')
@@ -82,7 +83,7 @@ def dashboard(request):
     fifteen_days_ago = today - timedelta(days=15)
     one_days_ago = today - timedelta(days=1)
 
-    emi_dues = EMI.objects.filter(next_due_date__range=[fifteen_days_ago, one_days_ago]).values('vehicle__id', 'vehicle__vehicle_number', 'next_due_date')
+    emi_dues = EMI.objects.filter(next_due_date__range=[fifteen_days_ago, one_days_ago], status='pending').values('vehicle__id', 'vehicle__vehicle_number', 'next_due_date')
     policy_dues = Policy.objects.filter(due_date__range=[fifteen_days_ago, one_days_ago]).values('vehicle__id', 'vehicle__vehicle_number', 'due_date')
     tax_dues = OtherDues.objects.filter(tax_due_date__range=[fifteen_days_ago, one_days_ago]).values('vehicle__id', 'vehicle__vehicle_number', 'tax_due_date')
     fitness_dues = OtherDues.objects.filter(fitness_due_date__range=[fifteen_days_ago, one_days_ago]).values('vehicle__id', 'vehicle__vehicle_number', 'fitness_due_date')
@@ -107,7 +108,6 @@ def dashboard(request):
         'expire_dues_counts':expire_dues_counts,
         'three_days_later_dues':three_days_later_dues,
         'fifteen_days_ago_expire_dues':fifteen_days_ago_expire_dues
-
     })
  
 
@@ -297,7 +297,7 @@ def update_policy(request, id):
 # View for the EMI section
 @finance_required 
 def emi_list(request):
-    emi=EMI.objects.select_related('vehicle').order_by('next_due_date')
+    emi=EMI.objects.select_related('vehicle').order_by('next_due_date') 
     filter = EMIFilter(request.GET, queryset=emi)
     filtered_data = filter.qs  # Filtered queryset
     # EMI_Installment.objects.all().delete()
@@ -418,37 +418,39 @@ from datetime import date
 
 @finance_required
 def emi_installments_list(request, id):
-
     emi = get_object_or_404(EMI, id=id)
-    installments=EMI_Installment.objects.filter(emi=emi)
-    form=EMI_InstallmentForm()
+    installments = EMI_Installment.objects.filter(emi=emi)
+    form = EMI_InstallmentForm()  # Initialize form
+
     if emi.next_due_date:
         remaining_days = (emi.next_due_date - date.today()).days
     else:
-        remaining_days=0
+        remaining_days = 0
 
     if request.method == 'POST':
-        print("form called")
+        form = EMI_InstallmentForm(request.POST)  # Bind form with request data
         if form.is_valid():
-            fm=form.save(commit=False)
-            fm.emi=emi
+            fm = form.save(commit=False)
+            next_due_date=request.POST.get('id_next_due_date')
+            fm.emi = emi
+            emi.next_due_date=next_due_date
+            emi.save()
             fm.save()
-            messages.success(request, 'Installment Added successfully.') 
+
+            messages.success(request, 'Installment Added successfully.')
+            return redirect(request.path)  # Redirect to clear form on success
         else:
             print("Form is not valid")
-            print("Errors:", form.errors) 
-    else:
-        print("form Not called")
- 
+            print("Errors:", form.errors)  # Print errors for debugging
+
     context = {
         'form': form,
-        'installments': installments, 
+        'installments': installments,
         'remaining_days': remaining_days,
         'emi': emi
     }
 
     return render(request, 'finance_emi_installments_list.html', context)
-
 
 
 

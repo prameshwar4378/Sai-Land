@@ -1,5 +1,5 @@
 {% extends "admin_base.html" %}
-{% block title %}Dashboard{% endblock title %}
+{% block title %}Finance Dashboard{% endblock title %}
 {% block content %}
 <style>
  
@@ -33,7 +33,7 @@
     
         <div class="col-sm-6">
             <div class="pagetitle">
-                <h1>Dashboard</h1>
+                <h1>Finance Dashboard</h1>
                 <nav>
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="#">Home</a></li>
@@ -60,129 +60,429 @@
                     <div class="row">
                         <!-- Total Loan Amount Card -->
                         <div class="col-sm-4">
-                            <div class="card radius-10 border-start border-0 border-5 border-info">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <div>
-                                            <p class="mb-0 text-secondary">EMI Dues Count</p>
-                                            <h3 class="my-1 text-info">{{ thirty_days_counts.emi_dues }}</h3>
-                                        </div>
-                                        <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
-                                            <h1 class="text-info">₹</h1>
+                            <a href="#" style="text-decoration:none;" data-toggle="modal" data-target="#model_emi_dues">  
+                                <div class="card radius-10 border-start border-0 border-5 border-info">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div>
+                                                <p class="mb-0 text-secondary">EMI Dues Count</p>
+                                                <h3 class="my-1 text-info">{{ thirty_days_counts.emi_dues }}</h3>
+                                            </div>
+                                            <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                                <h1 class="text-info">₹</h1>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
                     
                         <!-- Loan Paid Amount Card -->
                         <div class="col-sm-4">
-                            <div class="card radius-10 border-start border-0 border-5 border-success">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <div>
-                                            <p class="mb-0 text-secondary">Policy Dues Count</p>
-                                            <h3 class="my-1 text-success">{{ thirty_days_counts.policy_dues }}</h3>
-                                        </div>
-                                        <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
-                                            <h1 class="text-danger">₹</h1>
+                                <a href="#" style="text-decoration:none;" data-toggle="modal" data-target="#model_policy_dues">  
+                                <div class="card radius-10 border-start border-0 border-5 border-success">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            
+                                            <div>
+                                                <p class="mb-0 text-secondary">Policy Insurance Dues Count</p>
+                                                <h3 class="my-1 text-success">{{ thirty_days_counts.policy_dues }}</h3>
+                                            </div>
+                                            <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                                <h1 class="text-danger">₹</h1>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
-                    
-                        <!-- Loan Remaining Amount Card -->
+                     
                         <div class="col-sm-4">
-                            <div class="card radius-10 border-start border-0 border-5 border-danger">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <div>
-                                            <p class="mb-0 text-secondary">Inssurance Count</p>
-                                            <h3 class="my-1 text-danger">{{ thirty_days_counts.insurance_dues }}</h3>
-                                        </div>
-                                        <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
-                                            <h1 class="text-danger">₹</h1>
+                            <a href="#" style="text-decoration:none;" data-toggle="modal" data-target="#model_tax_dues">  
+                                <div class="card radius-10 border-start border-0 border-5 border-primary">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div>
+                                                <p class="mb-0 text-secondary">Tax Dues</p>
+                                                <h3 class="my-1" style="color:#B14ABB;">{{ thirty_days_counts.tax_dues }}</h3>
+                                            </div>
+                                            <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                                <h1 class="text-danger">₹</h1>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
                     </div>
                     
                     <!-- Total Installment Card -->
                     <div class="row">
-                        <div class="col-sm-3">
-                            <div class="card radius-10 border-start border-0 border-5 border-primary">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <div>
-                                            <p class="mb-0 text-secondary">Tax Dues</p>
-                                            <h3 class="my-1" style="color:#B14ABB;">{{ thirty_days_counts.tax_dues }}</h3>
-                                        </div>
-                                        <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
-                                            <h1 class="text-danger">₹</h1>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    
                         <!-- Paid Installment Card -->
-                        <div class="col-sm-3">
-                            <div class="card radius-10 border-start border-0 border-5 border-success">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <div>
-                                            <p class="mb-0 text-success">Fitness Dues</p>
-                                            <h3 class="my-1 text-success">{{ thirty_days_counts.fitness_dues }}</h3>
-                                        </div>
-                                        <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
-                                            <h1 class="text-success">₹</h1>
+                        <div class="col-sm-4">
+                            <a href="#" style="text-decoration:none;" data-toggle="modal" data-target="#model_fitness_dues">  
+                                <div class="card radius-10 border-start border-0 border-5 border-success">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div>
+                                                <p class="mb-0 text-success">Fitness Dues</p>
+                                                <h3 class="my-1 text-success">{{ thirty_days_counts.fitness_dues }}</h3>
+                                            </div>
+                                            <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                                <h1 class="text-success">₹</h1>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
                     
                         <!-- Remaining Installment Card -->
-                        <div class="col-sm-3">
-                            <div class="card radius-10 border-start border-0 border-5 border-danger">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <div>
-                                            <p class="mb-0 text-secondary">Permit Dues</p>
-                                            <h3 class="my-1 text-danger">{{ thirty_days_counts.permit_dues }}</h3>
-                                        </div>
-                                        <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
-                                            <h1 class="text-danger">₹</h1>
+                        <div class="col-sm-4">
+                            <a href="#" style="text-decoration:none;" data-toggle="modal" data-target="#model_permit_dues">  
+                                <div class="card radius-10 border-start border-0 border-5 border-danger">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div>
+                                                <p class="mb-0 text-secondary">Permit Dues</p>
+                                                <h3 class="my-1 text-danger">{{ thirty_days_counts.permit_dues }}</h3>
+                                            </div>
+                                            <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                                <h1 class="text-danger">₹</h1>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
 
-                        <div class="col-sm-3">
-                            <div class="card radius-10 border-start border-0 border-5 border-danger">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <div>
-                                            <p class="mb-0 text-secondary">PUC Dues</p>
-                                            <h3 class="my-1 text-danger">{{ thirty_days_counts.puc_dues }}</h3>
-                                        </div>
-                                        <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
-                                            <h1 class="text-danger">₹</h1>
+                        <div class="col-sm-4">
+                            <a href="#" style="text-decoration:none;" data-toggle="modal" data-target="#model_puc_dues">  
+                                <div class="card radius-10 border-start border-0 border-5 border-danger">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div>
+                                                <p class="mb-0 text-secondary">PUC Dues</p>
+                                                <h3 class="my-1 text-danger">{{ thirty_days_counts.puc_dues }}</h3>
+                                            </div>
+                                            <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                                <h1 class="text-danger">₹</h1>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
                     </div>
  
             </div>
         </div>  
+
+         
+<div class="modal fade" id="model_emi_dues" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#9c4b2e;">
+                <h4 class="modal-title text-white" id="exampleModalLongTitle">EMI Dues  <a href="{% url "export_finance_30_days_emi" %}" class="btn btn-warning py-1">Export</a></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left"> 
+                    <div class="row">
+                        {% if thirty_days_records.emi_dues %}
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Vehicle Number</th>
+                                    <th>Due Date</th>
+                                    <th>Due Name</th>
+                                    <th  class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for due in thirty_days_records.emi_dues %}
+                                    <tr>
+                                        <td>{{ due.vehicle.vehicle_number }}</td>
+                                        <td>{{ due.next_due_date|date:"d-M-Y" }}</td>
+                                        <td>EMI</td>
+                                        <td  class="text-center">
+                                            <a href="{% url 'finance_vehicle_dashboard' due.vehicle_id %}" class="btn btn-primary btn-sm">Read More</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <center>
+                            <p>No Records found.</p>
+                        </center>
+                    {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
  
 
+
+         
+<div class="modal fade" id="model_policy_dues" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#9c4b2e;">
+                <h4 class="modal-title text-white" id="exampleModalLongTitle">Policy Dues    <a href="{% url "export_finance_30_days_policy" %}" class="btn btn-warning py-1">Export</a></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left"> 
+                    <div class="row">
+                        {% if thirty_days_records.policy_dues %}
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Vehicle Number</th>
+                                    <th>Due Date</th>
+                                    <th>Due Name</th>
+                                    <th  class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for due in thirty_days_records.policy_dues %}
+                                    <tr>
+                                        <td>{{ due.vehicle.vehicle_number }}</td>
+                                        <td>{{ due.due_date|date:"d-M-Y" }}</td>
+                                        <td>Policy</td>
+                                        <td  class="text-center">
+                                            <a href="{% url 'finance_vehicle_dashboard' due.vehicle_id %}" class="btn btn-primary btn-sm">Read More</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <center>
+                            <p>No Records found.</p>
+                        </center>
+                    {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+
+ 
+
+         
+<div class="modal fade" id="model_tax_dues" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#9c4b2e;">
+                <h4 class="modal-title text-white" id="exampleModalLongTitle">TAX Dues    <a href="{% url "export_finance_30_days_tax" %}" class="btn btn-warning py-1">Export</a></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left"> 
+                    <div class="row">
+                        {% if thirty_days_records.tax_dues %}
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Vehicle Number</th>
+                                    <th>Due Date</th>
+                                    <th>Due Name</th>
+                                    <th  class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for due in thirty_days_records.tax_dues %}
+                                    <tr>
+                                        <td>{{ due.vehicle.vehicle_number }}</td>
+                                        <td>{{ due.tax_due_date|date:"d-M-Y" }}</td>
+                                        <td>Tax</td>
+                                        <td  class="text-center">
+                                            <a href="{% url 'finance_vehicle_dashboard' due.vehicle_id %}" class="btn btn-primary btn-sm">Read More</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <center>
+                            <p>No Records found.</p>
+                        </center>
+                    {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+
+         
+<div class="modal fade" id="model_fitness_dues" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#9c4b2e;">
+                <h4 class="modal-title text-white" id="exampleModalLongTitle">Fitness Dues     <a href="{% url "export_finance_30_days_fitness" %}" class="btn btn-warning py-1">Export</a></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left"> 
+                    <div class="row">
+                        {% if thirty_days_records.fitness_dues %}
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Vehicle Number</th>
+                                    <th>Due Date</th>
+                                    <th>Due Name</th>
+                                    <th  class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for due in thirty_days_records.fitness_dues %}
+                                    <tr>
+                                        <td>{{ due.vehicle.vehicle_number }}</td>
+                                        <td>{{ due.fitness_due_date|date:"d-M-Y" }}</td>
+                                        <td>Fitness</td>
+                                        <td  class="text-center">
+                                            <a href="{% url 'finance_vehicle_dashboard' due.vehicle_id %}" class="btn btn-primary btn-sm">Read More</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <center>
+                            <p>No Records found.</p>
+                        </center>
+                    {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+
+         
+<div class="modal fade" id="model_permit_dues" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#9c4b2e;">
+                <h4 class="modal-title text-white" id="exampleModalLongTitle">Permit Dues    <a href="{% url "export_finance_30_days_permit" %}" class="btn btn-warning py-1">Export</a></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left"> 
+                    <div class="row">
+                        {% if thirty_days_records.permit_dues %}
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Vehicle Number</th>
+                                    <th>Due Date</th>
+                                    <th>Due Name</th>
+                                    <th  class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for due in thirty_days_records.fitness_dues %}
+                                    {% if due.permit_due_date %}
+                                    <tr>
+                                        <td>{{ due.vehicle.vehicle_number }}</td>
+                                        <td>{{ due.permit_due_date|date:"d-M-Y" }}</td>
+                                        <td>Permit</td>
+                                        <td  class="text-center">
+                                            <a href="{% url 'finance_vehicle_dashboard' due.vehicle_id %}" class="btn btn-primary btn-sm">Read More</a>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <center>
+                            <p>No Records found.</p>
+                        </center>
+                    {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+
+         
+<div class="modal fade" id="model_puc_dues" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#9c4b2e;">
+                <h4 class="modal-title text-white" id="exampleModalLongTitle">PUC Dues      <a href="{% url "export_finance_30_days_puc" %}" class="btn btn-warning py-1">Export</a></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left"> 
+                    <div class="row">
+                        {% if thirty_days_records.puc_dues %}
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Vehicle Number</th>
+                                    <th>Due Date</th>
+                                    <th>Due Name</th>
+                                    <th  class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for due in thirty_days_records.puc_dues %}
+                                    <tr>
+                                        <td>{{ due.vehicle.vehicle_number }}</td>
+                                        <td>{{ due.puc_due_date|date:"d-M-Y" }}</td>
+                                        <td>PUC</td>
+                                        <td  class="text-center">
+                                            <a href="{% url 'finance_vehicle_dashboard' due.vehicle_id %}" class="btn btn-primary btn-sm">Read More</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <center>
+                            <p>No Records found.</p>
+                        </center>
+                    {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+ 
         {% if expire_dues_counts.insurance_dues  %}
         <div class="row mt-3">
             <div class="row mx-1 py-2 header-today-section">
@@ -212,21 +512,24 @@
         
                         <!-- Policy Dues Card -->
                         {% if expire_dues_counts.policy_dues %}
-                        <div class="col-sm-4">
-                            <div class="card radius-10 border-start border-0 border-5 border-success">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <div>
-                                            <p class="mb-0 text-secondary">Policy Dues Count</p>
-                                            <h3 class="my-1 text-success">{{ expire_dues_counts.policy_dues }}</h3>
-                                        </div>
-                                        <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
-                                            <h1 class="text-danger">₹</h1>
+
+                            <div class="col-sm-4">
+                                <div class="card radius-10 border-start border-0 border-5 border-success">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div>
+                                                <p class="mb-0 text-secondary">Policy Dues Count</p>
+                                                <h3 class="my-1 text-success">{{ expire_dues_counts.policy_dues }}</h3>
+                                            </div>
+                                            <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                                                <h1 class="text-danger">₹</h1>
+                                            </div>
+                                            
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+
                         {% endif %}
         
                         <!-- Insurance Dues Card -->
@@ -342,9 +645,9 @@
                 <div class="card recent-sales overflow-auto">
                     <div class="card-body">
                         <h5 class="card-title">Upcoming Dues |
-                            <span style="font-size:0.8rem; color:gray;"> 2 days </span>
+                            <span style="font-size:0.8rem; color:gray;"> 3 days </span>
                         </h5>
-                        {% if two_days_later_dues %}
+                        {% if three_days_later_dues %}
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
@@ -355,7 +658,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for due in two_days_later_dues %}
+                                {% for due in three_days_later_dues %}
                                     <tr>
                                         <td>{{ due.vehicle_number }}</td>
                                         <td>{{ due.due_date|date:"d-M-Y" }}</td>

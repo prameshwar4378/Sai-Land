@@ -81,6 +81,14 @@ urlpatterns = [
     path('export_policy_data', export_policy_data , name="export_policy_data"),
     path('export_emi_data', export_emi_data , name="export_emi_data"),
     path('export_vehicle_for_finance', export_vehicle_for_finance , name="export_vehicle_for_finance"),
+    path('export_finance_30_days_emi', export_finance_30_days_emi , name="export_finance_30_days_emi"),
+    path('export_finance_30_days_policy', export_finance_30_days_policy , name="export_finance_30_days_policy"),
+    path('export_finance_30_days_permit', export_finance_30_days_permit , name="export_finance_30_days_permit"),
+    path('export_finance_30_days_puc', export_finance_30_days_puc , name="export_finance_30_days_puc"),
+    path('export_finance_30_days_tax', export_finance_30_days_tax , name="export_finance_30_days_tax"),
+    path('export_finance_30_days_fitness', export_finance_30_days_fitness , name="export_finance_30_days_fitness"),
+    path('export_finance_30_days_puc', export_finance_30_days_puc , name="export_finance_30_days_puc"),
+
 
 
 ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

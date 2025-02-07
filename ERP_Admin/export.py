@@ -535,3 +535,171 @@ def export_vehicle_for_finance(request):
     return response
 
 
+
+
+
+
+
+
+
+from datetime import timedelta 
+
+def export_finance_30_days_emi(request):
+    today = date.today()
+    thirty_days_date = today + timedelta(days=30)
+
+    thirty_days_record = { 
+        'emi_dues': EMI.objects.filter(next_due_date__range=[today, thirty_days_date], status='pending', vehicle__status='active'), 
+    }
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "EMI Data"
+    headers = ['Vehicle Number', 'Vehicle Owner', 'EMI Amount', 'Due Date', 'Due']
+    ws.append(headers)
+    for data in thirty_days_record["emi_dues"]: 
+        row = [
+            data.vehicle.vehicle_number,
+            data.vehicle.owner_name,
+            data.emi_amount,
+            data.next_due_date,
+            "EMI",
+        ]
+        ws.append(row)
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename=EMI Dues  {today} to {thirty_days_date}.xlsx'
+    wb.save(response)
+    return response
+
+
+def export_finance_30_days_policy(request):
+    today = date.today()
+    thirty_days_date = today + timedelta(days=30)
+
+    thirty_days_record = { 
+        'policy_dues': Policy.objects.filter(due_date__range=[today, thirty_days_date], vehicle__status='active'),
+    }
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Policy Data"
+    headers = ['Vehicle Number', 'Due Date', 'Due']
+    ws.append(headers)
+    for data in thirty_days_record["policy_dues"]: 
+        row = [
+            data.vehicle.vehicle_number,
+            data.due_date,
+            "Policy",
+        ]
+        ws.append(row)
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename=Policy Dues  {today} to {thirty_days_date}.xlsx' 
+    wb.save(response)
+    return response
+
+
+def export_finance_30_days_tax(request):
+    today = date.today()
+    thirty_days_date = today + timedelta(days=30)
+
+    thirty_days_record = { 
+        'tax_dues': OtherDues.objects.filter(tax_due_date__range=[today, thirty_days_date], vehicle__status='active'),
+    }
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "TAX Data"
+    headers = ['Vehicle Number', 'Vehicle Owner', 'Due Date', 'Due Type']
+    ws.append(headers)
+    for data in thirty_days_record["tax_dues"]: 
+        row = [
+            data.vehicle.vehicle_number,
+            data.vehicle.owner_name,
+            data.tax_due_date,
+            "TAX",
+        ]
+        ws.append(row)
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename=Tax Dues  {today} to {thirty_days_date}.xlsx' 
+    wb.save(response)
+    return response
+
+
+
+def export_finance_30_days_fitness(request):
+    today = date.today()
+    thirty_days_date = today + timedelta(days=30)
+
+    thirty_days_record = { 
+        'fitness_dues': OtherDues.objects.filter(fitness_due_date__range=[today, thirty_days_date], vehicle__status='active'),
+    }
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Fitness Due Data"
+    headers = ['Vehicle Number', 'Vehicle Owner', 'Due Date', 'Due Type']
+    ws.append(headers)
+    for data in thirty_days_record["fitness_dues"]: 
+        row = [
+            data.vehicle.vehicle_number,
+            data.vehicle.owner_name,
+            data.fitness_due_date,
+            "Fitness",
+        ]
+        ws.append(row)
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename=Fitness Dues  {today} to {thirty_days_date}.xlsx' 
+    wb.save(response)
+    return response
+
+ 
+
+def export_finance_30_days_permit(request):
+    today = date.today()
+    thirty_days_date = today + timedelta(days=30)
+
+    thirty_days_record = { 
+        'permit_dues': OtherDues.objects.filter(permit_due_date__range=[today, thirty_days_date],permit_due_date__isnull=False, vehicle__status='active'),
+    }
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Permit Data"
+    headers = ['Vehicle Number', 'Vehicle Owner', 'Due Date', 'Due Type']
+    ws.append(headers)
+    for data in thirty_days_record["permit_dues"]: 
+        row = [
+            data.vehicle.vehicle_number,
+            data.vehicle.owner_name,
+            data.permit_due_date,
+            "Permit",
+        ]
+        ws.append(row)
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename=Permit Dues  {today} to {thirty_days_date}.xlsx' 
+    wb.save(response)
+    return response
+
+ 
+
+def export_finance_30_days_puc(request):
+    today = date.today()
+    thirty_days_date = today + timedelta(days=30)
+
+    thirty_days_record = { 
+        'puc_dues': OtherDues.objects.filter(puc_due_date__range=[today, thirty_days_date], vehicle__status='active'),
+    } 
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "TAX Data"
+    headers = ['Vehicle Number', 'Vehicle Owner', 'Due Date', 'Due Type']
+    ws.append(headers)
+    for data in thirty_days_record["puc_dues"]: 
+        row = [
+            data.vehicle.vehicle_number,
+            data.vehicle.owner_name,
+            data.puc_due_date,
+            "PUC",
+        ]
+        ws.append(row)
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename=PUC Dues  {today} to {thirty_days_date}.xlsx'
+    wb.save(response)
+    return response
+
+ 

@@ -198,31 +198,34 @@
                 <div class="col-sm-12">
  
                    <form method="POST"> {% csrf_token %} 
-                    <div class="row mt-1 mb-3">
-                        <div class="row">
-                            
-                            <div class="col-md">
-                                {{ form.emi_amount|as_crispy_field }}
-                            </div>
-                            <div class="col-md">
-                                {{ form.principal_amount|as_crispy_field }}
-                            </div>
-                            <div class="col-md">
-                                {{ form.interest_amount|as_crispy_field }}
+                        <div class="row mt-1 mb-3">
+                            <div class="row">
+                                
+                                <div class="col-md">
+                                    {{ form.emi_amount|as_crispy_field }}
+                                </div>
+                                <div class="col-md">
+                                    {{ form.principal_amount|as_crispy_field }}
+                                </div>
+                                <div class="col-md">
+                                    {{ form.interest_amount|as_crispy_field }}
 
+                                </div>
+                                
+                                <div class="col-md">
+                                    {{ form.outstanding_amount|as_crispy_field }}
+                                </div>
                             </div>
-                            
-                            <div class="col-md">
-                                {{ form.outstanding_amount|as_crispy_field }}
+                            <div class="row">
+                                <div class="col-md">
+                                    {{ form.paid_date|as_crispy_field }}
+                                </div> 
+                                <div class="col-md">
+                                    {{ form.next_due_date|as_crispy_field }}
+                                </div> 
                             </div>
+                                
                         </div>
-                        <div class="row">
-                            <div class="col-md">
-                                {{ form.paid_date|as_crispy_field }}
-                            </div> 
-                        </div>
-                            
-                    </div>
                     
                         <center><button type="submit" class="btn btn-primary mt-1 px-5">Submit</button></center>
                     </form> 
