@@ -2,6 +2,9 @@ from django.urls import path
 from .import views
 
 urlpatterns = [
+    path('daily_reminder_report_mail/', views.daily_reminder_mail, name='finance_daily_reminder_mail'),
+
+
     path('dashboard/', views.dashboard, name='finance_dashboard'),
     path('vehicle_list/', views.vehicle_list, name='finance_vehicle_list'),
     path('vehicle_dashboard/<int:id>', views.vehicle_dashboard, name='finance_vehicle_dashboard'),
@@ -14,6 +17,7 @@ urlpatterns = [
     path('update_emi/<int:id>', views.update_emi, name='finance_update_emi'),
 
     path('emi_installments_list/<int:id>', views.emi_installments_list, name='finance_emi_installments_list'),
+    path('delete_emi_installment/<int:id>', views.delete_emi_installment, name='finance_delete_emi_installment'), 
 
     path('emi_item_list/<int:id>', views.emi_item_list, name='finance_emi_item_list'),
     path('delete_emi_item/<int:id>', views.delete_emi_item, name='finance_delete_emi_item'),

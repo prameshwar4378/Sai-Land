@@ -114,7 +114,7 @@ legend {
                             <h4 class="card-title">EMI |                                
                                 {% if emi %} 
                                 <span style="font-weight: 200; ">
-                                    <a href="javascript:void(0);" data-url="{% url 'finance_emi_item_list' emi.id %}" onclick="mini_window_1(this)"  style="text-decoration: none;">Update</a>
+                                    <a href="javascript:void(0);" data-url="{% url 'finance_emi_installments_list' emi.id %}" onclick="mini_window_1(this)"  style="text-decoration: none;">Update</a>
                                 </span> 
                                 {% endif %}   
                             </h4>
@@ -126,7 +126,7 @@ legend {
                                 </div>
                                 <div class="record">
                                     <span class="label">EMI Amount:</span>
-                                    <span class="value">{{ emi_amount }}</span>
+                                    <span class="value">{{ emi.emi_amount }}</span>
                                 </div>
                                 <div class="record">
                                     <span class="label">Due Date:</span>
@@ -402,16 +402,19 @@ legend {
                             {{ emi_form.finance_bank|as_crispy_field }}
                         </div>
                         <!-- Total Installments Field -->
-                        <div class="col-sm-6">
+                        <div class="col-sm-4">
+                            {{ emi_form.tenure|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-sm-4">
                             {{ emi_form.emi_amount|as_crispy_field }}
                         </div>
                         <!-- Paid Installments Field -->
-                        <div class="col-sm-6">
+                        <div class="col-sm-4">
                             {{ emi_form.paid_installments|as_crispy_field }}
-                        </div>
-                        <!-- Next Due Date Field --> 
-                        <!-- File Upload Field -->
-                        <div class="col-sm-6">
+                        </div>  
+                        <!-- File Upload Field --> 
+                        <div class="col-sm-12">
                             {{ emi_form.file|as_crispy_field }}
                         </div>
                         <div class="col-sm-6">

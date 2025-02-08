@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Finance Department Daily Reminder</title>
+</head>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" />
+<body>
+    <center>
+        <h1 style="color: red;">Finance Department Daily Reminder Report <br> {{current_datetime}}</h1>
+    </center>
+    <div class="card recent-sales overflow-auto">
+        <div class="card-body"> 
+            {% if three_days_later_dues %}
+            <table class="table table-bordered" style="width:100%; border:2px solid black; ">
+                <thead>
+                    <tr >
+                        <th style="background-color: black; color: white; text-align: center;"  colspan="3"><b>Upcoming Three Days Dues</b></th>
+                    </tr>
+                    <tr>
+                        <th style="border:2px solid black; background-color: rgb(234, 234, 234); text-align: center;">Vehicle Number</th>
+                        <th style="border:2px solid black; background-color: rgb(234, 234, 234); text-align: center;">Due Date</th>
+                        <th style="border:2px solid black; background-color: rgb(234, 234, 234); text-align: center;">Due Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for due in three_days_later_dues %}
+                        <tr>
+                            <td  style="border:2px solid black; text-align: center;">{{ due.vehicle_number }}</td>
+                            <td  style="border:2px solid black; text-align: center;">{{ due.due_date|date:"d-M-Y" }}</td>
+                            <td  style="border:2px solid black; text-align: center;">{{ due.due_name }}</td> 
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No upcoming dues found.</p>
+        {% endif %}
+        </div>
+    </div>
+    <br>
+    <hr>
+    <br>
+    <div class="card-body"> 
+        {% if expire_dues %}
+        <table class="table table-bordered"  style="width:100%; border:2px solid black; ">
+            <thead>
+                
+                <tr >
+                    <th style="background-color: black; color: white; text-align: center;"  colspan="3"><b>Expire Dues</b></th>
+                </tr>
+
+                <tr>
+                    <th  style="border:2px solid black; background-color: rgb(234, 234, 234); text-align: center;">Vehicle Number</th>
+                    <th  style="border:2px solid black; background-color: rgb(234, 234, 234); text-align: center;">Due Date</th>
+                    <th  style="border:2px solid black; background-color: rgb(234, 234, 234); text-align: center;">Due Name</th> 
+                </tr>
+            </thead>
+            <tbody>
+                {% for due in expire_dues %}
+                    <tr>
+                        <td  style="border:2px solid black; text-align: center;">{{ due.vehicle_number }}</td>
+                        <td  style="border:2px solid black; text-align: center;">{{ due.due_date|date:"d-M-Y" }}</td>
+                        <td  style="border:2px solid black; text-align: center;">{{ due.due_name }}</td> 
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No Recent Expire Dues Found.</p>
+    {% endif %}
+    </div>
+</body>
+</html>

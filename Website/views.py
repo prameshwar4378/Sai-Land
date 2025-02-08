@@ -5,7 +5,7 @@ from django.core.mail import EmailMessage
 from django.conf import settings
 from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib import messages
-
+from ERP_Admin.views import send_email_in_background
 # Create your views here.
 
 
@@ -15,12 +15,7 @@ def index(request):
         mobile = request.POST.get('mobile')
         email = request.POST.get('email')
         subject = request.POST.get('subject')
-        message = request.POST.get('message')
-        print("name : ",name)
-        print("mobile : ",mobile)
-        print("email : ",email)
-        print("subject : ",subject)
-        print("message : ",message)
+        message = request.POST.get('message') 
 
         if name and mobile and email and subject and message:
             # Save the enquiry in the database
@@ -53,7 +48,7 @@ def index(request):
                 subject=email_subject,
                 body=email_body,
                 from_email=settings.DEFAULT_FROM_EMAIL,
-                to=['vitthalminde1@gmail.com'],  # Replace with the appropriate email address -- sales@dynaxcel.com
+                to=['prameshwar4378@gmail.com'],  # Replace with the appropriate email address -- sales@dynaxcel.com
             )
 
             # Send the email in a separate thread to avoid blocking
@@ -77,12 +72,6 @@ def about_us(request):
 def material_handling(request):
     return render(request,"material-handling.html")
 
-
-def send_email_in_background(email_message):
-    try:
-        email_message.send()
-    except Exception as e:
-        print(f"Error sending email: {e}")
 
 
 
@@ -130,7 +119,7 @@ def contact_us(request):
                 subject=email_subject,
                 body=email_body,
                 from_email=settings.DEFAULT_FROM_EMAIL,
-                to=['vitthalminde1@gmail.com'],  # Replace with the appropriate email address -- sales@dynaxcel.com
+                to=['prameshwar4378@gmail.com'],  # Replace with the appropriate email address -- sales@dynaxcel.com
             )
 
             # Send the email in a separate thread to avoid blocking

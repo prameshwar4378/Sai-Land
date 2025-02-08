@@ -58,7 +58,11 @@ class EMI_InstallmentForm(forms.ModelForm):
             'paid_date': forms.DateInput(attrs={'type': 'date'}), 
             'next_due_date': forms.DateInput(attrs={'type': 'date'}),  
         }
-  
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make 'emi_amount' field readonly
+        self.fields['emi_amount'].widget.attrs['readonly'] = True
+          
     def clean_next_due_date(self):
         next_due_date = self.cleaned_data.get('next_due_date') 
         if next_due_date:

@@ -47,7 +47,7 @@
         <div class="col-sm-6">
             <div class="container" style="max-width:97%;">
                 <div class="text-lg-end text-start"> 
-                
+                    <a href="{% url 'finance_daily_reminder_mail' %}">Triger Mail</a>
                 </div>
             </div>
         </div>
@@ -404,7 +404,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for due in thirty_days_records.fitness_dues %}
+                                {% for due in thirty_days_records.permit_dues %}
                                     {% if due.permit_due_date %}
                                     <tr>
                                         <td>{{ due.vehicle.vehicle_number }}</td>

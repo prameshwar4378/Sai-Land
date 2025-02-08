@@ -404,7 +404,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for due in thirty_days_records.fitness_dues %}
+                                {% for due in thirty_days_records.permit_dues %} 
                                     {% if due.permit_due_date %}
                                     <tr>
                                         <td>{{ due.vehicle.vehicle_number }}</td>

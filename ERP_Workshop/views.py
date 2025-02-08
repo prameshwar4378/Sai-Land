@@ -10,10 +10,8 @@ from .filters import *
 from django.db.models import Count
 from django.db.models import F
 from django.core.paginator import Paginator
-
- 
+from ERP_Admin.views import send_email_in_background
 from functools import wraps
- 
 
 def workshop_required(function):
     @wraps(function)
