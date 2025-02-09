@@ -9,14 +9,36 @@ from rest_framework.decorators import api_view
 from ERP_Admin.models import *
 from .serializers import AllocateDriverToVehicleSerializer
 from django.utils.timezone import now
- 
+from rest_framework.authtoken.models import Token
+from django.shortcuts import get_object_or_404
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.decorators import api_view
+from django.contrib.auth import authenticate
 
-class CustomAuthToken(ObtainAuthToken):
-    permission_classes = [AllowAny]
-    def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
-        return response
- 
+@api_view(['POST'])
+def login(request):
+    username = request.data.get('username')
+    password = request.data.get('password')
+    if not username or not password:
+        raise AuthenticationFailed('Username and password are required')
+    user = authenticate(username=username, password=password)
+    if user is None:
+        raise AuthenticationFailed('Invalid credentials')
+    token, created = Token.objects.get_or_create(user=user)
+    user_id=token.user.id
+
+    custom_user=get_object_or_404(CustomUser,id=user_id)
+    response_data = {
+        'token': token.key,
+        'is_driver': custom_user.is_driver,
+        'is_admin':custom_user.is_admin,
+        'is_finance':custom_user.is_finance,
+        'is_fuel':custom_user.is_fuel,
+        'is_workshop':custom_user.is_workshop,
+        'user_id':custom_user.id
+    }
+    return Response(response_data, status=status.HTTP_200_OK)
+
 
 @api_view(['POST'])
 def allocate_driver_to_vehicle(request): 

@@ -18,7 +18,6 @@ class AllocateDriverToVehicleSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Vehicle is required.")
         if not driver:
             raise serializers.ValidationError("Driver is required.")
-
         return data
 
 
