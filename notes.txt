@@ -1,14 +1,14 @@
 
 Bouce Changes need to add in  
 Maintenance Schedule in Workshop
+website footer links adding remain
 
-
+Maintenance Schedule
 
 Changes Done
 
 EMI : 
     - Automatic Calculations (installment wise)
-
 
 Policy : 
 	- Premium amount

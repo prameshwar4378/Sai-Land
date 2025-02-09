@@ -926,19 +926,6 @@ def delete_party(request, id):
     return redirect('/admin/party-list')
 
 
-
-from rest_framework.permissions import AllowAny
-from rest_framework.authtoken.views import ObtainAuthToken
- 
-# Create a view to handle login and return token
-class CustomAuthToken(ObtainAuthToken):
-    permission_classes = [AllowAny]
-    def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
-        return response
- 
-
-
 from django.db.models import Sum
 from datetime import datetime, timedelta
 

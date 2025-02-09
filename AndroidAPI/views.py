@@ -1,21 +1,30 @@
+
+
+from rest_framework.permissions import AllowAny
+from rest_framework.authtoken.views import ObtainAuthToken
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from .models import AllocateDriverToVehicle
-from ..AndroidAPI.serializers import AllocateDriverToVehicleSerializer
-import logging
+from ERP_Admin.models import *
+from .serializers import AllocateDriverToVehicleSerializer
 from django.utils.timezone import now
+ 
+
+class CustomAuthToken(ObtainAuthToken):
+    permission_classes = [AllowAny]
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        return response
  
 
 @api_view(['POST'])
 def allocate_driver_to_vehicle(request): 
     print("Current Date Time is : ",now)
     if request.method == 'POST': 
-        # Extract vehicle and driver from the request
         vehicle_id = request.data.get('vehicle')
         driver_id = request.data.get('driver')
 
-        # Check if required fields are provided
         if not vehicle_id or not driver_id:
             return Response(
                 {"error": "Both vehicle and driver are required."},

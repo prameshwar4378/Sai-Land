@@ -19,7 +19,7 @@ from django.urls import path,include
 from Website import views as WebView 
 from Website import urls as WebUrls
 from ERP_Admin import urls as ERP_Admin_Urls 
-from ERP_Admin import API_urls as ERP_Admin_API_urls
+from AndroidAPI import urls as AndroidAPIUrls
 from ERP_Account import urls as ERP_Account_Urls
 from ERP_Workshop import urls as ERP_Workshop_Urls
 from ERP_Finance import urls as ERP_Finance_Urls
@@ -28,6 +28,7 @@ from django.conf import settings
 from django.conf.urls.static import static 
 
 urlpatterns = [
+    
     path('default-admin/', admin.site.urls),
     path('', WebView.index, name="index"), 
     path('web/', include(WebUrls)), 
@@ -35,12 +36,11 @@ urlpatterns = [
     path('account/', include(ERP_Account_Urls)),  
     path('workshop/', include(ERP_Workshop_Urls)),
     path('finance/', include(ERP_Finance_Urls)),
-
     path('login/', ERP_Admin_View.login, name="login"), 
     path('logout/', ERP_Admin_View.logout, name="logout"),  
     path('delete_user/<int:id>', ERP_Admin_View.delete_user, name="delete_user"),  
+    path('api/', include(AndroidAPIUrls)),
 
-    path('api/', include(ERP_Admin_API_urls)),
 ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT) 
 if settings.DEBUG:
     import debug_toolbar

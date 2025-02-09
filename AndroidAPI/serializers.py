@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import AllocateDriverToVehicle
+from ERP_Admin.models import AllocateDriverToVehicle
 
 
 class AllocateDriverToVehicleSerializer(serializers.ModelSerializer):
