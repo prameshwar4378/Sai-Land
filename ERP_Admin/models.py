@@ -282,7 +282,7 @@ class JobCardItem(models.Model):
             super().delete(*args, **kwargs)
 
     def __str__(self):
-        return f"Job Card {self.job_card_number} for Vehicle ID {self.vehicle.id}"
+        return f"Job Card {self.job_card.job_card_number} for Vehicle ID {self.job_card.vehicle}"
 
 
 class Policy(models.Model):
@@ -294,9 +294,8 @@ class Policy(models.Model):
     premium_amount=models.BigIntegerField(null=True, blank=True) 
 
     def __str__(self):
-        return f"Policy for {self.vehicle.vehicle_number} - {self.vehicle.model_name.model_name}"
-    
-
+        return f"Policy for {self.vehicle.vehicle_number[:-5]} {self.vehicle.vehicle_number[-4:]} - {self.vehicle.model_name.model_name}"
+ 
 FREQUENCY_CHOICES = (
     ('yearly', 'Yearly'),
     ('quarterly', 'Quarterly'),
@@ -331,12 +330,14 @@ class EMI(models.Model):
         return self.tenure - self.paid_installments
 
     def __str__(self):
-        return f"EMI for {self.vehicle.vehicle_number} ({self.remaining_installments} remaining)"
+        return f"EMI for {self.vehicle.vehicle_number[:-5]} {self.vehicle.vehicle_number[-4:]} - ({self.remaining_installments} remaining)"
 
 INSTALLMENT_PAID_STATUS=(
     ('Paid','Paid'),
     ('Pending','Pending')
 )
+
+
 
 class EMI_Installment(models.Model):
     emi = models.ForeignKey(EMI, on_delete=models.CASCADE, related_name='installments')
@@ -417,7 +418,7 @@ class AllocateDriverToVehicle(models.Model):
             models.Index(fields=['vehicle', 'is_active']),
             models.Index(fields=['driver', 'is_active']),
     ]
-
+        
     def __str__(self):
         return f"Driver {self.driver} assigned to Vehicle {self.vehicle}"
     
