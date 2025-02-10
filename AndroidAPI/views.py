@@ -26,23 +26,50 @@ def login(request):
         raise AuthenticationFailed('Invalid credentials')
     token, created = Token.objects.get_or_create(user=user)
     user_id=token.user.id
-
     custom_user=get_object_or_404(CustomUser,id=user_id)
+    if custom_user.is_admin:
+        role='admin'
+        name=f'{custom_user.first_name} {custom_user.last_name}'
+    elif custom_user.is_fuel:
+        role='admin'
+        name=f'{custom_user.first_name} {custom_user.last_name}'
+    elif custom_user.is_driver:
+        role='driver'
+        driver=get_object_or_404(Driver,user=custom_user.id)
+        name=f'{driver.driver_name}'
+    elif custom_user.is_workshop:
+        role='workshop'
+        name=f'{custom_user.first_name} {custom_user.last_name}'
+    else:
+        raise AuthenticationFailed('Android Login not available for this role..!')
+    
     response_data = {
         'token': token.key,
-        'is_driver': custom_user.is_driver,
-        'is_admin':custom_user.is_admin,
-        'is_finance':custom_user.is_finance,
-        'is_fuel':custom_user.is_fuel,
-        'is_workshop':custom_user.is_workshop,
+        'role': role,
+        'name':name, 
+        'emp_id':custom_user.emp_id.emp_id,
         'user_id':custom_user.id
     }
     return Response(response_data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
+def get_vehicle_details(request):
+    vehicle_number = request.data.get('vehicle_number')
+    vehicle=Vehicle.objects.filter(vehicle_number=vehicle_number)
+    if not vehicle.exists(): 
+        raise AuthenticationFailed(f'Vehicle with {vehicle_number} number not eixst')
+    vehicle=vehicle.first()
+
+    response_data = {
+        'vehicle_number': vehicle_number,
+        'vehicle_name':vehicle.model_name.model_name,  
+    }
+    return Response(response_data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
 def allocate_driver_to_vehicle(request): 
-    print("Current Date Time is : ",now)
     if request.method == 'POST': 
         vehicle_id = request.data.get('vehicle')
         driver_id = request.data.get('driver')
@@ -52,7 +79,6 @@ def allocate_driver_to_vehicle(request):
                 {"error": "Both vehicle and driver are required."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
         # Check if the same driver is already active for the same vehicle
         active_record_exists = AllocateDriverToVehicle.objects.filter( vehicle=vehicle_id,  driver=driver_id,   is_active=True  ).exists()
 
