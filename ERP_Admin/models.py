@@ -336,7 +336,7 @@ INSTALLMENT_PAID_STATUS=(
     ('Paid','Paid'),
     ('Pending','Pending')
 )
-
+   
 
 
 class EMI_Installment(models.Model):
@@ -400,11 +400,11 @@ class OtherDues(models.Model):
     fitness_due_date = models.DateField(null=True,blank=True)
     permit_due_date = models.DateField(null=True,blank=True)
     puc_due_date = models.DateField(null=True,blank=True)
-    fitness_document=models.ImageField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
-    permit_document=models.ImageField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
-    puc_document=models.ImageField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
-    rc_book=models.ImageField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
-    invoice=models.ImageField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
+    fitness_document=models.FileField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
+    permit_document=models.FileField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
+    puc_document=models.FileField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
+    rc_book=models.FileField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
+    invoice=models.FileField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
  
 class AllocateDriverToVehicle(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name="allocated_drivers")
