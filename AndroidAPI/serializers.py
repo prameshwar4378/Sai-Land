@@ -1,23 +1,21 @@
 from rest_framework import serializers
-from ERP_Admin.models import AllocateDriverToVehicle
-
+from ERP_Admin.models import *
+from rest_framework.authtoken.models import Token
 
 class AllocateDriverToVehicleSerializer(serializers.ModelSerializer):
     class Meta:
         model = AllocateDriverToVehicle
-        fields = ['vehicle', 'driver']
+        fields = ['vehicle']  # Include 'driver_token' as part of the input, but not as a model field
 
-    def validate(self, data):
-        """
-        Custom validation to ensure that both vehicle and driver are provided.
-        """
-        vehicle = data.get('vehicle')
-        driver = data.get('driver')
+ 
+class BreakdownTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BreakdownType
+        fields = ['id', 'type']  # Fields you want to expose in the response
 
-        if not vehicle:
-            raise serializers.ValidationError("Vehicle is required.")
-        if not driver:
-            raise serializers.ValidationError("Driver is required.")
-        return data
-
+ 
+class BreakdownSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Breakdown
+        fields = ['description', 'audio', 'image1', 'image2', 'image3', 'image4']
 

@@ -1,24 +1,23 @@
 
 
-from rest_framework.permissions import AllowAny
-from rest_framework.authtoken.views import ObtainAuthToken
-
+ 
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from ERP_Admin.models import *
-from .serializers import AllocateDriverToVehicleSerializer
+from .serializers import *
 from django.utils.timezone import now
 from rest_framework.authtoken.models import Token
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.decorators import api_view
 from django.contrib.auth import authenticate
+from django.utils import timezone
 
 @api_view(['POST'])
 def login(request):
     username = request.data.get('username')
-    password = request.data.get('password')
+    password = request.data.get('password')  
     if not username or not password:
         raise AuthenticationFailed('Username and password are required')
     user = authenticate(username=username, password=password)
@@ -31,7 +30,7 @@ def login(request):
         role='admin'
         name=f'{custom_user.first_name} {custom_user.last_name}'
     elif custom_user.is_fuel:
-        role='admin'
+        role='fuel'
         name=f'{custom_user.first_name} {custom_user.last_name}'
     elif custom_user.is_driver:
         role='driver'
@@ -56,71 +55,115 @@ def login(request):
 @api_view(['POST'])
 def get_vehicle_details(request):
     vehicle_number = request.data.get('vehicle_number')
-    vehicle=Vehicle.objects.filter(vehicle_number=vehicle_number)
-    if not vehicle.exists(): 
-        raise AuthenticationFailed(f'Vehicle with {vehicle_number} number not eixst')
-    vehicle=vehicle.first()
+    vehicle=Vehicle.objects.filter(vehicle_number=vehicle_number).first()
+    if not vehicle: 
+        raise AuthenticationFailed(f'Vehicle with {vehicle.vehicle_number} number not eixst')
 
     response_data = {
         'vehicle_number': vehicle_number,
         'vehicle_name':vehicle.model_name.model_name,  
+        'vehicle_id':vehicle.id,  
     }
     return Response(response_data, status=status.HTTP_200_OK)
 
 
+ 
+
 @api_view(['POST'])
-def allocate_driver_to_vehicle(request): 
-    if request.method == 'POST': 
-        vehicle_id = request.data.get('vehicle')
-        driver_id = request.data.get('driver')
+def allocate_driver_to_vehicle(request):
+    """
+    This API allocates a vehicle to a driver based on the provided user token.
+    """
+    token = request.data.get('token')
+    vehicle_id = request.data.get('vehicle_id') 
 
-        if not vehicle_id or not driver_id:
-            return Response(
-                {"error": "Both vehicle and driver are required."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        # Check if the same driver is already active for the same vehicle
-        active_record_exists = AllocateDriverToVehicle.objects.filter( vehicle=vehicle_id,  driver=driver_id,   is_active=True  ).exists()
+    # Retrieve the user associated with the token
+    user = get_object_or_404(Token, key=token)
+ 
+    if not token: 
+        return Response({"detail": "Token is required."}, status=status.HTTP_400_BAD_REQUEST)
+     
+    if not vehicle_id: 
+        return Response({"detail": "Vehicle ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Check if the user is a driver
+    if not user.user.is_driver: 
+        return Response({"detail": "Not Valid Token For Driver."}, status=status.HTTP_400_BAD_REQUEST)
+ 
+    user_id = user.user.id
+  
+    # Check if the vehicle and driver exist
+    vehicle_exists = Vehicle.objects.filter(id=vehicle_id)
+    driver_exists = Driver.objects.filter(user=user_id).exists()
 
-        if active_record_exists:
-            return Response( {"error": "You are already allocated this vehicle."},  status=status.HTTP_400_BAD_REQUEST )
+    if not vehicle_exists:
+        return Response({"detail": "Vehicle does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+    if not driver_exists:
+        return Response({"detail": "Driver does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Optimize queries by combining filters and using bulk updates
-        # Deactivate the current active driver, if any
-        AllocateDriverToVehicle.objects.filter(driver=driver_id, is_active=True).update(is_active=False, leaving_date_time=now())
+    if vehicle_exists and driver_exists:
+        # Get the actual vehicle and driver objects
+        vehicle_data=Vehicle.objects.filter(id=vehicle_id).last() 
+        allocation_data=AllocateDriverToVehicle.objects.filter(vehicle=vehicle_data,is_active=True).last() 
+        if allocation_data:
+            return Response({"detail": f"Vehicle is already allocated to : {allocation_data.driver.driver_name} - {allocation_data.driver.user.emp_id.emp_id}"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Deactivate the current active vehicle, if any
-        AllocateDriverToVehicle.objects.filter(vehicle=vehicle_id, is_active=True ).update(is_active=False, leaving_date_time=now())
-        # Create a new record
-        serializer = AllocateDriverToVehicleSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            # AllocateDriverToVehicle.objects.all().delete()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        vehicle = Vehicle.objects.get(id=vehicle_id)
+        driver = Driver.objects.get(user=user_id)
 
+        # Allocate the driver to the vehicle
+        allocation = AllocateDriverToVehicle(
+            vehicle=vehicle,
+            driver=driver,
+            is_active=True
+        )
+        allocation.save()
+
+        # Prepare the response data
+        response_data = {
+            "vehicle_id": vehicle.id,
+            "vehicle_number": vehicle.vehicle_number,
+            "driver_name": allocation.driver.driver_name,
+            "joining_date_time": allocation.joining_date_time,
+            "is_active": allocation.is_active
+        }
+
+        return Response(response_data, status=status.HTTP_201_CREATED)
+
+    else:
+        return Response({"detail": "Something Missing"}, status=status.HTTP_400_BAD_REQUEST)
+    
 
 
 @api_view(['POST'])
 def leave_driver_from_vehicle(request): 
     if request.method == 'POST': 
+        token = request.data.get('token')
+        vehicle_id = request.data.get('vehicle_id') 
+
+        # Retrieve the user associated with the token
+        user = get_object_or_404(Token, key=token)
+    
+        if not token: 
+            return Response({"detail": "Token is required."}, status=status.HTTP_400_BAD_REQUEST)
+     
+        if not vehicle_id: 
+            return Response({"detail": "Vehicle ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+            
+        # Check if the user is a driver
+        if not user.user.is_driver: 
+            return Response({"detail": "Not Valid Token For Driver."}, status=status.HTTP_400_BAD_REQUEST)
+ 
         # Extract vehicle and driver from the request
-        vehicle_id = request.data.get('vehicle')
-
-        # Check if required fields are provided
-        if not vehicle_id:
-            return Response(
-                {"error": "Vehicle is required."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
+ 
         # Check if the same driver is already active for the same vehicle
-        active_record = AllocateDriverToVehicle.objects.filter(vehicle=vehicle_id, is_active=True).first()
+        vehicle=get_object_or_404(Vehicle,id=vehicle_id)
+        active_record = AllocateDriverToVehicle.objects.filter(vehicle=vehicle, is_active=True).first()
 
         if active_record:
             # Set the 'is_active' field to False for the active record
             active_record.is_active = False
+            active_record.leaving_date_time=now()
             active_record.save()
 
             return Response(
@@ -132,3 +175,92 @@ def leave_driver_from_vehicle(request):
             {"error": "No active driver found for this vehicle."},
             status=status.HTTP_404_NOT_FOUND
         )
+
+
+@api_view(['GET'])
+def get_breakdown_type(request):
+    """
+    This API returns all available breakdown types.
+    """
+    breakdown_types = BreakdownType.objects.all()  # Fetch all breakdown types from the database
+    serializer = BreakdownTypeSerializer(breakdown_types, many=True)  # Serialize the data
+    return Response(serializer.data, status=status.HTTP_200_OK)
+ 
+ 
+@api_view(['POST'])
+def create_breakdown(request):
+    if request.method == 'POST':
+        # Directly access data from the request
+        vehicle_id = request.data.get('vehicle')  # Get 'vehicle' field from the request
+        breakdown_type_id = request.data.get('type')  # Get 'type' field from the request
+    
+        # Initialize the serializer with incoming data
+        serializer = BreakdownSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            # Fetch related instances from the database
+            try:
+                vehicle = Vehicle.objects.get(id=vehicle_id)  # Fetch the vehicle by ID
+                breakdown_type = BreakdownType.objects.get(id=breakdown_type_id)  # Fetch breakdown type by ID
+            except Vehicle.DoesNotExist:
+                return Response({"error": "Vehicle not found"}, status=status.HTTP_400_BAD_REQUEST)
+            except BreakdownType.DoesNotExist:
+                return Response({"error": "Breakdown type not found"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Create Breakdown instance from validated data (without saving yet)
+            breakdown_instance = Breakdown(**serializer.validated_data)
+            
+            # Assign the fetched instances to the foreign key fields
+            breakdown_instance.vehicle = vehicle
+            breakdown_instance.type = breakdown_type
+            
+            # Save the instance to the database
+            breakdown_instance.save()
+            
+            # Re-serialize the saved object to return the updated data
+            response_serializer = BreakdownSerializer(breakdown_instance)
+            
+            # Return the serialized data in the response
+            return Response("Request Submited Success", status=status.HTTP_201_CREATED)
+        
+        # If the serializer is not valid, return validation errors
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+@api_view(['GET'])
+def get_driver_allocation_history(request):
+    # Fetch all active vehicle-driver allocations
+    
+    token = request.data.get('token')
+    user = get_object_or_404(Token, key=token)
+
+    if not token: 
+        return Response({"detail": "Token is required."}, status=status.HTTP_400_BAD_REQUEST)
+     
+    # Check if the user is a driver
+    if not user.user.is_driver: 
+        return Response({"detail": "Not Valid Token For Driver."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    allocations = AllocateDriverToVehicle.objects.filter(is_active=True,driver__user=user.user)
+    
+    # Create a list to store the result
+    allocation_history = []
+
+    for allocation in allocations:
+        # Calculate working hours
+        if allocation.leaving_date_time:
+            working_hours = (allocation.leaving_date_time - allocation.joining_date_time).total_seconds() / 3600
+        else:
+            # If the leaving date is not set, use the current time for the working hour calculation
+            working_hours = (timezone.now() - allocation.joining_date_time).total_seconds() / 3600
+        
+        # Prepare the data for this allocation
+        allocation_history.append({
+            'vehicle_number': allocation.vehicle.vehicle_number,  # Assuming `vehicle_number` is a field in the `Vehicle` model
+            'joining_time': allocation.joining_date_time,
+            'leaving_time': allocation.leaving_date_time or "Still Active",  # Set leaving time as 'Still Active' if None
+            'working_hours': round(working_hours, 2),  # Round the working hours to 2 decimal places
+        })
+
+    return Response(allocation_history, status=status.HTTP_200_OK)

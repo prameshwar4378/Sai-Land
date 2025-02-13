@@ -155,6 +155,7 @@ def job_card_item_list(request, id):
             total_cost = int(total_cost) if total_cost is not None else 0
             labour_cost=int(job_card.labour_cost) if job_card.labour_cost is not None else 0
             grand_total_cost=int(total_cost+labour_cost)
+            return redirect(f"/workshop/job_card_item_list/{id}")
 
         else:
             print("Form errors:", form.errors)
@@ -424,11 +425,14 @@ def get_product_details(request):
     if product_code:
             product = get_object_or_404(Product, product_code=product_code)  
             product_image_url = product.product_image.url if product.product_image else None
+            model_name =product.model.model_name if product.model.model_name else None
             data = {        
                 'id': product.id,
                 'product_name': product.product_name,
                 'product_rate': product.sale_price,  # Ensure this field exists in your model
                 'product_code': product.product_code, 
+                'model_name': model_name,
+                'available_stock':product.available_stock, 
                 'product_image_url':product_image_url          # Include any other necessary fields
             }    
             return JsonResponse(data, safe=False) 

@@ -5,4 +5,5 @@ from .models import *
 admin.site.register(Product)
 admin.site.register(Finance_Bank)
 admin.site.register(Insurance_Bank)
+admin.site.register(BreakdownType)
  

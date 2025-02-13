@@ -400,28 +400,12 @@ class OtherDues(models.Model):
     fitness_due_date = models.DateField(null=True,blank=True)
     permit_due_date = models.DateField(null=True,blank=True)
     puc_due_date = models.DateField(null=True,blank=True)
-    fitness_document=models.ImageField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
-    permit_document=models.ImageField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
-    puc_document=models.ImageField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
-    rc_book=models.ImageField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
-    invoice=models.ImageField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
+    fitness_document=models.FileField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
+    permit_document=models.FileField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
+    puc_document=models.FileField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
+    rc_book=models.FileField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
+    invoice=models.FileField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
  
-class AllocateDriverToVehicle(models.Model):
-    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name="allocated_drivers")
-    driver = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name="allocated_vehicles")
-    joining_date_time = models.DateTimeField(auto_now_add=True)
-    leaving_date_time = models.DateTimeField(auto_now=True)
-    is_active = models.BooleanField(default=True)
- 
-    class Meta:
-        indexes = [
-            models.Index(fields=['vehicle', 'is_active']),
-            models.Index(fields=['driver', 'is_active']),
-    ]
-        
-    def __str__(self):
-        return f"Driver {self.driver} assigned to Vehicle {self.vehicle}"
-    
 
 
 class Enquiry(models.Model):
@@ -434,3 +418,45 @@ class Enquiry(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.subject}"
+    
+
+
+class AllocateDriverToVehicle(models.Model):
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name="allocated_vehicles")
+    driver = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name="allocated_drivers")
+    joining_date_time = models.DateTimeField(auto_now_add=True)
+    leaving_date_time = models.DateTimeField(null=True,blank=True)
+    is_active = models.BooleanField(default=True)
+ 
+    class Meta:
+        indexes = [
+            models.Index(fields=['vehicle', 'is_active']),
+            models.Index(fields=['driver', 'is_active']),
+    ]
+        
+    def __str__(self):
+        return f"Driver {self.driver} assigned to Vehicle {self.vehicle}"
+    
+
+   
+class BreakdownType(models.Model):
+    type = models.CharField(max_length=100)
+    
+    def __str__(self):
+        return self.type
+      
+class Breakdown(models.Model):
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name="breakdown_vehicle", null=True, blank=True)
+    type = models.ForeignKey(BreakdownType, on_delete=models.CASCADE, related_name="breakdown_type", null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    date_time = models.DateTimeField(auto_now_add=True)
+    audio=models.FileField(upload_to="Breakdown_Audio", null=True, blank=True)
+    image1=models.ImageField(upload_to="Breakdown_Images", max_length=None, null=True, blank=True)
+    image2=models.ImageField(upload_to="Breakdown_Images", max_length=None, null=True, blank=True)
+    image3=models.ImageField(upload_to="Breakdown_Images", max_length=None, null=True, blank=True)
+    image4=models.ImageField(upload_to="Breakdown_Images", max_length=None, null=True, blank=True)
+    
+    def __str__(self):
+        return self.type
+    
+    

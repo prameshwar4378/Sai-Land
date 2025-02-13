@@ -184,6 +184,23 @@
                             <div class="col-md-2">
                                 {{ form.total_cost|as_crispy_field }}
                             </div>
+
+                            <div class="col-md-6">
+                                <label
+                                    for="model_name" class="form-label">
+                                    Model Name
+                                </label>
+                                    <input type="text" class="form-control" id="model_name" name="model_name" placeholder="Model Name" readonly />
+                            </div>
+ 
+                            <div class="col-md-6">
+                                <label
+                                    for="available_stock" class="form-label">
+                                    Available Stock
+                                </label>
+                                    <input type="text" class="form-control" id="available_stock" name="available_stock" placeholder="Available Stock" readonly />
+                            </div>
+ 
                         </div>
                         
                         <input type="hidden" class="form-control" id="product_id" name="product_id" required />
@@ -337,6 +354,9 @@
                         $('#id_quantity').val(1);
                         $('#product_id').val(data.id);
                         $('#id_total_cost').val(data.product_rate);
+                        $('#model_name').val(data.model_name);
+                        $('#available_stock').val(data.available_stock);
+
                         if (data.product_image_url) {
                             $('#product_image').attr('src', data.product_image_url);  // Set the image URL dynamically
                         } else {
