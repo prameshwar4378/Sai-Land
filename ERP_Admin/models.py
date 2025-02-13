@@ -336,7 +336,7 @@ INSTALLMENT_PAID_STATUS=(
     ('Paid','Paid'),
     ('Pending','Pending')
 )
-
+   
 
 
 class EMI_Installment(models.Model):
