@@ -458,5 +458,27 @@ class Breakdown(models.Model):
     
     def __str__(self):
         return self.type
-    
-    
+
+
+
+
+class FuelRecord(models.Model):
+    vehicle = models.ForeignKey('Vehicle', on_delete=models.CASCADE)
+    driver = models.ForeignKey('Driver', on_delete=models.CASCADE)
+    fuel_amount = models.DecimalField(max_digits=10, decimal_places=2)  # Cost of fuel
+    fuel_liters = models.DecimalField(max_digits=8, decimal_places=2)   # Quantity of fuel in liters
+    current_km = models.PositiveIntegerField()                          # Current odometer reading
+    dashboard_photo = models.ImageField(upload_to='fuel/dashboard_photos/', blank=True, null=True)
+    dispenser_photo = models.ImageField(upload_to='fuel/dispenser_photos/', blank=True, null=True)
+    receipt_photo = models.ImageField(upload_to='fuel/receipt_photos/', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def fuel_efficiency(self):
+        """Calculate fuel efficiency (KM per liter)"""
+        if self.current_km and self.last_km and self.fuel_liters > 0:
+            return (self.current_km - self.last_km) / self.fuel_liters
+        return None
+
+    def __str__(self):
+        return f"{self.vehicle.vehicle_number} - {self.created_at}"

@@ -19,3 +19,15 @@ class BreakdownSerializer(serializers.ModelSerializer):
         model = Breakdown
         fields = ['description', 'audio', 'image1', 'image2', 'image3', 'image4']
 
+
+class FuelRecordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FuelRecord
+        fields = '__all__'
+
+
+ 
+class FuelLastRecord(serializers.ModelSerializer):
+    class Meta:
+        model = Breakdown
+        fields = ['description', 'audio', 'image1', 'image2', 'image3', 'image4']

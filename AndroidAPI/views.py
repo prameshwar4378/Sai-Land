@@ -13,7 +13,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.decorators import api_view
 from django.contrib.auth import authenticate
 from django.utils import timezone
-
+from SLD.settings import BASE_DIR
 @api_view(['POST'])
 def login(request):
     username = request.data.get('username')
@@ -28,16 +28,20 @@ def login(request):
     custom_user=get_object_or_404(CustomUser,id=user_id)
     if custom_user.is_admin:
         role='admin'
+        profile_image_url = custom_user.profile_photo.url if custom_user.profile_photo else None
         name=f'{custom_user.first_name} {custom_user.last_name}'
     elif custom_user.is_fuel:
         role='fuel'
+        profile_image_url = custom_user.profile_photo.url if custom_user.profile_photo else None
         name=f'{custom_user.first_name} {custom_user.last_name}'
     elif custom_user.is_driver:
-        role='driver'
+        role='driver' 
         driver=get_object_or_404(Driver,user=custom_user.id)
+        profile_image_url = driver.profile_photo.url if driver.profile_photo else None
         name=f'{driver.driver_name}'
     elif custom_user.is_workshop:
         role='workshop'
+        profile_image_url = custom_user.profile_photo.url if custom_user.profile_photo else None
         name=f'{custom_user.first_name} {custom_user.last_name}'
     else:
         raise AuthenticationFailed('Android Login not available for this role..!')
@@ -47,14 +51,16 @@ def login(request):
         'role': role,
         'name':name, 
         'emp_id':custom_user.emp_id.emp_id,
-        'user_id':custom_user.id
+        'user_id':custom_user.id,
+        'profile_image':profile_image_url
     }
     return Response(response_data, status=status.HTTP_200_OK)
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 def get_vehicle_details(request):
-    vehicle_number = request.data.get('vehicle_number')
+    vehicle_number=request.query_params.get('vehicle_number')
+
     vehicle=Vehicle.objects.filter(vehicle_number=vehicle_number).first()
     if not vehicle: 
         raise AuthenticationFailed(f'Vehicle with {vehicle.vehicle_number} number not eixst')
@@ -73,7 +79,7 @@ def get_vehicle_details(request):
 def allocate_driver_to_vehicle(request):
     """
     This API allocates a vehicle to a driver based on the provided user token.
-    """
+    """ 
     token = request.data.get('token')
     vehicle_id = request.data.get('vehicle_id') 
 
@@ -137,9 +143,9 @@ def allocate_driver_to_vehicle(request):
 
 @api_view(['POST'])
 def leave_driver_from_vehicle(request): 
-    if request.method == 'POST': 
-        token = request.data.get('token')
-        vehicle_id = request.data.get('vehicle_id') 
+    if request.method == 'POST':  
+        token=request.query_params.get('token')
+        vehicle_id=request.query_params.get('vehicle_id')
 
         # Retrieve the user associated with the token
         user = get_object_or_404(Token, key=token)
@@ -232,7 +238,7 @@ def create_breakdown(request):
 def get_driver_allocation_history(request):
     # Fetch all active vehicle-driver allocations
     
-    token = request.data.get('token')
+    token = request.query_params.get('token')
     user = get_object_or_404(Token, key=token)
 
     if not token: 
@@ -264,3 +270,66 @@ def get_driver_allocation_history(request):
         })
 
     return Response(allocation_history, status=status.HTTP_200_OK)
+
+
+
+@api_view([ 'POST'])
+def create_fuel_record(request): 
+    if request.method == 'POST':
+        serializer = FuelRecordSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def get_last_fuel_record(request):
+    """
+    This API returns the last fuel record for a vehicle using query parameters.
+    Example: /api/get-last-fuel-record/?vehicle_id=10
+    """
+    vehicle_id = request.query_params.get('vehicle_id')
+
+    if not vehicle_id:
+        return Response({"detail": "Vehicle ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Retrieve the vehicle object
+    vehicle = get_object_or_404(Vehicle, id=vehicle_id)
+
+    # Fetch the last fuel record for the vehicle
+    last_record = FuelRecord.objects.filter(vehicle=vehicle).last()
+
+    if not last_record:
+        return Response({"detail": "No fuel records found for this vehicle."}, status=status.HTTP_404_NOT_FOUND)
+
+    data = {
+         'last_km': last_record.current_km,
+        'last_fuel_date': last_record.created_at,
+        'last_driver_name': last_record.driver.driver_name,
+        # 'emi_id':last_record.driver.user.emp_id.emp_id 
+    }
+
+    return Response(data, status=status.HTTP_200_OK)
+
+
+
+@api_view(['GET'])
+def get_fuel_history(request):
+    # Fetch all active vehicle-driver allocations
+
+    fuel = FuelRecord.objects.order_by('-id')[:100]
+    
+    # Create a list to store the result
+    fuel_data_history = []
+
+    for f in fuel: 
+        # Prepare the data for this allocation
+        fuel_data_history.append({
+            'vehicle_number': f.vehicle.vehicle_number,  # Assuming `vehicle_number` is a field in the `Vehicle` model
+            'fuel_fill_date': f.created_at,
+            'fuel_liters': f.fuel_liters ,  # Set leaving time as 'Still Active' if None
+            'driver': f.driver.driver_name,  # Round the working hours to 2 decimal places
+        })
+
+    return Response(fuel_data_history, status=status.HTTP_200_OK)
