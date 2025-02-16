@@ -14,6 +14,15 @@ from rest_framework.decorators import api_view
 from django.contrib.auth import authenticate
 from django.utils import timezone
 from SLD.settings import BASE_DIR
+from rest_framework.exceptions import NotFound
+
+from ERP_Admin.views import send_email_in_background
+from django.conf import settings
+import threading
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+
+
 @api_view(['POST'])
 def login(request):
     username = request.data.get('username')
@@ -38,7 +47,34 @@ def login(request):
         role='driver' 
         driver=get_object_or_404(Driver,user=custom_user.id)
         profile_image_url = driver.profile_photo.url if driver.profile_photo else None
+
+        allocated_vehicle=AllocateDriverToVehicle.objects.filter(driver=driver,is_active=True).last()
+
+        allocated_vehicle_data=[]
+
+        if allocated_vehicle:
+            allocated_vehicle_data.append(
+                {
+                    'vehicle_number':allocated_vehicle.vehicle.vehicle_number,
+                    'vehicle_id':allocated_vehicle.vehicle.id,
+                    "joining_date_time": allocated_vehicle.joining_date_time,
+
+                 }
+                )
+
         name=f'{driver.driver_name}'
+
+        response_data = {
+            'token': token.key,
+            'role': role,
+            'name':name, 
+            'emp_id':custom_user.emp_id.emp_id,
+            'user_id':custom_user.id,
+            'profile_image':profile_image_url,
+            'allocated_vehicle_data':allocated_vehicle_data
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+
     elif custom_user.is_workshop:
         role='workshop'
         profile_image_url = custom_user.profile_photo.url if custom_user.profile_photo else None
@@ -52,26 +88,34 @@ def login(request):
         'name':name, 
         'emp_id':custom_user.emp_id.emp_id,
         'user_id':custom_user.id,
-        'profile_image':profile_image_url
+        'profile_image':profile_image_url,
+
     }
     return Response(response_data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
 def get_vehicle_details(request):
-    vehicle_number=request.query_params.get('vehicle_number')
+    try:
+        vehicle_number = request.query_params.get('vehicle_number')
+        if not vehicle_number:
+            return Response({'error': 'Vehicle number is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-    vehicle=Vehicle.objects.filter(vehicle_number=vehicle_number).first()
-    if not vehicle: 
-        raise AuthenticationFailed(f'Vehicle with {vehicle.vehicle_number} number not eixst')
+        vehicle = Vehicle.objects.filter(vehicle_number=vehicle_number).first()
+        if not vehicle:
+            raise NotFound(f'Vehicle with number {vehicle_number} does not exist')
 
-    response_data = {
-        'vehicle_number': vehicle_number,
-        'vehicle_name':vehicle.model_name.model_name,  
-        'vehicle_id':vehicle.id,  
-    }
-    return Response(response_data, status=status.HTTP_200_OK)
-
+        response_data = {
+            'vehicle_number': vehicle.vehicle_number,
+            'vehicle_name': vehicle.model_name.model_name,  
+            'vehicle_id': vehicle.id,  
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    except NotFound as e:
+        return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'error': 'An unexpected error occurred', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
  
 
@@ -97,15 +141,22 @@ def allocate_driver_to_vehicle(request):
         return Response({"detail": "Not Valid Token For Driver."}, status=status.HTTP_400_BAD_REQUEST)
  
     user_id = user.user.id
+
+    
   
     # Check if the vehicle and driver exist
-    vehicle_exists = Vehicle.objects.filter(id=vehicle_id)
-    driver_exists = Driver.objects.filter(user=user_id).exists()
+    vehicle_exists = Vehicle.objects.filter(id=vehicle_id).last()
+    driver_exists = Driver.objects.filter(user=user_id).last()
 
     if not vehicle_exists:
         return Response({"detail": "Vehicle does not exist."}, status=status.HTTP_400_BAD_REQUEST)
     if not driver_exists:
         return Response({"detail": "Driver does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+    is_alredy_allocated=AllocateDriverToVehicle.objects.filter(driver=driver_exists,is_active=True).last() 
+
+    if is_alredy_allocated:
+        return Response({"detail": f"You are already allocated to a vehicle {vehicle_exists.vehicle_number}"}, status=status.HTTP_400_BAD_REQUEST)
 
     if vehicle_exists and driver_exists:
         # Get the actual vehicle and driver objects
@@ -130,7 +181,6 @@ def allocate_driver_to_vehicle(request):
             "vehicle_id": vehicle.id,
             "vehicle_number": vehicle.vehicle_number,
             "driver_name": allocation.driver.driver_name,
-            "joining_date_time": allocation.joining_date_time,
             "is_active": allocation.is_active
         }
 
@@ -141,20 +191,23 @@ def allocate_driver_to_vehicle(request):
     
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 def leave_driver_from_vehicle(request): 
-    if request.method == 'POST':  
-        token=request.query_params.get('token')
-        vehicle_id=request.query_params.get('vehicle_id')
+    if request.method == 'GET':  
+        token=request.query_params.get('token') 
 
         # Retrieve the user associated with the token
-        user = get_object_or_404(Token, key=token)
-    
+        user = get_object_or_404(Token, key=token) 
+
+        driver=get_object_or_404(Driver, user=user.user)
+
+        allocated_vehicle=AllocateDriverToVehicle.objects.filter(driver=driver,is_active=True).last()
+
         if not token: 
             return Response({"detail": "Token is required."}, status=status.HTTP_400_BAD_REQUEST)
      
-        if not vehicle_id: 
-            return Response({"detail": "Vehicle ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+        if not allocated_vehicle: 
+            return Response({"detail": "No any vehicle allocated."}, status=status.HTTP_400_BAD_REQUEST)
             
         # Check if the user is a driver
         if not user.user.is_driver: 
@@ -162,15 +215,15 @@ def leave_driver_from_vehicle(request):
  
         # Extract vehicle and driver from the request
  
-        # Check if the same driver is already active for the same vehicle
-        vehicle=get_object_or_404(Vehicle,id=vehicle_id)
-        active_record = AllocateDriverToVehicle.objects.filter(vehicle=vehicle, is_active=True).first()
+        # # Check if the same driver is already active for the same vehicle
+        # vehicle=get_object_or_404(Vehicle,id=vehicle_id)
+        # active_record = AllocateDriverToVehicle.objects.filter(vehicle=vehicle, is_active=True).first()
 
-        if active_record:
+        if allocated_vehicle:
             # Set the 'is_active' field to False for the active record
-            active_record.is_active = False
-            active_record.leaving_date_time=now()
-            active_record.save()
+            allocated_vehicle.is_active = False
+            allocated_vehicle.leaving_date_time=now()
+            allocated_vehicle.save()
 
             return Response(
                 {"message": "Driver has been removed from the vehicle."},
@@ -192,46 +245,110 @@ def get_breakdown_type(request):
     serializer = BreakdownTypeSerializer(breakdown_types, many=True)  # Serialize the data
     return Response(serializer.data, status=status.HTTP_200_OK)
  
- 
+
+
 @api_view(['POST'])
 def create_breakdown(request):
-    if request.method == 'POST':
+    if request.method == 'POST': 
         # Directly access data from the request
-        vehicle_id = request.data.get('vehicle')  # Get 'vehicle' field from the request
-        breakdown_type_id = request.data.get('type')  # Get 'type' field from the request
-    
+        vehicle_id = request.data.get('vehicle_id')
+        breakdown_type_id = request.data.get('type')
+
+        # Retrieve the user associated with the token
+        token=request.data.get('token')
+        user = get_object_or_404(Token, key=token)
+        driver=Driver.objects.filter(user=user).last()
+
+        if not token: 
+            return Response({"Required": "Token is required."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not user.user.is_driver: 
+            return Response({"detail": "Only Driver can generate breakdown alert."}, status=status.HTTP_400_BAD_REQUEST)
+                 
         # Initialize the serializer with incoming data
         serializer = BreakdownSerializer(data=request.data)
         
         if serializer.is_valid():
-            # Fetch related instances from the database
             try:
-                vehicle = Vehicle.objects.get(id=vehicle_id)  # Fetch the vehicle by ID
-                breakdown_type = BreakdownType.objects.get(id=breakdown_type_id)  # Fetch breakdown type by ID
+                vehicle = Vehicle.objects.get(id=vehicle_id)
+                breakdown_type = BreakdownType.objects.get(id=breakdown_type_id)
             except Vehicle.DoesNotExist:
                 return Response({"error": "Vehicle not found"}, status=status.HTTP_400_BAD_REQUEST)
             except BreakdownType.DoesNotExist:
                 return Response({"error": "Breakdown type not found"}, status=status.HTTP_400_BAD_REQUEST)
             
-            # Create Breakdown instance from validated data (without saving yet)
+            # Create and save the breakdown instance
             breakdown_instance = Breakdown(**serializer.validated_data)
-            
-            # Assign the fetched instances to the foreign key fields
             breakdown_instance.vehicle = vehicle
             breakdown_instance.type = breakdown_type
-            
-            # Save the instance to the database
+            breakdown_instance.driver=driver
             breakdown_instance.save()
             
-            # Re-serialize the saved object to return the updated data
-            response_serializer = BreakdownSerializer(breakdown_instance)
+            # Prepare the email body using HTML template
+            email_body = render_to_string('breakdown_alert_email.html', {
+                'vehicle': breakdown_instance.vehicle,
+                'Breakdown_Type': breakdown_instance.type,
+                'Description': breakdown_instance.description,
+                'date_time': breakdown_instance.date_time,
+                'audio': breakdown_instance.audio,
+                'image1': breakdown_instance.image1,
+                'image2': breakdown_instance.image2,
+                'image3': breakdown_instance.image3,
+                'image4': breakdown_instance.image4,
+            })
             
-            # Return the serialized data in the response
-            return Response("Request Submited Success", status=status.HTTP_201_CREATED)
-        
-        # If the serializer is not valid, return validation errors
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            # Configure the email
+            email_message = EmailMessage(
+                subject="Notification - Breakdown Alert",
+                body=email_body,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=['prameshwar4378@gmail.com'],  # Replace with the appropriate recipient email
+            )
 
+            # Set the email content type to HTML
+            email_message.content_subtype = 'html'
+
+            # Attach images if they exist
+            if breakdown_instance.image1:
+                email_message.attach(
+                    os.path.basename(breakdown_instance.image1.name),  # Get the file name
+                    breakdown_instance.image1.read(),  # Read the image file content
+                    breakdown_instance.image1.url  # The content type of the file
+                )
+            if breakdown_instance.image2:
+                email_message.attach(
+                    os.path.basename(breakdown_instance.image2.name),
+                    breakdown_instance.image2.read(),
+                    breakdown_instance.image2.url
+                )
+            if breakdown_instance.image3:
+                email_message.attach(
+                    os.path.basename(breakdown_instance.image3.name),
+                    breakdown_instance.image3.read(),
+                    breakdown_instance.image3.url
+                )
+            if breakdown_instance.image4:
+                email_message.attach(
+                    os.path.basename(breakdown_instance.image4.name),
+                    breakdown_instance.image4.read(),
+                    breakdown_instance.image4.url
+                )
+            if breakdown_instance.audio:
+                email_message.attach(
+                    os.path.basename(breakdown_instance.audio.name),
+                    breakdown_instance.audio.read(),
+                    breakdown_instance.audio.url
+                )
+             
+            # Print to confirm
+            print("Email body prepared, attaching files...")
+
+            # Send the email in a background thread to avoid blocking the request
+            email_thread = threading.Thread(target=send_email_in_background, args=(email_message,))
+            email_thread.start()
+
+            return Response({"message": "Breakdown alert sent!"}, status=status.HTTP_201_CREATED)
+        
 
 
 @api_view(['GET'])
@@ -248,7 +365,7 @@ def get_driver_allocation_history(request):
     if not user.user.is_driver: 
         return Response({"detail": "Not Valid Token For Driver."}, status=status.HTTP_400_BAD_REQUEST)
     
-    allocations = AllocateDriverToVehicle.objects.filter(is_active=True,driver__user=user.user)
+    allocations = AllocateDriverToVehicle.objects.filter(driver__user=user.user).order_by('-id')
     
     # Create a list to store the result
     allocation_history = []

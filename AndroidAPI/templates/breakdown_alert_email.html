@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breakdown Alert</title>
+    <style>
+        body {
+            background-color: #f4f7fc;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding-top: 30px;
+        }
+
+        .header-title {
+            text-align: center;
+            color: #dc3545;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            border-radius: 15px;
+            margin-top: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: white;
+        }
+
+        .card-header {
+            background-color: #dc3545;
+            color: white;
+            border-radius: 15px 15px 0 0;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .card-body {
+            padding: 30px;
+            background-color: rgb(255, 225, 225);
+        }
+
+        .detail-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .detail-row div {
+            width: 45%;
+        }
+
+        .btn-primary {
+            background-color: #dc3545;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .btn-primary:hover {
+            background-color: #c82333;
+        }
+
+        .audio-player {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .img-fluid {
+            margin-top: 10px;
+            border-radius: 10px;
+        }
+
+        .image-gallery {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .image-gallery img {
+            max-width: 45%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+            }
+
+            .header-title {
+                font-size: 1.5rem;
+            }
+
+            .detail-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .detail-row div {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .card-body {
+                padding: 20px;
+            }
+
+            .btn-primary {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-title {
+                font-size: 1.2rem;
+            }
+        }
+
+
+        /* Button style for More Details link */
+.btn-more-details {
+    display: inline-block;
+    background-color: #04b60d;  /* Red background */
+    color: white;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-more-details:hover {
+    background-color: #0e9c0e;  /* Darker red */
+    transform: scale(1.05);  /* Slightly enlarge on hover */
+}
+
+.btn-more-details:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgb(3, 80, 9);  /* Focus effect */
+}
+
+.btn-more-details:active {
+    background-color: #21bd2e;  /* Even darker red when clicked */
+    transform: scale(0.98);  /* Slight shrink effect on click */
+}
+
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1 class="header-title">Breakdown Alert <br> {{ current_datetime }}</h1>
+
+        <div class="card">
+            <div class="card-header">
+                <h4>Breakdown Details</h4>
+            </div>
+            <div class="card-body">
+                <div class="detail-row">
+                    <div class="detail-title">Vehicle:</div>
+                    <div>{{ vehicle.vehicle_number }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-title">Driver:</div>
+                    <div>{{ driver.driver_name }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-title">Type:</div>
+                    <div>{{ Breakdown_Type }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-title">Description:</div>
+                    <div>{{ Description }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-title">Date & Time:</div>
+                    <div>{{ date_time }}</div>
+                </div>
+                
+<center>
+    <a href="#" class="btn-more-details">More Details</a>
+
+</center>
+                <!-- Add more content like audio or images as needed -->
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

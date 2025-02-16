@@ -447,6 +447,7 @@ class BreakdownType(models.Model):
       
 class Breakdown(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name="breakdown_vehicle", null=True, blank=True)
+    driver = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name="breakdown_driver", null=True, blank=True)
     type = models.ForeignKey(BreakdownType, on_delete=models.CASCADE, related_name="breakdown_type", null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     date_time = models.DateTimeField(auto_now_add=True)
