@@ -50,23 +50,24 @@ def login(request):
 
         allocated_vehicle=AllocateDriverToVehicle.objects.filter(driver=driver,is_active=True).last()
 
-        allocated_vehicle_data=[]
 
         if allocated_vehicle:
-            allocated_vehicle_data.append(
-                {
+            allocated_vehicle_data = {
                     'vehicle_number':allocated_vehicle.vehicle.vehicle_number,
+                    'vehicle_name':allocated_vehicle.vehicle.model_name.model_name,
                     'vehicle_id':allocated_vehicle.vehicle.id,
                     "joining_date_time": allocated_vehicle.joining_date_time,
-
                  }
-                )
+        else:
+            allocated_vehicle_data = None
+                
 
         name=f'{driver.driver_name}'
 
         response_data = {
             'token': token.key,
             'role': role,
+            # "driver_id": driver.id,
             'name':name, 
             'emp_id':custom_user.emp_id.emp_id,
             'user_id':custom_user.id,
@@ -180,7 +181,8 @@ def allocate_driver_to_vehicle(request):
         response_data = {
             "vehicle_id": vehicle.id,
             "vehicle_number": vehicle.vehicle_number,
-            "driver_name": allocation.driver.driver_name,
+            "vehicle_name": vehicle.model_name.model_name,
+            "joining_date_time": allocation.joining_date_time,
             "is_active": allocation.is_active
         }
 
@@ -253,17 +255,22 @@ def create_breakdown(request):
         # Directly access data from the request
         vehicle_id = request.data.get('vehicle_id')
         breakdown_type_id = request.data.get('type')
-
-        # Retrieve the user associated with the token
-        token=request.data.get('token')
-        user = get_object_or_404(Token, key=token)
-        driver=Driver.objects.filter(user=user).last()
-
-        if not token: 
-            return Response({"Required": "Token is required."}, status=status.HTTP_400_BAD_REQUEST)
         
-        if not user.user.is_driver: 
-            return Response({"detail": "Only Driver can generate breakdown alert."}, status=status.HTTP_400_BAD_REQUEST)
+        # Retrieve the user associated with the token
+        token = request.data.get('token')
+        
+        if not token: 
+            return Response({"error": "Token is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = Token.objects.get(key=token)
+        except Token.DoesNotExist:
+            return Response({"error": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
+
+        custom_user = CustomUser.objects.filter(id=user.user_id).last()
+
+        if not custom_user or not custom_user.is_driver: 
+            return Response({"error": "Only drivers can generate breakdown alerts."}, status=status.HTTP_400_BAD_REQUEST)
                  
         # Initialize the serializer with incoming data
         serializer = BreakdownSerializer(data=request.data)
@@ -281,7 +288,7 @@ def create_breakdown(request):
             breakdown_instance = Breakdown(**serializer.validated_data)
             breakdown_instance.vehicle = vehicle
             breakdown_instance.type = breakdown_type
-            breakdown_instance.driver=driver
+            breakdown_instance.driver=Driver.objects.get(user=custom_user.id)
             breakdown_instance.save()
             
             # Prepare the email body using HTML template
@@ -290,11 +297,7 @@ def create_breakdown(request):
                 'Breakdown_Type': breakdown_instance.type,
                 'Description': breakdown_instance.description,
                 'date_time': breakdown_instance.date_time,
-                'audio': breakdown_instance.audio,
-                'image1': breakdown_instance.image1,
-                'image2': breakdown_instance.image2,
-                'image3': breakdown_instance.image3,
-                'image4': breakdown_instance.image4,
+                'driver': breakdown_instance.driver, 
             })
             
             # Configure the email
@@ -309,47 +312,26 @@ def create_breakdown(request):
             email_message.content_subtype = 'html'
 
             # Attach images if they exist
-            if breakdown_instance.image1:
-                email_message.attach(
-                    os.path.basename(breakdown_instance.image1.name),  # Get the file name
-                    breakdown_instance.image1.read(),  # Read the image file content
-                    breakdown_instance.image1.url  # The content type of the file
-                )
-            if breakdown_instance.image2:
-                email_message.attach(
-                    os.path.basename(breakdown_instance.image2.name),
-                    breakdown_instance.image2.read(),
-                    breakdown_instance.image2.url
-                )
-            if breakdown_instance.image3:
-                email_message.attach(
-                    os.path.basename(breakdown_instance.image3.name),
-                    breakdown_instance.image3.read(),
-                    breakdown_instance.image3.url
-                )
-            if breakdown_instance.image4:
-                email_message.attach(
-                    os.path.basename(breakdown_instance.image4.name),
-                    breakdown_instance.image4.read(),
-                    breakdown_instance.image4.url
-                )
-            if breakdown_instance.audio:
-                email_message.attach(
-                    os.path.basename(breakdown_instance.audio.name),
-                    breakdown_instance.audio.read(),
-                    breakdown_instance.audio.url
-                )
-             
-            # Print to confirm
+            for image_field in ['image1', 'image2', 'image3', 'image4', 'audio']:
+                file = getattr(breakdown_instance, image_field)
+                if file:
+                    email_message.attach(
+                        os.path.basename(file.name),
+                        file.read(),
+                        file.url
+                    )
+            
             print("Email body prepared, attaching files...")
 
-            # Send the email in a background thread to avoid blocking the request
+            # Send the email in a background thread
             email_thread = threading.Thread(target=send_email_in_background, args=(email_message,))
             email_thread.start()
 
             return Response({"message": "Breakdown alert sent!"}, status=status.HTTP_201_CREATED)
         
-
+        # **Fix: Return validation errors if serializer is not valid**
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
 @api_view(['GET'])
 def get_driver_allocation_history(request):
