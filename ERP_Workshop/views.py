@@ -243,18 +243,19 @@ def maintenance_logs(request):
 def maintenance_schedule(request):
     return render(request, "workshop_maintenance_schedule.html")
 
+
 @workshop_required
 def product_list(request):
-    # products = Product.objects.all().delete()
     form = ProductForm()
-    # products = cache.get('cache_products')
-    products = Product.objects.select_related("model").order_by("-id")
-
-    # if not products: 
-    #     products = list(Product.objects.all().order_by('-id').values())
-    #     cache.set('cache_products', products, timeout=None)
-    
-    return render(request, "workshop_product_list.html", {'form': form, 'product': products})
+    queryset = Product.objects.select_related("model").order_by("-id")
+    filter = ProductFilter(request.GET, queryset=queryset)
+    filtered_rec = filter.qs  # Filtered queryset
+     
+    return render(request, "workshop_product_list.html", {
+        'form': form,
+        'product': filtered_rec,  # Pass the paginated object to the template
+        'filter': filter,  # Pass the filter object for displaying the form
+    })
 
 
 def create_product(request):

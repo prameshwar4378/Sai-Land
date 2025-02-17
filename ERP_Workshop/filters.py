@@ -91,3 +91,31 @@ class PurchaseFilter(django_filters.FilterSet):
         model = Purchase
         fields = ['start_date', 'end_date', 'amount_less_than', 'amount_greater_than', 'bill_type', 'bill_no']
 
+
+
+ 
+class ProductFilter(django_filters.FilterSet):
+    product_code = django_filters.CharFilter(field_name='product_code', lookup_expr='icontains', label='Product Code')
+    product_name = django_filters.CharFilter(field_name='product_name', lookup_expr='icontains', label='Product Name')
+    model = django_filters.ModelChoiceFilter(queryset=VehicleModel.objects.all(), label='Model')
+
+    # For filtering stock
+    minimum_stock_alert = django_filters.ChoiceFilter(
+        choices=[('1', 'Less than Minimum Stock Alert'), ('2', 'Out of Stock'), ('3', 'Available Stock')], 
+        label='Stock Status',
+        method='filter_stock'
+    )
+
+    class Meta:
+        model = Product
+        fields = ['product_code', 'product_name', 'model', 'minimum_stock_alert']
+
+    def filter_stock(self, queryset, name, value):
+        if value == '1':  # Less than Minimum Stock Alert
+            return queryset.filter(available_stock__lt=models.F('minimum_stock_alert'))
+        elif value == '2':  # Out of Stock
+            return queryset.filter(available_stock__lt=1)
+        elif value == '3':  # Available Stock > Minimum Stock Alert
+            return queryset.filter(available_stock__gt=models.F('minimum_stock_alert'))
+        return queryset
+

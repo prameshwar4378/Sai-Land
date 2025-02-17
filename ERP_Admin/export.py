@@ -5,6 +5,7 @@ from .models import CustomUser, Vehicle, Driver, Technician, Party, Product, Pur
 from .filters import *
 from openpyxl.styles import Font 
 from datetime import date
+from ERP_Workshop.filters import *
 
 
 from django.utils.timezone import localtime
@@ -108,6 +109,8 @@ def export_purchase_data(request):
 def export_product_data(request):
     # Fetch all products or apply filters if needed
     queryset = Product.objects.all().order_by('id')
+    filter = ProductFilter(request.GET, queryset=queryset)
+    filtered_data = filter.qs  # Filtered queryset
 
     # Create a new Workbook and add a sheet
     wb = openpyxl.Workbook()
@@ -122,7 +125,7 @@ def export_product_data(request):
     ws.append(headers)
 
     # Add data rows to the Excel sheet for each product
-    for product in queryset:
+    for product in filtered_data:
         row = [
             product.product_code,
             product.product_name,
