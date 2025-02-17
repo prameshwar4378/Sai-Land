@@ -28053,3 +28053,14 @@ Quit the server with CONTROL-C.
 [17/Feb/2025 19:36:55] "GET /workshop/dashboard/ HTTP/1.0" 200 587324
 [17/Feb/2025 19:37:40] "GET / HTTP/1.0" 200 33569
 [17/Feb/2025 19:37:44] "GET / HTTP/1.0" 200 33569
+[17/Feb/2025 19:40:06] "GET /workshop/dashboard/assets/img/favicon.png HTTP/1.0" 404 2512
+[17/Feb/2025 19:44:52] "GET /login/ HTTP/1.0" 200 17326
+[17/Feb/2025 19:44:52] "GET /login/assets/css/style-with-prefix.css HTTP/1.0" 404 2512
+[17/Feb/2025 19:44:52] "GET /images/cover.png HTTP/1.0" 404 2512
+[17/Feb/2025 19:58:03] "GET / HTTP/1.0" 200 33569
+[17/Feb/2025 20:00:37] "GET / HTTP/1.1" 200 33569
+[17/Feb/2025 20:00:51] "GET /favicon.ico HTTP/1.1" 404 2512
+[17/Feb/2025 20:00:59] "GET http://api.ipify.org/?format=json HTTP/1.1" 400 143
+[17/Feb/2025 20:01:01] "CONNECT www.shadowserver.org:443 HTTP/1.1" 400 143
+[17/Feb/2025 20:02:35] code 400, message Bad request version ('À\x14À')
+[17/Feb/2025 20:02:35] You're accessing the development server over HTTPS, but it only supports HTTP.
