@@ -14009,6 +14009,7 @@
         <div id="loader"></div>
     </div>
 <!-- ======= Header ======= -->
+<!-- ======= Header ======= -->
 <header id="header" class="header fixed-top d-flex align-items-center">
 
     <div class="d-flex align-items-center justify-content-between">
@@ -14019,21 +14020,26 @@
         <i class="bi bi-list toggle-sidebar-btn"></i>
     </div><!-- End Logo -->
 
+    <!-- Add "Sai Land Developers" text visible only on medium screens and larger -->
+    <div class="header-title ms-4 d-none d-md-block">
+        <center><span class="h4" style="color: #ee4f00"><b>Sai Land Developers</b></span></center>
+    </div><!-- End Company Title -->
 
     <nav class="header-nav ms-auto">
         <ul class="d-flex align-items-center">
-            <li class="nav-item dropdown pe-3 text-center  ">
-
+            <li class="nav-item dropdown pe-3 text-center">
+                
                 <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-           
+                    
                     {% if request.user.profile_photo %}
+                    test
                     <img src="/media/{{request.user.profile_photo}}" alt="Profile" class="rounded-circle" style="width: 40px; height: 40px;">
                     {% else %}
                     <img src="/media/default-profile.webp" alt="Profile" class="rounded-circle"  style="width: 40px; height: 40px;">
                     {% endif %}
                     
                     <span class="d-none d-md-block dropdown-toggle ps-2">{{request.user}}</span>
-                </a><!-- End Profile Iamge Icon -->
+                </a><!-- End Profile Image Icon -->
 
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                     <li class="dropdown-header">

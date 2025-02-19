@@ -80,14 +80,7 @@
                 </div>
             </div>
             <hr>
-
-            <!-- Danger Alert -->
-            <!-- <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <strong>Warning:</strong> Deleting this record will also remove all related data and may affect other records. Please proceed with caution.
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="background: none; margin-left: 15px;">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>-->
+ 
             <div class="row">
                 <!-- Left side columns -->
                 <div class="col-lg-12">
@@ -134,6 +127,25 @@
                                     {% endif %}
                                 </tbody>
                             </table>
+
+                            
+                            <!-- Pagination controls -->
+                            <div class="pagination-container">
+                                <div class="pagination">
+                                    {% if product.has_previous %}
+                                        <a href="?page=1&{{ filter_params }}">« First</a>
+                                        <a href="?page={{ product.previous_page_number }}&{{ filter_params }}">Previous</a>
+                                    {% endif %}
+                                    
+                                    <span class="current-page">Page {{ product.number }} of {{ product.paginator.num_pages }}</span>
+
+                                    {% if product.has_next %}
+                                        <a href="?page={{ product.next_page_number }}&{{ filter_params }}">Next</a>
+                                        <a href="?page={{ product.paginator.num_pages }}&{{ filter_params }}">Last »</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>

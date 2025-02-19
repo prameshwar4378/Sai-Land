@@ -120,8 +120,6 @@ def update_party_cache_on_save(sender, instance, **kwargs):
     # Serialize the technician model data into dictionary format
     from django.forms.models import model_to_dict
     party_data = [model_to_dict(party) for party in party]
-
-
     print("Party cache updated on save")
 
 @receiver(post_delete, sender=Party)
@@ -133,6 +131,24 @@ def update_party_cache_on_delete(sender, instance, **kwargs):
         partys.append(party_data)
     cache.set('cache_technicians', partys, timeout=None)
 
+    
+@receiver(post_save, sender=Product)
+def update_product_cache_on_save(sender, instance, created, **kwargs):
+    # Retrieve all product data after save
+    products = Product.objects.select_related('model').all()
+    # Cache the IDs of all products instead of the whole queryset
+    product_ids = list(products.values_list('id', flat=True))
+    cache.set('cache_product_ids', product_ids, timeout=None)  # Store only IDs in the cache
+    print("Product cache updated on save")
+
+@receiver(post_delete, sender=Product)
+def update_product_cache_on_delete(sender, instance, **kwargs):
+    # Retrieve all product data after delete
+    products = Product.objects.select_related('model').all()
+    # Cache the IDs of all products instead of the whole queryset
+    product_ids = list(products.values_list('id', flat=True))
+    cache.set('cache_product_ids', product_ids, timeout=None)  # Store only IDs in the cache
+    print("Product cache updated on delete")
 
 def reload_all_caches(request):
     # Reload Product cache (storing all data as dictionaries)

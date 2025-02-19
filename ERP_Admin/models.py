@@ -458,7 +458,7 @@ class Breakdown(models.Model):
     image4=models.ImageField(upload_to="Breakdown_Images", max_length=None, null=True, blank=True)
     
     def __str__(self):
-        return self.type
+        return f"{self.vehicle.vehicle_number} - {self.date_time}"
 
 
 

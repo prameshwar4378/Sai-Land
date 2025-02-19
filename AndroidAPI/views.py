@@ -40,7 +40,7 @@ def login(request):
         profile_image_url = custom_user.profile_photo.url if custom_user.profile_photo else None
         name=f'{custom_user.first_name} {custom_user.last_name}'
     elif custom_user.is_fuel:
-        role='fuel'
+        role='fuel_admin'
         profile_image_url = custom_user.profile_photo.url if custom_user.profile_photo else None
         name=f'{custom_user.first_name} {custom_user.last_name}'
     elif custom_user.is_driver:

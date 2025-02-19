@@ -243,18 +243,44 @@ def maintenance_logs(request):
 def maintenance_schedule(request):
     return render(request, "workshop_maintenance_schedule.html")
 
+from django.forms.models import model_to_dict
 
 @workshop_required
 def product_list(request):
-    form = ProductForm()
-    queryset = Product.objects.select_related("model").order_by("-id")
+    # Retrieve cached product IDs (list of primary keys)
+    cached_product_ids = cache.get('cache_product_ids')
+
+    if cached_product_ids is None:
+        # If the cache is empty, fetch from the database and store in cache
+        queryset = Product.objects.select_related("model").order_by("-id")
+        cached_product_ids = list(queryset.values_list('id', flat=True))  # Cache the product IDs
+        cache.set('cache_product_ids', cached_product_ids, timeout=None)  # Store in cache indefinitely
+        print("data uploaded to cache")
+    else:
+        print("data loaded from cache")
+    
+    # Retrieve the products based on the cached IDs (rehydrate QuerySet)
+    queryset = Product.objects.filter(id__in=cached_product_ids).select_related('model').order_by("-id")
+    
+    # Now that we have the QuerySet, we will filter the list using the filter object
     filter = ProductFilter(request.GET, queryset=queryset)
-    filtered_rec = filter.qs  # Filtered queryset
-     
+    filtered_rec = filter.qs  # This works on the queryset, not just a list
+
+    # Set up pagination for the filtered data
+    paginator = Paginator(filtered_rec, 50000)  # Show 50 products per page
+    page_number = request.GET.get('page')  # Get the page number from the GET request
+    page_obj = paginator.get_page(page_number)  # Get the corresponding page object
+
+    # Include the filter parameters in the pagination context
+    filter_params = request.GET.copy()  # Copy the GET parameters
+    if 'page' in filter_params:
+        del filter_params['page']  # Remove the page parameter if it exists
+ 
     return render(request, "workshop_product_list.html", {
-        'form': form,
-        'product': filtered_rec,  # Pass the paginated object to the template
+        'form': ProductForm(),
+        'product': page_obj,  # Pass the paginated object to the template
         'filter': filter,  # Pass the filter object for displaying the form
+        'filter_params': filter_params.urlencode(),  # Pass the filter parameters for pagination
     })
 
 
