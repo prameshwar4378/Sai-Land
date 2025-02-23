@@ -93,9 +93,7 @@ def allocate_driver_detail(request, pk):
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
-
-
+ 
  
 # ✅ CREATE & LIST Breakdowns
 @api_view(['GET', 'POST'])
