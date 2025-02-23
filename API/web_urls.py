@@ -8,16 +8,16 @@ from .android_api_views import *
   
 urlpatterns = [ 
     # WEB APIS
-    path('allocations', allocate_driver_list_create, name='allocate-driver-list-create-web'),
-    path('allocations/<int:pk>', allocate_driver_detail, name='allocate-driver-detail-web'),
+    path('allocations', allocate_driver_list_create, name='api-allocate-driver-list-create-web'),
+    path('allocations/<int:pk>', allocate_driver_detail, name='api-allocate-driver-detail-web'),
 
-    path('breakdowns', breakdown_list_create, name='breakdown-list-create'),
-    path('breakdowns/<int:pk>', breakdown_detail, name='breakdown-detail'),
+    path('breakdowns', breakdown_list_create, name='api-breakdown-list-create'),
+    path('breakdowns/<int:pk>', breakdown_detail, name='api-breakdown-detail'),
 
-    path('fuel_records', fuel_record_list_create, name='fuel-record-list-create'),
-    path('fuel_records/<int:pk>', fuel_record_detail, name='fuel-record-detail'),
+    path('fuel_records', fuel_record_list_create, name='api-fuel-record-list-create'),
+    path('fuel_records/<int:pk>', fuel_record_detail, name='api-fuel-record-detail'),
 
-    path('breakdown_types', breakdown_type_list_create, name='breakdown-type-list-create'),
-    path('breakdown_types/<int:pk>', breakdown_type_detail, name='breakdown-type-detail'),
+    path('breakdown_types', breakdown_type_list_create, name='api-breakdown-type-list-create'),
+    path('breakdown_types/<int:pk>', breakdown_type_detail, name='api-breakdown-type-detail'),
  
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

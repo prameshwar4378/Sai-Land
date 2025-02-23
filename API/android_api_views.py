@@ -21,8 +21,7 @@ from django.conf import settings
 import threading
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
-
-
+ 
 @api_view(['POST'])
 def login(request):
     username = request.data.get('username')

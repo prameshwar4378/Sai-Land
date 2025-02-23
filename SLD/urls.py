@@ -43,6 +43,7 @@ urlpatterns = [
     path('api/android/', include(APIAndroidUrls)),
     path('api/web/', include(APIWebUrls)),
 
+
 ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT) 
 # if settings.DEBUG:
 #     import debug_toolbar

@@ -12,7 +12,6 @@ class BreakdownTypeSerializerAndroid(serializers.ModelSerializer):
     class Meta:
         model = BreakdownType
         fields = ['id', 'type']  # Fields you want to expose in the response
-
  
 class BreakdownSerializerAndroid(serializers.ModelSerializer):
     class Meta:
