@@ -19,8 +19,8 @@ from django.urls import path,include
 from Website import views as WebView 
 from Website import urls as WebUrls
 from ERP_Admin import urls as ERP_Admin_Urls 
-from API import web_urls as WebUrls
-from API import android_urls as AndroidUrls
+from API import web_urls as APIWebUrls
+from API import android_urls as APIAndroidUrls
 from ERP_Account import urls as ERP_Account_Urls
 from ERP_Workshop import urls as ERP_Workshop_Urls
 from ERP_Finance import urls as ERP_Finance_Urls
@@ -39,8 +39,9 @@ urlpatterns = [
     path('login/', ERP_Admin_View.login, name="login"), 
     path('logout/', ERP_Admin_View.logout, name="logout"),  
     path('delete_user/<int:id>', ERP_Admin_View.delete_user, name="delete_user"),  
-    path('api/web/', include(WebUrls)),
-    path('api/android/', include(AndroidUrls)),
+    path('web/', include(WebUrls)),
+    path('api/android/', include(APIAndroidUrls)),
+    path('api/web/', include(APIWebUrls)),
 
 ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT) 
 # if settings.DEBUG:

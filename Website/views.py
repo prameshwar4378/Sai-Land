@@ -72,9 +72,6 @@ def about_us(request):
 def material_handling(request):
     return render(request,"material-handling.html")
 
-
-
-
 def contact_us(request):
     if request.method == "POST":
         name = request.POST.get('name')
