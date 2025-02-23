@@ -5,41 +5,43 @@
 
 {% block content %}
 <style>
-    .dropdown {
-        position: relative;
-        display: inline-block;
-    }
-
-    .dropdown-content {
-        display: none;
-        position: absolute;
-        background-color: #f9f9f9;
-        min-width: 100px;
-        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-        z-index: 1;
-        border-radius: 10px;
-    }
-
-    .dropdown-content a {
-        color: black;
-        padding: 5px 10px;
-        text-decoration: none;
-        display: block;
-        text-align: left;
-    }
-
-    .dropdown-content a:hover {
-        background-color: #f1f1f1;
-    }
-
-    .dropdown:hover .dropdown-content {
-        display: block;
-    }
-
-
-
-     
-
+    .dashboard-card {
+        border: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+      }
+      .dashboard-card:hover {
+        transform: translateY(-5px);
+      }
+      .card-icon {
+        font-size: 3rem;
+        width: 4rem;
+        height: 4rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+      }
+      .card-content {
+        margin-left: 1rem;
+      }
+      .bg-warning-light {
+        background-color: rgba(255, 193, 7, 0.1);
+      }
+      .bg-success-light {
+        background-color: rgba(25, 135, 84, 0.1);
+      }
+      .bg-info-light {
+        background-color: rgba(13, 202, 240, 0.1);
+      }
+      .bg-primary-light {
+        background-color: rgba(13, 110, 253, 0.1);
+      }
+  
+       
 </style>
 <main id="main" class="main">
 
@@ -82,8 +84,55 @@
             <hr>
  
             <div class="row">
+                <div class="row justify-content-center align-items-center">
+                    <div class="col-sm-12"> <br><br>
+                        <div class="row g-4">
+                            <!-- Total Bills -->
+                            <div class="col-lg-4 col-md-12">
+                                <div class="dashboard-card bg-danger-light">
+                                    <div class="card-icon bg-danger text-white">
+                                        <!-- Perfect icon for bills -->
+                                        <i class="bi bi-file-earmark-text-fill"></i>
+                                    </div>
+                                    <div class="card-content">
+                                        <h5 class="card-title">Out Off Stock</h5>
+                                        <p class="card-text fs-4">{{ out_of_stock }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-12">
+                                <div class="dashboard-card bg-warning-light">
+                                    <div class="card-icon bg-warning text-white">
+                                        <!-- Perfect icon for bills -->
+                                        <i class="bi bi-file-earmark-text-fill"></i>
+                                    </div>
+                                    <div class="card-content">
+                                        <h5 class="card-title">Minimum Stock Alert</h5>
+                                        <p class="card-text fs-4">{{ minimum_stock_count  }}</p>
+                                    </div>
+                                </div>
+                            </div>
+ 
+                            <!-- Total Amount -->
+                            <div class="col-lg-4 col-md-12">
+                                <div class="dashboard-card bg-success-light">
+                                    <div class="card-icon bg-success text-white">
+                                        ₹
+                                    </div>
+                                    <div class="card-content">
+                                        <h5 class="card-title">Total Stock</h5>
+                                        <p class="card-text fs-4">{{ total_available_stock }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+            </div>
+ 
                 <!-- Left side columns -->
-                <div class="col-lg-12">
+                <div class="col-lg-12 mt-3">
                     <div class="row">
                         <div class="container" style=" overflow:scroll;">
                             <table id="product_table" class="table table-striped "
@@ -262,7 +311,7 @@ aria-hidden="true">
             </div>
             <div class="modal-body text-left">
                 <div class="alert alert-danger d-none" id="createVehicleError"></div>
-                <form id="createVehicleForm" method="POST" enctype="multipart/form-data" action="{% url 'workshop_create_product' %}">
+                <form id="createProductForm" method="POST" enctype="multipart/form-data" action="{% url 'workshop_create_product' %}">
                     {% csrf_token %}
                     <div class="row">
                          <div class="col-sm-6">
@@ -448,17 +497,9 @@ aria-hidden="true">
   $("#id_model").selectize();
  }); 
 </script>
-
-<script>
-    $(document).ready(function () {
-        $('#product_table').DataTable({
-            "scrollX": true // If you want horizontal scrolling
-        });
-    }); 
-</script>
  
 <script>
-document.getElementById('createVehicleForm').addEventListener('submit', function (e) {
+document.getElementById('createProductForm').addEventListener('submit', function (e) {
     e.preventDefault();
     const form = e.target;
     const formData = new FormData(form);

@@ -57,6 +57,7 @@ class ProductForm(forms.ModelForm):
         ]
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4, 'cols': 40}), 
+            'model': forms.Select(attrs={'class': 'form-control'}), 
         }
         
     def __init__(self, *args, **kwargs):

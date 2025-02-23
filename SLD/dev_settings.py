@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'ERP_Workshop',
     'ERP_Account',
     'ERP_Finance',
-    'AndroidAPI',
+    'API',
     'rest_framework',
     'rest_framework.authtoken',
     'crispy_bootstrap5',

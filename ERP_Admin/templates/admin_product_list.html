@@ -1,6 +1,7 @@
 {% extends "admin_base.html" %}
 {% block title %}Product List{% endblock title %}
 {% load crispy_forms_tags %}
+{% load static %}
 {% block content %}
 <style>
     .dashboard-card {
@@ -59,14 +60,21 @@
             <div class="col-sm-6">
                 <div class="container" style="max-width:97%;">
                     <div class="text-lg-end text-start"> 
-                        <a href="{% url "export_product_data" %}" class="btn text-light"   style="background: linear-gradient(90deg, rgb(3, 32, 0) 0%,   rgb(31, 141, 0) 100%);"><i class="bi bi-file-earmark-spreadsheet"></i> | Export</a> 
+                        
+                        <a href="#" class="btn btn-primary" data-toggle="modal"
+                            data-target="#model_create_product"><i class="mdi mdi-filter"></i> Add Product</a>
+                        <a href="#" class="btn btn-primary" data-toggle="modal"  data-target="#model_filter"><i class="mdi mdi-filter"></i> <i class="bi bi-funnel"></i> | Filter</a>
+
+                        <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#model_import_product"><i class="mdi mdi-filter"></i> Import
+                            Product</a>
+                        <a href="#" class="btn text-light"  data-toggle="modal" data-target="#model_export_product"  style="background: linear-gradient(90deg, rgb(3, 32, 0) 0%,   rgb(31, 141, 0) 100%);"><i class="bi bi-file-earmark-spreadsheet"></i> | Export</a> 
                     </div>
                 </div>
             </div>
         </div>
 
         <section class="section dashboard">
-             <div class="row justify-content-center align-items-center">
+            <div class="row justify-content-center align-items-center">
                     <div class="col-sm-12"> <br><br>
                         <div class="row g-4">
                             <!-- Total Bills -->
@@ -111,7 +119,7 @@
 
                         </div>
                     </div>
-                </div>
+            </div>
 
 
             <hr>
@@ -167,6 +175,152 @@
  
 
 
+<div class="modal fade" id="model_filter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#9c4b2e;">
+                <h4 class="modal-title text-white" id="exampleModalLongTitle">Filter Products</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left">
+                <form method="GET" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row"> 
+                        <div class="col-sm-6">
+                            {{ filter.form.product_code|as_crispy_field }}
+                        </div>
+                        
+                        <!-- Product Name Field -->
+                        <div class="col-sm-6">
+                            {{ filter.form.product_name|as_crispy_field }}
+                        </div>
+                        
+                        <!-- Model Field -->
+                        <div class="col-sm-6">
+                            {{ filter.form.model|as_crispy_field }}
+                        </div>
+                        
+                        <!-- Minimum Stock Alert Field -->
+                        <div class="col-sm-6">
+                            {{ filter.form.minimum_stock_alert|as_crispy_field }}
+                        </div>
+                         
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="model_export_product" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#9c4b2e;">
+                <h4 class="modal-title text-white" id="exampleModalLongTitle">Export Product</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left">
+                <form method="GET" enctype="multipart/form-data" action="{% url "export_product_data" %}">
+                    {% csrf_token %}
+                     <div class="row"> 
+                        <div class="col-sm-6">
+                            {{ filter.form.product_code|as_crispy_field }}
+                        </div>
+                        
+                        <!-- Product Name Field -->
+                        <div class="col-sm-6">
+                            {{ filter.form.product_name|as_crispy_field }}
+                        </div>
+                        
+                        <!-- Model Field -->
+                        <div class="col-sm-6">
+                            {{ filter.form.model|as_crispy_field }}
+                        </div>
+                        
+                        <!-- Minimum Stock Alert Field -->
+                        <div class="col-sm-6">
+                            {{ filter.form.minimum_stock_alert|as_crispy_field }}
+                        </div>
+                         
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="modal fade" id="model_create_product" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#9c4b2e;">
+                <h4 class="modal-title text-white" id="exampleModalLongTitle">Create Product</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left">
+                <div class="alert alert-danger d-none" id="createVehicleError"></div>
+                <form id="createVehicleForm" method="POST" enctype="multipart/form-data" action="{% url 'workshop_create_product' %}">
+                    {% csrf_token %}
+                    <div class="row">
+                         <div class="col-sm-6">
+                            {{ form.product_code|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6"> 
+                            <label for="id_model" class="mb-2">Model</label>
+                            {{ form.model }}
+                        </div>
+                        <div class="col-sm-12">
+                            {{ form.product_name|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-12">
+                            {{ form.description|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ form.sale_price|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ form.minimum_stock_alert|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ form.available_stock|as_crispy_field }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ form.product_image|as_crispy_field }}
+                        </div> 
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <div class="modal fade" id="model_import_product" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 800px;">
@@ -178,11 +332,18 @@
                 </button>
             </div>
             <div class="modal-body text-left">
- 
+                <!-- Note section if needed -->
+                <div class="alert alert-warning">
+                    <strong>Note:</strong> Please upload a file in CSV or Excel format containing product data. <a href="#"  data-toggle="modal" data-target="#model_data_formate">Data Formate</a>
+                </div>
                   <!-- Form for file upload -->
                 <form method="POST" enctype="multipart/form-data" action="{% url 'workshop_import_products' %}">
                     {% csrf_token %}
- 
+                    <div class="form-group">
+                        <label for="productFile" class="control-label">Select Product Import File</label>
+                        <input type="file" class="form-control" id="productFile" name="product_file" accept=".csv, .xlsx, .xls" required>
+                    </div>
+                    
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Submit</button>
@@ -193,16 +354,121 @@
     </div>
 </div>
 
- 
+
+<div class="modal fade" id="model_data_formate" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 1200px;">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#9c4b2e;">
+                <h4 class="modal-title text-white" id="exampleModalLongTitle">Data Formate</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left"> 
+                    <a href="{% static 'Excel/Import_Stock_Data_Format.xlsx' %}" download>Download Data Format</a> <br><br>
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col" class="text-center">Product Number</th>
+                            <th scope="col" class="text-center">Product Name</th>
+                            <th scope="col" class="text-center">Model Name</th>
+                            <th scope="col" class="text-center">Description</th>
+                            <th scope="col" class="text-center">Sale Price</th>
+                            <th scope="col" class="text-center">Minimum Stock Alert</th>
+                            <th scope="col" class="text-center">Available Stock</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Sample Data Rows -->
+                        <tr>
+                            <td class="text-center">ABC-123</td>
+                            <td class="text-center">Toyota Corolla</td>
+                            <td class="text-center">Sedan</td>
+                            <td class="text-center"> </td>
+                            <td class="text-center">$20,000</td>
+                            <td class="text-center">5</td>
+                            <td class="text-center">25</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">XYZ-456</td>
+                            <td class="text-center">Honda Civic</td>
+                            <td class="text-center">Sedan</td>
+                            <td class="text-center"> </td>
+                            <td class="text-center">$18,000</td>
+                            <td class="text-center">4</td>
+                            <td class="text-center">30</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">LMN-789</td>
+                            <td class="text-center">Ford Focus</td>
+                            <td class="text-center">Hatchback</td>
+                            <td class="text-center"> </td>
+                            <td class="text-center">$16,000</td>
+                            <td class="text-center">3</td>
+                            <td class="text-center">20</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">DEF-112</td>
+                            <td class="text-center">Chevrolet Malibu</td>
+                            <td class="text-center">Sedan</td>
+                            <td class="text-center"> </td>
+                            <td class="text-center">$22,000</td>
+                            <td class="text-center">6</td>
+                            <td class="text-center">15</td>
+                        </tr> 
+                    </tbody>
+                </table>
+
+                
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">Close</button>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
  
+ 
+
+
 <script>
-    $(document).ready(function () {
-        $('#product_table').DataTable({
-            "scrollX": true // If you want horizontal scrolling
+    document.getElementById('createProductForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+        const errorAlert = document.getElementById('createVehicleError');
+        
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // alert(data.message); // Show success alert// Show success alert
+                location.reload();   // Refresh the page or update the list dynamically
+            } else {
+                let errorMessage = '<strong>Error:</strong><br>';
+                for (const [field, errors] of Object.entries(data.errors)) {
+                    errorMessage += `${field}: ${errors.join(', ')}<br>`;
+                }
+                errorAlert.innerHTML = errorMessage;
+                errorAlert.classList.remove('d-none');
+            }
+        })
+        .catch(error => {
+            errorAlert.innerHTML = '<strong>An unexpected error occurred. Please try again later.</strong>';
+            errorAlert.classList.remove('d-none');
         });
-    }); 
-</script>
-  
+    });
+    
+    </script>
+    
   
 {% endblock content %}

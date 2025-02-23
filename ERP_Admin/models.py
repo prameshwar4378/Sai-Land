@@ -424,7 +424,7 @@ class Enquiry(models.Model):
 class AllocateDriverToVehicle(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name="allocated_vehicles")
     driver = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name="allocated_drivers")
-    joining_date_time = models.DateTimeField(auto_now_add=True)
+    joining_date_time = models.DateTimeField(null=True,blank=True)
     leaving_date_time = models.DateTimeField(null=True,blank=True)
     is_active = models.BooleanField(default=True)
  
@@ -436,12 +436,9 @@ class AllocateDriverToVehicle(models.Model):
         
     def __str__(self):
         return f"Driver {self.driver} assigned to Vehicle {self.vehicle}"
-    
 
-   
 class BreakdownType(models.Model):
-    type = models.CharField(max_length=100)
-    
+    type = models.CharField(max_length=100) 
     def __str__(self):
         return self.type
       
@@ -465,7 +462,7 @@ class Breakdown(models.Model):
 
 class FuelRecord(models.Model):
     vehicle = models.ForeignKey('Vehicle', on_delete=models.CASCADE)
-    driver = models.ForeignKey('Driver', on_delete=models.CASCADE)
+    driver = models.ForeignKey('Driver', on_delete=models.CASCADE,null=True,blank=True)
     fuel_amount = models.DecimalField(max_digits=10, decimal_places=2)  # Cost of fuel
     fuel_liters = models.DecimalField(max_digits=8, decimal_places=2)   # Quantity of fuel in liters
     current_km = models.PositiveIntegerField()                          # Current odometer reading

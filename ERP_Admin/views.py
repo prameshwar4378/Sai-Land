@@ -131,25 +131,7 @@ def update_party_cache_on_delete(sender, instance, **kwargs):
         partys.append(party_data)
     cache.set('cache_technicians', partys, timeout=None)
 
-    
-@receiver(post_save, sender=Product)
-def update_product_cache_on_save(sender, instance, created, **kwargs):
-    # Retrieve all product data after save
-    products = Product.objects.select_related('model').all()
-    # Cache the IDs of all products instead of the whole queryset
-    product_ids = list(products.values_list('id', flat=True))
-    cache.set('cache_product_ids', product_ids, timeout=None)  # Store only IDs in the cache
-    print("Product cache updated on save")
-
-@receiver(post_delete, sender=Product)
-def update_product_cache_on_delete(sender, instance, **kwargs):
-    # Retrieve all product data after delete
-    products = Product.objects.select_related('model').all()
-    # Cache the IDs of all products instead of the whole queryset
-    product_ids = list(products.values_list('id', flat=True))
-    cache.set('cache_product_ids', product_ids, timeout=None)  # Store only IDs in the cache
-    print("Product cache updated on delete")
-
+     
 def reload_all_caches(request):
     # Reload Product cache (storing all data as dictionaries)
     products = []
@@ -475,36 +457,33 @@ def purchase_item_list(request,id):
     return render(request, "admin_purchase_item_list.html",{'item':item,'purchase':purchase,'total_amount':total_amount})
 
 
+from ERP_Workshop.filters import ProductFilter
+from ERP_Workshop.forms import *
 
 @admin_required
-def product_list(request):
-    # Retrieve products from cache
-    products = Product.objects.select_related("model").order_by("-id")
-    # products = cache.get('cache_products')
+def product_list(request): 
+    queryset = Product.objects.select_related("model").order_by("-id")
+  
+    # Now that we have the QuerySet, we will filter the list using the filter object
+    filter = ProductFilter(request.GET, queryset=queryset)
+    filtered_rec = filter.qs  # This works on the queryset, not just a list
+
+    # Set up pagination for the filtered data
+    paginator = Paginator(filtered_rec, 20)  # Show 50 products per page
+    page_number = request.GET.get('page')  # Get the page number from the GET request
+    page_obj = paginator.get_page(page_number)  # Get the corresponding page object
+
+    # Include the filter parameters in the pagination context
+    filter_params = request.GET.copy()  # Copy the GET parameters
+    if 'page' in filter_params:
+        del filter_params['page']  # Remove the page parameter if it exists
  
-    # Variables for counts
-    out_of_stock = 0
-    minimum_stock_alert_count = 0
-    total_available_stock = 0
-
-    # if not products:
-    #     # Query all products and store in cache
-    #     products = list(Product.objects.all().order_by('-id').values())
-    #     # cache.set('cache_products', products, timeout=None)
-
-    # Perform calculations
-    out_of_stock = Product.objects.filter(available_stock__lte=0).count()  # Count products with no stock
-    minimum_stock_alert_count = Product.objects.filter(available_stock__lte=F('minimum_stock_alert')).count()  # Count products below minimum stock
-    total_available_stock = Product.objects.aggregate(total=Sum('available_stock'))['total'] or 0  # Sum of all available stock
-
-    # Context for rendering
-    context = {
-        'product': products,
-        'out_of_stock': out_of_stock,
-        'minimum_stock_alert_count': minimum_stock_alert_count,
-        'total_available_stock': total_available_stock,
-    }
-    return render(request, "admin_product_list.html", context)
+    return render(request, "admin_product_list.html", { 
+        'form': ProductForm(),
+        'product': page_obj,  # Pass the paginated object to the template
+        'filter': filter,  # Pass the filter object for displaying the form
+        'filter_params': filter_params.urlencode(),  # Pass the filter parameters for pagination
+    })
 
 
 def report(request):
