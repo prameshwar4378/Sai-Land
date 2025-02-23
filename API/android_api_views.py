@@ -243,7 +243,7 @@ def get_breakdown_type(request):
     This API returns all available breakdown types.
     """
     breakdown_types = BreakdownType.objects.all()  # Fetch all breakdown types from the database
-    serializer = BreakdownTypeSerializer(breakdown_types, many=True)  # Serialize the data
+    serializer = BreakdownTypeSerializerAndroid(breakdown_types, many=True)  # Serialize the data
     return Response(serializer.data, status=status.HTTP_200_OK)
  
 
@@ -272,7 +272,7 @@ def create_breakdown(request):
             return Response({"error": "Only drivers can generate breakdown alerts."}, status=status.HTTP_400_BAD_REQUEST)
                  
         # Initialize the serializer with incoming data
-        serializer = BreakdownSerializer(data=request.data)
+        serializer = BreakdownSerializerAndroid(data=request.data)
         
         if serializer.is_valid():
             try:

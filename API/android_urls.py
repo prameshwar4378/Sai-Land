@@ -23,9 +23,6 @@ urlpatterns = [
     path('get_last_fuel_record', get_last_fuel_record, name='api_get_last_fuel_record'), 
     path('get_fuel_history', get_fuel_history, name='api_get_fuel_history'), 
   
-
-    # WEB APIS
-    path('allocations_web', allocate_driver_list_create, name='allocate-driver-list-create-web'),
-    path('allocations_web/<int:pk>', allocate_driver_detail, name='allocate-driver-detail-web'),
-
+ 
+ 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

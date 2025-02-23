@@ -2,19 +2,19 @@ from rest_framework import serializers, filters
 from ERP_Admin.models import *
 from rest_framework.authtoken.models import Token
 
-class AllocateDriverToVehicleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AllocateDriverToVehicle
-        fields = ['vehicle']  # Include 'driver_token' as part of the input, but not as a model field
+# class AllocateDriverToVehicleSerializerAndroid(serializers.ModelSerializer):
+#     class Meta:
+#         model = AllocateDriverToVehicle
+#         fields = ['vehicle']  # Include 'driver_token' as part of the input, but not as a model field
 
  
-class BreakdownTypeSerializer(serializers.ModelSerializer):
+class BreakdownTypeSerializerAndroid(serializers.ModelSerializer):
     class Meta:
         model = BreakdownType
         fields = ['id', 'type']  # Fields you want to expose in the response
 
  
-class BreakdownSerializer(serializers.ModelSerializer):
+class BreakdownSerializerAndroid(serializers.ModelSerializer):
     class Meta:
         model = Breakdown
         fields = ['description', 'audio', 'image1', 'image2', 'image3', 'image4']
@@ -29,4 +29,20 @@ class FuelRecordSerializerAndroid(serializers.ModelSerializer):
 class AllocateDriverToVehicleSerializerWeb(serializers.ModelSerializer):
     class Meta:
         model = AllocateDriverToVehicle
+        fields = '__all__'
+
+class BreakdownSerializerWeb(serializers.ModelSerializer):
+    class Meta:
+        model = Breakdown
+        fields = '__all__'
+
+
+class FuelRecordSerializerWeb(serializers.ModelSerializer):
+    class Meta:
+        model = FuelRecord
+        fields = '__all__'
+
+class BreakdownTypeSerializerWeb(serializers.ModelSerializer):
+    class Meta:
+        model = BreakdownType
         fields = '__all__'

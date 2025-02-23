@@ -480,3 +480,4 @@ class FuelRecord(models.Model):
 
     def __str__(self):
         return f"{self.vehicle.vehicle_number} - {self.created_at}"
+    

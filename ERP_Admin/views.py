@@ -545,7 +545,8 @@ def delete_user(request, id):
  
 @admin_required
 def drivers_list(request):
-    drivers = Driver.objects.select_related('user').all()
+    drivers = Driver.objects.select_related('user').all()  
+    # Driver.objects.all().delete()
     form = DriverRegistrationForm()
     return render(request, "admin_drivers_list.html", {'form': form, 'drivers': drivers})
 
@@ -606,6 +607,7 @@ def delete_driver(request, id):
 from django.db import IntegrityError
 
 def import_drivers(request):
+    
     if request.method == "POST":
         excel_file = request.FILES.get('Driver_file')
         password = make_password('Pass@123')
