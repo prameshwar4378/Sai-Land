@@ -47,7 +47,7 @@ def login(request):
         driver=get_object_or_404(Driver,user=custom_user.id)
         profile_image_url = driver.profile_photo.url if driver.profile_photo else None
 
-        allocated_vehicle=AllocateDriverToVehicle.objects.filter(driver=driver,is_active=True).last()
+        allocated_vehicle=AllocateDriverToVehicle.objects.filter(driver=driver,is_active=True).order_by('-id').first()
 
 
         if allocated_vehicle:
@@ -145,23 +145,23 @@ def allocate_driver_to_vehicle(request):
     user_id = user.user.id
   
     # Check if the vehicle and driver exist
-    vehicle_exists = Vehicle.objects.filter(id=vehicle_id).last()
-    driver_exists = Driver.objects.filter(user=user_id).last()
+    vehicle_exists = Vehicle.objects.filter(id=vehicle_id).order_by('-id').first()
+    driver_exists = Driver.objects.filter(user=user_id).order_by('-id').first()
 
     if not vehicle_exists:
         return Response({"detail": "Vehicle does not exist."}, status=status.HTTP_400_BAD_REQUEST)
     if not driver_exists:
         return Response({"detail": "Driver does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
-    is_alredy_allocated=AllocateDriverToVehicle.objects.filter(driver=driver_exists,is_active=True).last() 
+    is_alredy_allocated=AllocateDriverToVehicle.objects.filter(driver=driver_exists,is_active=True).order_by('-id').first()
 
     if is_alredy_allocated:
         return Response({"detail": f"You are already allocated to a vehicle {vehicle_exists.vehicle_number}"}, status=status.HTTP_400_BAD_REQUEST)
 
     if vehicle_exists and driver_exists:
         # Get the actual vehicle and driver objects
-        vehicle_data=Vehicle.objects.filter(id=vehicle_id).last() 
-        allocation_data=AllocateDriverToVehicle.objects.filter(vehicle=vehicle_data,is_active=True).last() 
+        vehicle_data=Vehicle.objects.filter(id=vehicle_id).order_by('-id').first()
+        allocation_data=AllocateDriverToVehicle.objects.filter(vehicle=vehicle_data,is_active=True).order_by('-id').first()
         if allocation_data:
             return Response({"detail": f"Vehicle is already allocated to : {allocation_data.driver.driver_name} - {allocation_data.driver.user.emp_id.emp_id}"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -201,7 +201,7 @@ def leave_driver_from_vehicle(request):
 
         driver=get_object_or_404(Driver, user=user.user)
 
-        allocated_vehicle=AllocateDriverToVehicle.objects.filter(driver=driver,is_active=True).last()
+        allocated_vehicle=AllocateDriverToVehicle.objects.filter(driver=driver,is_active=True).order_by('-id').first()
 
         if not token: 
             return Response({"detail": "Token is required."}, status=status.HTTP_400_BAD_REQUEST)
@@ -265,7 +265,7 @@ def create_breakdown(request):
         except Token.DoesNotExist:
             return Response({"error": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
 
-        custom_user = CustomUser.objects.filter(id=user.user_id).last()
+        custom_user = CustomUser.objects.filter(id=user.user_id).order_by('-id').first()
 
         if not custom_user or not custom_user.is_driver: 
             return Response({"error": "Only drivers can generate breakdown alerts."}, status=status.HTTP_400_BAD_REQUEST)
@@ -385,13 +385,13 @@ def get_vehicle_or_fuel_details(request):
         
         allocation = AllocateDriverToVehicle.objects.filter(
             vehicle=vehicle, is_active=True 
-        ).last()
+        ).order_by('-id').first()
         if allocation:
             allocated_driver=allocation.driver.driver_name
         else:
             allocated_driver=""
 
-        last_fuel_rec=FuelRecord.objects.filter(vehicle=vehicle).last()
+        last_fuel_rec=FuelRecord.objects.filter(vehicle=vehicle).order_by('-id').first()
         if last_fuel_rec:
             last_fuel_data={
                 'last_km':last_fuel_rec.current_km,
@@ -424,7 +424,7 @@ def create_fuel_record(request):
         # Check if the vehicle has an active driver allocation
         allocation = AllocateDriverToVehicle.objects.filter(
             vehicle=vehicle, is_active=True 
-        ).last()
+        ).order_by('-id').first()
         if not allocation:
             return Response({"detail": "No driver allocated for this vehicle."}, status=status.HTTP_400_BAD_REQUEST)
         # Serialize the data and validate it
@@ -451,7 +451,7 @@ def get_last_fuel_record(request):
     vehicle = get_object_or_404(Vehicle, id=vehicle_id)
 
     # Fetch the last fuel record for the vehicle
-    last_record = FuelRecord.objects.filter(vehicle=vehicle).last()
+    last_record = FuelRecord.objects.filter(vehicle=vehicle).order_by('-id').first()
 
     if not last_record:
         return Response({"detail": "No fuel records found for this vehicle."}, status=status.HTTP_404_NOT_FOUND)

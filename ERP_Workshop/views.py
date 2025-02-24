@@ -247,32 +247,34 @@ from django.forms.models import model_to_dict
 
 @workshop_required
 def product_list(request): 
-    queryset = Product.objects.select_related("model").order_by("-id")
-  
-    # Now that we have the QuerySet, we will filter the list using the filter object
-    filter = ProductFilter(request.GET, queryset=queryset)
-    filtered_rec = filter.qs  # This works on the queryset, not just a list
-
-    # Set up pagination for the filtered data
-    paginator = Paginator(filtered_rec, 20)  # Show 50 products per page
-    page_number = request.GET.get('page')  # Get the page number from the GET request
-    page_obj = paginator.get_page(page_number)  # Get the corresponding page object
-
-    # Include the filter parameters in the pagination context
-    filter_params = request.GET.copy()  # Copy the GET parameters
-    if 'page' in filter_params:
-        del filter_params['page']  # Remove the page parameter if it exists
+    queryset = Product.objects.select_related("model").order_by("-id") 
     
-    out_of_stock = queryset.filter(available_stock__lte=0).count()
-    total_available_stock = queryset.filter(available_stock__te=queryset.available_stock).count()
-    out_of_stock = queryset.filter(available_stock__lte=0).count()
+    # Apply filtering
+    filter = ProductFilter(request.GET, queryset=queryset)
+    filtered_rec = filter.qs  # Apply filters to the queryset
+
+    # Pagination setup
+    paginator = Paginator(filtered_rec, 20)  # Show 20 products per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Preserve filter parameters for pagination
+    filter_params = request.GET.copy()
+    if 'page' in filter_params:
+        del filter_params['page']
+ 
+    out_of_stock_items = filtered_rec.filter(available_stock__lte=0).count()
+    available_stock_items = filtered_rec.filter(available_stock__gt=F('minimum_stock_alert')).count()  # Ensure it returns 0 if no stock exists
+    low_stock_items = filtered_rec.filter(available_stock__lte=F('minimum_stock_alert'),available_stock__gt=0).count()
 
     return render(request, "workshop_product_list.html", {
         'form': ProductForm(),
-        'product': page_obj,  # Pass the paginated object to the template
-        'filter': filter,  # Pass the filter object for displaying the form
-        'filter_params': filter_params.urlencode(),  # Pass the filter parameters for pagination
-        'out_of_stock':out_of_stock,
+        'product': page_obj,  # Changed to plural for clarity
+        'filter': filter,
+        'filter_params': filter_params.urlencode(),
+        'out_of_stock_items': out_of_stock_items,
+        'available_stock_items': available_stock_items,
+        'low_stock_items': low_stock_items,  # Now correctly calculated
     })
 
 

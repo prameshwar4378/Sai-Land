@@ -195,7 +195,7 @@ def dashboard(request):
 def vehicle_list(request):
     # Instantiate the filter form
     filter_form = VehicleFilterForFinance(request.GET or None)
-    queryset = Vehicle.objects.all()
+    queryset = Vehicle.objects.select_related('model_name').all()
 
     # Initialize filters
     start_date = filter_form.cleaned_data.get('start_date') if filter_form.is_valid() else None
@@ -278,8 +278,8 @@ def vehicle_list(request):
 def vehicle_dashboard(request,id):
     emi_form=EMIForm()
     policy_form=PolicyForm()
+    vehicle = Vehicle.objects.select_related('model_name').all() or None
 
-    vehicle = Vehicle.objects.all() or None
     vehicle = Vehicle.objects.get(id=id)
     other_dues_data=OtherDues.objects.filter(vehicle=vehicle) 
 
@@ -495,7 +495,7 @@ from datetime import date
 def emi_installments_list(request, id):
     emi = get_object_or_404(EMI, id=id)
     installments = EMI_Installment.objects.filter(emi=emi)
-    last_installment=installments.last()
+    last_installment=installments.order_by('-id').first()
     emi_amount=emi.emi_amount
     if last_installment:
         due_date=last_installment.next_due_date

@@ -33,22 +33,7 @@ def admin_required(function):
             return redirect('/login')  # Redirect to login if user is not admin or superuser
         return function(request, *args, **kwargs)
     return _wrapped_view
-
-# @receiver(post_save, sender=Product)
-# def update_cache_on_save(sender, instance, **kwargs):
-#     products = [] 
-#     for product in Product.objects.select_related('model').all().order_by('-id'):
-#         product_data = model_to_dict(product)
-#         product_data['model'] = {
-#             'model_name': product.model.model_name,   
-#         }
-#         products.append(product_data)
-#     cache.set('cache_products', products, timeout=None)
-
-# @receiver(post_delete, sender=Product)
-# def update_cache_on_delete(sender, instance, **kwargs):
-#     update_cache_on_save(sender, instance)  #  
-
+ 
 
 def send_email_in_background(email_message):
     try:
@@ -229,18 +214,19 @@ def logout(request):
     return redirect('/login')
 
 
-@admin_required
+@admin_required 
 def dashboard(request):
     today = date.today()
     thirty_days_date = today + timedelta(days=30)
     two_days_date = today + timedelta(days=2)
 
-    # Optimizing queries by reducing redundant filters
-    active_vehicles = Vehicle.objects.filter(status='active').values_list('id', flat=True)
-    
-    policy_dues = Policy.objects.filter(vehicle_id__in=active_vehicles)
-    emi_dues = EMI.objects.filter(vehicle_id__in=active_vehicles)
-    other_dues = OtherDues.objects.filter(vehicle_id__in=active_vehicles)
+    # Fetch active vehicle IDs in one optimized query
+    active_vehicle_ids = Vehicle.objects.filter(status='active').values_list('id', flat=True)
+
+    # Pre-filter dues
+    policy_dues = Policy.objects.filter(vehicle_id__in=active_vehicle_ids)
+    emi_dues = EMI.objects.filter(vehicle_id__in=active_vehicle_ids)
+    other_dues = OtherDues.objects.filter(vehicle_id__in=active_vehicle_ids)
 
     def get_due_counts(queryset, date_field, date_range):
         return queryset.filter(**{f'{date_field}__range': date_range, f'{date_field}__isnull': False}).count()
@@ -272,7 +258,7 @@ def dashboard(request):
         other_dues.filter(puc_due_date__lt=today, puc_due_date__isnull=False).count()
     ])
 
-    # Aggregate user counts
+    # Aggregate user role counts in a single query
     user_roles = CustomUser.objects.aggregate(
         admin_count=Count('id', filter=Q(is_admin=True)),
         account_count=Count('id', filter=Q(is_account=True)),
@@ -281,9 +267,12 @@ def dashboard(request):
     )
 
     user_count = sum(user_roles.values())
-    product_count = Product.objects.count()
-    vehicle_count = active_vehicles.count()
 
+    # Product & Vehicle Counts
+    product_count = Product.objects.count()
+    vehicle_count = len(active_vehicle_ids)  # Avoiding extra count query
+
+    # Aggregate job card counts
     job_card_status_counts = JobCard.objects.values('status').annotate(count=Count('id'))
     status_map = {item['status']: item['count'] for item in job_card_status_counts}
 
@@ -292,10 +281,12 @@ def dashboard(request):
     job_completed_count = status_map.get('completed', 0)
     job_total_count = sum(status_map.values())
 
-    stock = Product.objects.all()
-    total_products = stock.count()
-    low_stock = stock.filter(available_stock__lt=F('minimum_stock_alert'), available_stock__gt=0).count()
-    out_of_stock = stock.filter(available_stock__lte=0).count()
+    # Aggregate stock data
+    stock = Product.objects.aggregate(
+        total_products=Count('id'),
+        low_stock=Count('id', filter=Q(available_stock__lt=F('minimum_stock_alert'), available_stock__gt=0)),
+        out_of_stock=Count('id', filter=Q(available_stock__lte=0))
+    )
 
     context = {
         'roles': ['Admin', 'Account', 'Workshop', 'Driver'],
@@ -310,23 +301,22 @@ def dashboard(request):
         'thirty_days_counts': thirty_days_counts,
         'two_days_counts': two_days_counts,
         'expire_dues_counts': expire_dues_counts,
-        'low_stock': low_stock,
-        'out_of_stock': out_of_stock,
-        'total_products': total_products,
+        'low_stock': stock['low_stock'],
+        'out_of_stock': stock['out_of_stock'],
+        'total_products': stock['total_products'],
     }
 
     return render(request, "admin_dashboard.html", context)
 
-
-
 @admin_required
 def enquiry_list(request):
-    queryset = Enquiry.objects.all().order_by('-id') 
+    queryset = Enquiry.objects.order_by('-id')  # No need for `.all()`
+    # Apply filtering
     filter = EnquiryFilter(request.GET, queryset=queryset)
-    filtered_enquiry = filter.qs  # Filtered queryset
-    return render(request, 'admin_enquiry_list.html', {'filtered_enquiry': filtered_enquiry,'filter':filter})
+    filtered_enquiry = filter.qs
+    return render(request, 'admin_enquiry_list.html', {'filtered_enquiry': filtered_enquiry, 'filter': filter})
 
-
+ 
 def delete_enquiry(request,id):
     Enquiry.objects.get(id=id).delete()
     return redirect("/admin/enquiry_list")
@@ -344,6 +334,8 @@ def vehicle_model_list(request):
     else: 
         form = VehicleModelForm()
     return render(request, 'admin_vehicle_model_list.html', {'rec': rec,'form': form})
+ 
+
  
 def vehicle_model_update(request, id):
     model_instance = get_object_or_404(VehicleModel, id=id)
@@ -373,7 +365,7 @@ def live_status(request):
 
 @admin_required
 def job_card_list(request):
-    queryset = JobCard.objects.all().order_by('-id') 
+    queryset = JobCard.objects.order_by('-id') 
     filter = JobCardFilter(request.GET, queryset=queryset)
     filtered_job_cards = filter.qs  # Filtered queryset
     # Pagination
@@ -387,12 +379,12 @@ def job_card_list(request):
     in_progress_count=filtered_job_cards.filter(status="in_progress").count()
     completed_count=filtered_job_cards.filter(status="completed").count()
     total_count=int(pending_count)+int(in_progress_count)+int(completed_count)
+    print(queryset.count())
     if 'page' in filter_params:
         del filter_params['page']  # Remove the page parameter if it exists
     return render(request, "admin_job_card_list.html", {
         'job_card': page_obj,  # Pass the paginated object to the template
         'filter': filter,  # Pass the filter object for displaying the form
-        'filter_params': filter_params.urlencode(),  # Pass the filter parameters for pagination
         'pending_count':pending_count,
         'in_progress_count':in_progress_count,
         'completed_count':completed_count,
@@ -405,84 +397,110 @@ def job_card_list(request):
 @admin_required
 def job_card_item_list(request, id):
     job_card = get_object_or_404(JobCard, id=id)
+
+    # Fetch all job card items with an optimized query
     items = JobCardItem.objects.filter(job_card=job_card).order_by('-id')
-    total_cost = items.aggregate(Sum('total_cost'))['total_cost__sum']
-    total_cost = int(total_cost) if total_cost is not None else 0
-    labour_cost=int(job_card.labour_cost) if job_card.labour_cost is not None else 0
-    grand_total_cost=int(total_cost+labour_cost)
-   
+
+    # Aggregate total cost efficiently
+    total_cost = items.aggregate(total_cost=Sum('total_cost'))['total_cost'] or 0
+
+    # Ensure labour_cost is handled safely
+    labour_cost = job_card.labour_cost or 0
+
+    # Grand total cost calculation
+    grand_total_cost = total_cost + labour_cost
+
     return render(request, "admin_job_card_item_list.html", {
         'items': items,
         'job_card': job_card,
         'total_cost': total_cost,
-        'labour_cost':labour_cost,
-        'grand_total_cost':grand_total_cost
+        'labour_cost': labour_cost,
+        'grand_total_cost': grand_total_cost
     })
 
 
 
 @admin_required
 def purchase_list(request):
-    queryset = Purchase.objects.all().order_by('-id') 
+    queryset = Purchase.objects.order_by('-id')
     filter = PurchaseFilter(request.GET, queryset=queryset)
     filtered_purchase = filter.qs  # Filtered queryset
-    
+
+    # Compute total count and total amount before pagination (efficiently)
+    total_bill_count = filtered_purchase.count()
+    total_amount = filtered_purchase.aggregate(total_cost=Sum('total_cost'))['total_cost'] or 0.0
+
     # Pagination
-    paginator = Paginator(filtered_purchase, 20)  # Show 10 job cards per page.
+    paginator = Paginator(filtered_purchase, 20)  # Show 20 purchases per page
     page_number = request.GET.get('page')  # Get the page number from the GET request
     page_obj = paginator.get_page(page_number)  # Get the corresponding page object
-    
-    # Include the filter parameters in the pagination context
-    filter_params = request.GET.copy()  # Copy the GET parameters
-    if 'page' in filter_params:
-        del filter_params['page']  # Remove the page parameter if it exists
-    total_bill_count=filtered_purchase.count()
-    total_amount = filtered_purchase.aggregate(Sum('total_cost'))['total_cost__sum'] or 0.0
+
+    # Preserve filter parameters for pagination
+    filter_params = request.GET.copy()
+    filter_params.pop('page', None)  # Remove 'page' parameter if it exists
+
     return render(request, "admin_purchase_list.html", {
         'purchase': page_obj,  # Pass the paginated object to the template
         'filter': filter,  # Pass the filter object for displaying the form
         'filter_params': filter_params.urlencode(),  # Pass the filter parameters for pagination
-        'total_bill_count':total_bill_count,
-        'total_amount':total_amount
+        'total_bill_count': total_bill_count,
+        'total_amount': total_amount
     })
 
 
 
-@admin_required
-def purchase_item_list(request,id):
-    purchase=get_object_or_404(Purchase, id=id)
-    item=PurchaseItem.objects.filter(purchase=purchase).order_by('-id')
-    total_amount = item.aggregate(Sum('total_amount'))['total_amount__sum']
-    total_amount = int(total_amount) if total_amount is not None else 0  # In case there are no items, set total_amount to 0
-    return render(request, "admin_purchase_item_list.html",{'item':item,'purchase':purchase,'total_amount':total_amount})
 
+
+# Query optimize going on
+@admin_required
+def purchase_item_list(request, id):
+    purchase = get_object_or_404(Purchase, id=id)
+    
+    # Fetch only required fields
+    items = PurchaseItem.objects.filter(purchase=purchase).order_by('-id').only('total_amount')
+    
+    # Aggregate total amount efficiently
+    total_amount = items.aggregate(total_amount=Sum('total_amount'))['total_amount'] or 0
+
+    return render(request, "admin_purchase_item_list.html", {
+        'item': items,
+        'purchase': purchase,
+        'total_amount': int(total_amount)  # Ensure integer format
+    })
 
 from ERP_Workshop.filters import ProductFilter
 from ERP_Workshop.forms import *
 
 @admin_required
 def product_list(request): 
-    queryset = Product.objects.select_related("model").order_by("-id")
-  
-    # Now that we have the QuerySet, we will filter the list using the filter object
+    queryset = Product.objects.select_related("model").order_by("-id") 
+    
+    # Apply filtering
     filter = ProductFilter(request.GET, queryset=queryset)
-    filtered_rec = filter.qs  # This works on the queryset, not just a list
+    filtered_rec = filter.qs  # Apply filters to the queryset
 
-    # Set up pagination for the filtered data
-    paginator = Paginator(filtered_rec, 20)  # Show 50 products per page
-    page_number = request.GET.get('page')  # Get the page number from the GET request
-    page_obj = paginator.get_page(page_number)  # Get the corresponding page object
+    # Pagination setup
+    paginator = Paginator(filtered_rec, 20)  # Show 20 products per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
-    # Include the filter parameters in the pagination context
-    filter_params = request.GET.copy()  # Copy the GET parameters
+    # Preserve filter parameters for pagination
+    filter_params = request.GET.copy()
     if 'page' in filter_params:
-        del filter_params['page']  # Remove the page parameter if it exists
+        del filter_params['page']
  
-    return render(request, "admin_product_list.html", { 
+    out_of_stock_items = filtered_rec.filter(available_stock__lte=0).count()
+    available_stock_items = filtered_rec.filter(available_stock__gt=F('minimum_stock_alert')).count()  # Ensure it returns 0 if no stock exists
+    low_stock_items = filtered_rec.filter(available_stock__lte=F('minimum_stock_alert'),available_stock__gt=0).count()
+
+    return render(request, "admin_product_list.html", {
         'form': ProductForm(),
-        'product': page_obj,  # Pass the paginated object to the template
-        'filter': filter,  # Pass the filter object for displaying the form
-        'filter_params': filter_params.urlencode(),  # Pass the filter parameters for pagination
+        'product': page_obj,  # Changed to plural for clarity
+        'filter': filter,
+        'filter_params': filter_params.urlencode(),
+        'out_of_stock_items': out_of_stock_items,
+        'available_stock_items': available_stock_items,
+        'low_stock_items': low_stock_items,  # Now correctly calculated
     })
 
 
@@ -777,7 +795,7 @@ def import_vehicles(request):
                     vehicle_model, _ = VehicleModel.objects.get_or_create(model_name=model_name)
 
                     # Skip if Vehicle already exists
-                    if Vehicle.objects.filter(vehicle_number=vehicle_number).exists():
+                    if Vehicle.objects.select_related('model_name').filter(vehicle_number=vehicle_number).exists():
                         messages.warning(request, f"Vehicle with number {vehicle_number} already exists. Skipping.")
                         continue
 
@@ -940,7 +958,7 @@ def vehicle_dashboard(request):
     one_emi_amount=0
     remaining_emi_amount=0
 
-    vehicle = Vehicle.objects.filter(vehicle_number__iexact=vehicle_number).first()
+    vehicle = Vehicle.objects.select_related('model_name').filter(vehicle_number__iexact=vehicle_number).first()
     try:
         if vehicle_number:
             # Get the vehicle by its vehicle_number
@@ -1241,7 +1259,7 @@ def finance_vehicle_list(request):
 
 def finance_vehicle_dashboard(request,id): 
 
-    vehicle = Vehicle.objects.all() or None
+    vehicle = Vehicle.objects.select_related('model_name') or None
     vehicle = Vehicle.objects.get(id=id)
     other_dues_data=OtherDues.objects.filter(vehicle=vehicle) 
 

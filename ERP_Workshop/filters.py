@@ -112,7 +112,7 @@ class ProductFilter(django_filters.FilterSet):
 
     def filter_stock(self, queryset, name, value):
         if value == '1':  # Less than Minimum Stock Alert
-            return queryset.filter(available_stock__lt=models.F('minimum_stock_alert'))
+            return queryset.filter(available_stock__lt=models.F('minimum_stock_alert'),available_stock__gt=0)
         elif value == '2':  # Out of Stock
             return queryset.filter(available_stock__lt=1)
         elif value == '3':  # Available Stock > Minimum Stock Alert

@@ -24,23 +24,25 @@ def allocate_driver_list_create(request):
                 return Response({"detail": "Driver is required."}, status=status.HTTP_400_BAD_REQUEST)
         
             # Check if the vehicle and driver exist
-            vehicle_exists = Vehicle.objects.filter(id=vehicle).last()
-            driver_exists = Driver.objects.filter(id=driver).last()
+            vehicle_exists = Vehicle.objects.select_related('model_name').filter(id=vehicle).first()
+
+            driver_exists = Driver.objects.filter(id=driver).first()
 
             if not vehicle_exists:
                 return Response({"detail": "Vehicle does not exist."}, status=status.HTTP_400_BAD_REQUEST)
             if not driver_exists:
                 return Response({"detail": "Driver does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
-            is_alredy_allocated=AllocateDriverToVehicle.objects.filter(driver=driver_exists,is_active=True).last() 
+            is_alredy_allocated=AllocateDriverToVehicle.objects.filter(driver=driver_exists,is_active=True).first() 
 
             if is_alredy_allocated:
                 return Response({"detail": f"You are already allocated to a vehicle {vehicle_exists.vehicle_number}"}, status=status.HTTP_400_BAD_REQUEST)
 
             if vehicle_exists and driver_exists:
                 # Get the actual vehicle and driver objects
-                vehicle_data=Vehicle.objects.filter(id=vehicle).last() 
-                allocation_data=AllocateDriverToVehicle.objects.filter(vehicle=vehicle_data,is_active=True).last() 
+                vehicle_data=Vehicle.objects.select_related('model_name').filter(id=vehicle).order_by('-id').first() 
+                allocation_data=AllocateDriverToVehicle.objects.filter(vehicle=vehicle_data,is_active=True).order_by('-id').first() 
+                
                 if allocation_data:
                     return Response({"detail": f"Vehicle is already allocated to : {allocation_data.driver.driver_name} - {allocation_data.driver.user.emp_id.emp_id}"}, status=status.HTTP_400_BAD_REQUEST)
 

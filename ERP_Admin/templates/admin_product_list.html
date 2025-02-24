@@ -86,7 +86,7 @@
                                     </div>
                                     <div class="card-content">
                                         <h5 class="card-title">Out Off Stock</h5>
-                                        <p class="card-text fs-4">{{ out_of_stock }}</p>
+                                        <p class="card-text fs-4">{{ out_of_stock_items  }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -98,8 +98,8 @@
                                         <i class="bi bi-file-earmark-text-fill"></i>
                                     </div>
                                     <div class="card-content">
-                                        <h5 class="card-title">Minimum Stock Alert</h5>
-                                        <p class="card-text fs-4">{{ minimum_stock_alert_count  }}</p>
+                                        <h5 class="card-title">Low Stock Items</h5>
+                                        <p class="card-text fs-4">{{ low_stock_items   }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -112,7 +112,7 @@
                                     </div>
                                     <div class="card-content">
                                         <h5 class="card-title">Total Stock</h5>
-                                        <p class="card-text fs-4">{{ total_available_stock }}</p>
+                                        <p class="card-text fs-4">{{ available_stock_items  }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -138,6 +138,7 @@
                                         <th scope="col" class="text-center text-white" style="">Product Name</th>
                                         <th scope="col" class="text-center text-white" style="">Model</th>
                                         <th scope="col" class="text-center text-white" style="">Available Stock</th>
+                                        <th scope="col" class="text-center text-white" style="">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -157,13 +158,36 @@
                                             <span class="badge bg-success">{{r.available_stock}}</span>
                                             {% endif %}
                                         </td>
- 
+                                        <td class="text-center"> 
+                                            <a href="javascript:void(0);" data-url="{% url 'workshop_update_product' r.id %}" class="btn btn-warning px-2 py-2" onclick="mini_window_2(this)"><i class="bi bi-pencil-square"></i></a>
+                                        </td>
+                                        
                                     </tr>
                                     {% endfor %}
                                     {% else %}
                                     {% endif %}
                                 </tbody>
                             </table>
+
+                            
+                            
+                            <!-- Pagination controls -->
+                            <div class="pagination-container">
+                                <div class="pagination">
+                                    {% if product.has_previous %}
+                                        <a href="?page=1&{{ filter_params }}">« First</a>
+                                        <a href="?page={{ product.previous_page_number }}&{{ filter_params }}">Previous</a>
+                                    {% endif %}
+                                    
+                                    <span class="current-page">Page {{ product.number }} of {{ product.paginator.num_pages }}</span>
+
+                                    {% if product.has_next %}
+                                        <a href="?page={{ product.next_page_number }}&{{ filter_params }}">Next</a>
+                                        <a href="?page={{ product.paginator.num_pages }}&{{ filter_params }}">Last »</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -471,4 +495,38 @@ aria-hidden="true">
     </script>
     
   
+    
+<script>
+    function mini_window_1(element) { 
+        const url = element.dataset.url;
+        var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+        var newWidth = screenWidth * 0.9;  // 90% of the screen width
+        var newHeight = screenHeight * 0.9;  // 90% of the screen height
+        var left = (screenWidth - newWidth) / 2;
+        var top = (screenHeight - newHeight) / 2;
+        var windowFeatures = `width=${newWidth},height=${newHeight},scrollbars=yes,resizable=yes,top=${top},left=${left}`;
+        var newWindow = window.open(url, "miniWindow", windowFeatures);
+        newWindow.onload = function() {
+            newWindow.location.replace(url);
+        };
+    }
+
+    
+    function mini_window_2(element) { 
+        const url = element.dataset.url;
+        var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+        var newWidth = screenWidth * 0.5;  // 90% of the screen width
+        var newHeight = screenHeight * 0.8;  // 90% of the screen height
+        var left = (screenWidth - newWidth) / 2;
+        var top = (screenHeight - newHeight) / 2;
+        var windowFeatures = `width=${newWidth},height=${newHeight},scrollbars=yes,resizable=yes,top=${top},left=${left}`;
+        var newWindow = window.open(url, "miniWindow", windowFeatures);
+        newWindow.onload = function() {
+            newWindow.location.replace(url);
+        };
+    }
+</script>
+
 {% endblock content %}
