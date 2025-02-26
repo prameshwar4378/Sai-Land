@@ -23,4 +23,7 @@ urlpatterns = [
     path('get_last_fuel_record', get_last_fuel_record, name='api_get_last_fuel_record'), 
     path('get_fuel_history', get_fuel_history, name='api_get_fuel_history'), 
   
+    path('get_breakdown_list_for_workshop', get_breakdown_list_for_workshop, name='api_get_breakdown_list_for_workshop'),
+    path('get_breakdown_details_for_workshop/<int:id>', get_breakdown_details_for_workshop, name='api_get_breakdown_details_for_workshop'),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

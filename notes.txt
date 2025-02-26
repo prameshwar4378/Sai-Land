@@ -7,3 +7,18 @@ driver import need to check done hardcoded date formate
 
 Get Pass Feature Need to add 
 
+
+
+
+
+http://127.0.0.1:8000/api/android/get_vehicle_or_fuel_details?vehicle_number=10
+
+{
+    "vehicle_number": "10",
+    "vehicle_name": "SHAILESH KHUHWAHA",
+    "vehicle_id": 218,
+    "last_fuel_data": "",
+    "allocated_driver": ""
+}
+
+INSTEAD OF EMOPTY STING NEED TO SEND ENPLY OBJECT

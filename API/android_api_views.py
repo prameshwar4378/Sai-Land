@@ -389,7 +389,7 @@ def get_vehicle_or_fuel_details(request):
         if allocation:
             allocated_driver=allocation.driver.driver_name
         else:
-            allocated_driver=""
+            allocated_driver={}
 
         last_fuel_rec=FuelRecord.objects.filter(vehicle=vehicle).order_by('-id').first()
         if last_fuel_rec:
@@ -398,7 +398,7 @@ def get_vehicle_or_fuel_details(request):
                 'last_fuel_fill_date':last_fuel_rec.created_at,
             }
         else:
-            last_fuel_data=""
+            last_fuel_data={}
 
         response_data = {
             'vehicle_number': vehicle.vehicle_number,
@@ -506,3 +506,67 @@ def get_fuel_history(request):
             {"error": "An error occurred while fetching fuel history", "details": str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+
+
+
+
+
+
+
+@api_view(['GET'])
+def get_breakdown_list_for_workshop(request):
+    try:
+        # Get all breakdowns with related vehicle and driver
+        vehicles = Breakdown.objects.select_related('vehicle', 'driver').only('vehicle', 'driver', 'date_time').order_by('-id')
+        # Prepare the response data
+        response_data = []
+        for vehicle in vehicles:
+            breakdown_data = {
+                'id': vehicle.id,
+                'vehicle_number': vehicle.vehicle.vehicle_number,
+                'driver': vehicle.driver.driver_name,
+                'date_time': vehicle.date_time,
+                'is_resolved': True  # Assuming `is_resolved` is always True for now, modify as needed
+            }
+            response_data.append(breakdown_data)
+
+        return Response(response_data, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        # Catch all other exceptions
+        return Response({'error': 'An unexpected error occurred', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+@api_view(['GET'])
+def get_breakdown_details_for_workshop(request, id):
+    try:
+        # Get a specific breakdown by ID, along with related vehicle and driver
+        vehicle = Breakdown.objects.select_related('vehicle', 'driver').filter(id=id).first()
+
+        if vehicle is None:
+            return Response({'error': 'Breakdown not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Prepare the response data for a single breakdown
+        response_data = {
+            'id': vehicle.id,
+            'vehicle_number': vehicle.vehicle.vehicle_number,
+            'driver': vehicle.driver.driver_name,
+            'type': vehicle.type.type,
+            'date_time': vehicle.date_time,
+            'description': vehicle.description,
+            'image1': vehicle.image1.url if vehicle.image1 else None,
+            'image2': vehicle.image2.url if vehicle.image2 else None,
+            'image3': vehicle.image3.url if vehicle.image3 else None,
+            'image4': vehicle.image4.url if vehicle.image4 else None,
+            'audio': vehicle.audio.url if vehicle.audio else None,
+            'is_resolved': True  # Assuming 'is_resolved' is True, modify as needed
+        }
+
+        return Response(response_data, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        # Catch all other exceptions
+        return Response({'error': 'An unexpected error occurred', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+

@@ -389,7 +389,7 @@ class EMI_Item(models.Model):
 
     def __str__(self):
         return f"Installment for EMI {self.emi.id} - Amount: {self.installment_amount}"
-    
+ 
  
 class OtherDues(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE) 
@@ -405,7 +405,7 @@ class OtherDues(models.Model):
     rc_book=models.FileField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
     invoice=models.FileField(upload_to="PolicyDocuments", max_length=None, null=True, blank=True)
  
-
+ 
 
 class Enquiry(models.Model):
     name = models.CharField(max_length=100)
@@ -456,9 +456,7 @@ class Breakdown(models.Model):
     def __str__(self):
         return f"{self.vehicle.vehicle_number} - {self.date_time}"
 
-
-
-
+ 
 class FuelRecord(models.Model):
     vehicle = models.ForeignKey('Vehicle', on_delete=models.CASCADE)
     driver = models.ForeignKey('Driver', on_delete=models.CASCADE,null=True,blank=True)

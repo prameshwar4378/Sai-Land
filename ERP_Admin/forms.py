@@ -97,7 +97,16 @@ class VehicleModelForm(forms.ModelForm):
     class Meta:
         model = VehicleModel
         fields = ['model_name']
-
+        
+    def clean_model_name(self):
+            model_name = self.cleaned_data.get('model_name')
+            instance_id = self.instance.pk  # Get the primary key of the instance being updated
+            # Check if a record with the same model_name exists, excluding the current instance (if updating)
+            if VehicleModel.objects.filter(model_name__iexact=model_name).exclude(pk=instance_id).exists():
+                raise ValidationError('This model name already exists. Please choose a different name.')
+        
+            return model_name
+    
 
 class VehicleForm(forms.ModelForm):
     class Meta:

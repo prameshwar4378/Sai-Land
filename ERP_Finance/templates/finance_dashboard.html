@@ -481,17 +481,15 @@
 </div>
  
  
-        {% if expire_dues_counts.insurance_dues  %}
+        {% if expire_dues_counts  %}
         <div class="row mt-3">
             <div class="row mx-1 py-2 header-today-section">
                 <h4>Expire Dues Count</h4>
                 <hr>
-                
-                    
                     <div class="row">
                         <!-- EMI Dues Card -->
                         {% if expire_dues_counts.emi_dues %}
-                        <div class="col-sm-4">
+                        <div class="col-sm-3">
                             <div class="card radius-10 border-start border-0 border-5 border-info">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center">
@@ -511,7 +509,7 @@
                         <!-- Policy Dues Card -->
                         {% if expire_dues_counts.policy_dues %}
 
-                            <div class="col-sm-4">
+                            <div class="col-sm-3">
                                 <div class="card radius-10 border-start border-0 border-5 border-success">
                                     <div class="card-body">
                                         <div class="d-flex align-items-center">
@@ -532,7 +530,7 @@
         
                         <!-- Insurance Dues Card -->
                         {% if expire_dues_counts.insurance_dues %}
-                        <div class="col-sm-4">
+                        <div class="col-sm-3">
                             <div class="card radius-10 border-start border-0 border-5 border-danger">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center">
@@ -547,10 +545,7 @@
                                 </div>
                             </div>
                         </div>
-                        {% endif %}
-                    </div>
-        
-                    <div class="row">
+                        {% endif %} 
                         <!-- Tax Dues Card -->
                         {% if expire_dues_counts.tax_dues %}
                         <div class="col-sm-3">

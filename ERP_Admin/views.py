@@ -24,6 +24,9 @@ from django.core.paginator import Paginator
 from .filters import *
 from functools import wraps
 
+from ERP_Workshop.filters import ProductFilter
+from ERP_Workshop.forms import ProductForm
+
 def admin_required(function):
     @wraps(function)
     def _wrapped_view(request, *args, **kwargs):
@@ -324,35 +327,53 @@ def delete_enquiry(request,id):
 
 @admin_required
 def vehicle_model_list(request):
-    rec = VehicleModel.objects.all()
-    if request.method == 'POST':
-        form = VehicleModelForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Model Created Success.')
-            return redirect('/admin/vehicle_model_list')
-    else: 
+    try:
+        rec = VehicleModel.objects.all()
+        if request.method == 'POST':
+            form = VehicleModelForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Model Created Successfully.')
+                return redirect('/admin/vehicle_model_list')
+            else:
+                messages.error(request, 'Form is invalid. Please check your input.')
+        else: 
+            form = VehicleModelForm()
+    except Exception as e:
+        messages.error(request, f'An error occurred: {str(e)}')
         form = VehicleModelForm()
-    return render(request, 'admin_vehicle_model_list.html', {'rec': rec,'form': form})
- 
+        rec = []
+
+    return render(request, 'admin_vehicle_model_list.html', {'rec': rec, 'form': form})
 
  
 def vehicle_model_update(request, id):
-    model_instance = get_object_or_404(VehicleModel, id=id)
-    if request.method == 'POST':
-        form = VehicleModelForm(request.POST, instance=model_instance)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Model Updated Success.')
-    else:
-        form = VehicleModelForm(instance=model_instance)
+    try:
+        model_instance = get_object_or_404(VehicleModel, id=id)
+        if request.method == 'POST':
+            form = VehicleModelForm(request.POST, instance=model_instance)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Model updated successfully.')
+                return redirect('/admin/vehicle_model_list')  # Redirect after successful update
+            else:
+                messages.error(request, 'Form is invalid. Please check your input.')
+        else:
+            form = VehicleModelForm(instance=model_instance)
+    except Exception as e:
+        messages.error(request, f'An error occurred: {str(e)}')
+        form = None  # Prevents passing an uninitialized variable in case of an error
     return render(request, 'admin_vehicle_model_update.html', {'form': form})
 
 def vehicle_model_delete(request, id):
-    model_instance = get_object_or_404(VehicleModel, id=id)
-    model_instance.delete()
-    messages.success(request, 'Model Deleted Success.')
+    try:
+        model_instance = get_object_or_404(VehicleModel, id=id)
+        model_instance.delete()
+        messages.success(request, 'Model deleted successfully.')
+    except Exception as e:
+        messages.error(request, f'Error : {str(e)}')
     return redirect('/admin/vehicle_model_list')
+
 
 def notifications(request):
     return render(request, "admin_notifications.html")
@@ -362,53 +383,68 @@ def financial_management(request):
 
 def live_status(request):
     return render(request, "admin_live_status.html")
-
+ 
 @admin_required
 def job_card_list(request):
-    queryset = JobCard.objects.order_by('-id') 
-    filter = JobCardFilter(request.GET, queryset=queryset)
-    filtered_job_cards = filter.qs  # Filtered queryset
-    # Pagination
-    paginator = Paginator(filtered_job_cards, 20)  # Show 10 job cards per page. 
-    page_number = request.GET.get('page')  # Get the page number from the GET request
-    page_obj = paginator.get_page(page_number)  # Get the corresponding page object
-    
-    # Include the filter parameters in the pagination context
-    filter_params = request.GET.copy()  # Copy the GET parameters
-    pending_count=filtered_job_cards.filter(status="pending").count()
-    in_progress_count=filtered_job_cards.filter(status="in_progress").count()
-    completed_count=filtered_job_cards.filter(status="completed").count()
-    total_count=int(pending_count)+int(in_progress_count)+int(completed_count)
-    print(queryset.count())
-    if 'page' in filter_params:
-        del filter_params['page']  # Remove the page parameter if it exists
+    try:
+        queryset = JobCard.objects.order_by('-id') 
+        filter = JobCardFilter(request.GET, queryset=queryset)
+        filtered_job_cards = filter.qs  # Filtered queryset
+
+        # Pagination
+        paginator = Paginator(filtered_job_cards, 20)  # Show 20 job cards per page
+        page_number = request.GET.get('page')  # Get the page number from the GET request
+        page_obj = paginator.get_page(page_number)  # Get the corresponding page object
+
+        # Include the filter parameters in the pagination context
+        filter_params = request.GET.copy()  # Copy the GET parameters
+        if 'page' in filter_params:
+            del filter_params['page']  # Remove the page parameter if it exists
+
+        # Job card status counts
+        pending_count = filtered_job_cards.filter(status="pending").count()
+        in_progress_count = filtered_job_cards.filter(status="in_progress").count()
+        completed_count = filtered_job_cards.filter(status="completed").count()
+        total_count = pending_count + in_progress_count + completed_count
+
+    except Exception as e:
+        messages.error(request, f"An error occurred: {str(e)}")
+        page_obj = None  # Prevents issues if pagination fails
+        filter = None
+        pending_count = in_progress_count = completed_count = total_count = 0
+
     return render(request, "admin_job_card_list.html", {
         'job_card': page_obj,  # Pass the paginated object to the template
         'filter': filter,  # Pass the filter object for displaying the form
-        'pending_count':pending_count,
-        'in_progress_count':in_progress_count,
-        'completed_count':completed_count,
-        'total_count':total_count
-
+        'pending_count': pending_count,
+        'in_progress_count': in_progress_count,
+        'completed_count': completed_count,
+        'total_count': total_count
     })
-
 
 
 @admin_required
 def job_card_item_list(request, id):
-    job_card = get_object_or_404(JobCard, id=id)
+    try:
+        job_card = get_object_or_404(JobCard, id=id)
 
-    # Fetch all job card items with an optimized query
-    items = JobCardItem.objects.filter(job_card=job_card).order_by('-id')
+        # Fetch all job card items with an optimized query
+        items = JobCardItem.objects.filter(job_card=job_card).order_by('-id')
 
-    # Aggregate total cost efficiently
-    total_cost = items.aggregate(total_cost=Sum('total_cost'))['total_cost'] or 0
+        # Aggregate total cost efficiently
+        total_cost = items.aggregate(total_cost=Sum('total_cost'))['total_cost'] or 0
 
-    # Ensure labour_cost is handled safely
-    labour_cost = job_card.labour_cost or 0
+        # Ensure labour_cost is handled safely
+        labour_cost = job_card.labour_cost or 0
 
-    # Grand total cost calculation
-    grand_total_cost = total_cost + labour_cost
+        # Grand total cost calculation
+        grand_total_cost = total_cost + labour_cost
+
+    except Exception as e:
+        messages.error(request, f"An error occurred: {str(e)}")
+        items = []
+        total_cost = labour_cost = grand_total_cost = 0
+        job_card = None
 
     return render(request, "admin_job_card_item_list.html", {
         'items': items,
@@ -419,25 +455,32 @@ def job_card_item_list(request, id):
     })
 
 
-
 @admin_required
 def purchase_list(request):
-    queryset = Purchase.objects.order_by('-id')
-    filter = PurchaseFilter(request.GET, queryset=queryset)
-    filtered_purchase = filter.qs  # Filtered queryset
+    try:
+        queryset = Purchase.objects.order_by('-id')
+        filter = PurchaseFilter(request.GET, queryset=queryset)
+        filtered_purchase = filter.qs  # Filtered queryset
 
-    # Compute total count and total amount before pagination (efficiently)
-    total_bill_count = filtered_purchase.count()
-    total_amount = filtered_purchase.aggregate(total_cost=Sum('total_cost'))['total_cost'] or 0.0
+        # Compute total count and total amount before pagination (efficiently)
+        total_bill_count = filtered_purchase.count()
+        total_amount = filtered_purchase.aggregate(total_cost=Sum('total_cost'))['total_cost'] or 0.0
 
-    # Pagination
-    paginator = Paginator(filtered_purchase, 20)  # Show 20 purchases per page
-    page_number = request.GET.get('page')  # Get the page number from the GET request
-    page_obj = paginator.get_page(page_number)  # Get the corresponding page object
+        # Pagination
+        paginator = Paginator(filtered_purchase, 20)  # Show 20 purchases per page
+        page_number = request.GET.get('page')  # Get the page number from the GET request
+        page_obj = paginator.get_page(page_number)  # Get the corresponding page object
 
-    # Preserve filter parameters for pagination
-    filter_params = request.GET.copy()
-    filter_params.pop('page', None)  # Remove 'page' parameter if it exists
+        # Preserve filter parameters for pagination
+        filter_params = request.GET.copy()
+        filter_params.pop('page', None)  # Remove 'page' parameter if it exists
+
+    except Exception as e:
+        messages.error(request, f"An error occurred: {str(e)}")
+        page_obj = []
+        total_bill_count = 0
+        total_amount = 0.0
+        filter_params = {}
 
     return render(request, "admin_purchase_list.html", {
         'purchase': page_obj,  # Pass the paginated object to the template
@@ -447,20 +490,22 @@ def purchase_list(request):
         'total_amount': total_amount
     })
 
-
-
-
-
-# Query optimize going on
+from django.db import DatabaseError
+ 
 @admin_required
 def purchase_item_list(request, id):
-    purchase = get_object_or_404(Purchase, id=id)
-    
-    # Fetch only required fields
-    items = PurchaseItem.objects.filter(purchase=purchase).order_by('-id').only('total_amount')
-    
-    # Aggregate total amount efficiently
-    total_amount = items.aggregate(total_amount=Sum('total_amount'))['total_amount'] or 0
+    try:
+        purchase = get_object_or_404(Purchase, id=id)
+
+        # Optimize query: fetch related purchase and order results
+        items = PurchaseItem.objects.filter(purchase=purchase).order_by('-id').select_related('purchase')
+
+        # Aggregate total amount efficiently
+        total_amount = items.aggregate(total_amount=Sum('total_amount'))['total_amount'] or 0
+
+    except DatabaseError as e:  # Catch only database-related errors
+        messages.error(request, f"Database error: {str(e)}")
+        purchase, items, total_amount = None, [], 0
 
     return render(request, "admin_purchase_item_list.html", {
         'item': items,
@@ -468,39 +513,48 @@ def purchase_item_list(request, id):
         'total_amount': int(total_amount)  # Ensure integer format
     })
 
-from ERP_Workshop.filters import ProductFilter
-from ERP_Workshop.forms import *
 
 @admin_required
 def product_list(request): 
-    queryset = Product.objects.select_related("model").order_by("-id") 
-    
-    # Apply filtering
-    filter = ProductFilter(request.GET, queryset=queryset)
-    filtered_rec = filter.qs  # Apply filters to the queryset
+    try:
+        queryset = Product.objects.select_related("model").order_by("-id")
 
-    # Pagination setup
-    paginator = Paginator(filtered_rec, 20)  # Show 20 products per page
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+        # Apply filtering
+        filter = ProductFilter(request.GET, queryset=queryset)
+        filtered_rec = filter.qs  # Apply filters to the queryset
 
-    # Preserve filter parameters for pagination
-    filter_params = request.GET.copy()
-    if 'page' in filter_params:
-        del filter_params['page']
- 
-    out_of_stock_items = filtered_rec.filter(available_stock__lte=0).count()
-    available_stock_items = filtered_rec.filter(available_stock__gt=F('minimum_stock_alert')).count()  # Ensure it returns 0 if no stock exists
-    low_stock_items = filtered_rec.filter(available_stock__lte=F('minimum_stock_alert'),available_stock__gt=0).count()
+        # Pagination setup
+        paginator = Paginator(filtered_rec, 20)  # Show 20 products per page
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        # Preserve filter parameters for pagination
+        filter_params = request.GET.copy()
+        filter_params.pop('page', None)  # More efficient way to remove 'page' if it exists
+
+        # Optimize stock calculations
+        out_of_stock_items = filtered_rec.filter(available_stock__lte=0).values_list("id", flat=True).count()
+        available_stock_items = filtered_rec.filter(available_stock__gt=F('minimum_stock_alert')).values_list("id", flat=True).count()
+        low_stock_items = filtered_rec.filter(available_stock__lte=F('minimum_stock_alert'), available_stock__gt=0).values_list("id", flat=True).count()
+
+    except DatabaseError as db_err:
+        messages.error(request, f"Database error: {db_err}")
+        page_obj = []
+        out_of_stock_items = available_stock_items = low_stock_items = 0
+
+    except Exception as e:
+        messages.error(request, f"An unexpected error occurred: {e}")
+        page_obj = []
+        out_of_stock_items = available_stock_items = low_stock_items = 0
 
     return render(request, "admin_product_list.html", {
         'form': ProductForm(),
-        'product': page_obj,  # Changed to plural for clarity
+        'product': page_obj,
         'filter': filter,
         'filter_params': filter_params.urlencode(),
         'out_of_stock_items': out_of_stock_items,
         'available_stock_items': available_stock_items,
-        'low_stock_items': low_stock_items,  # Now correctly calculated
+        'low_stock_items': low_stock_items,
     })
 
 
@@ -554,12 +608,34 @@ def update_user(request, id):
         form = UserRegistrationForm(instance=user)  # Pre-populate the form with existing data for GET request
     return render(request, 'admin_update_user.html', {'form': form, 'user': user})
 
+from django.db.models import ProtectedError
 
 def delete_user(request, id):
-    user = get_object_or_404(CustomUser, id=id)
-    if user:
-        user.delete()
-        messages.success(request, 'User deleted successfully.')
+    try:
+        user = get_object_or_404(CustomUser, id=id)
+
+        # Prevent admin from deleting themselves
+        if request.user == user:
+            messages.error(request, "You cannot delete your own account.")
+            return redirect('/admin/user-management/')  # Redirect to user list or another appropriate page
+
+        if user:
+            user=user.delete() 
+            messages.success(request, "User deleted successfully.")
+    
+    except ProtectedError:
+        messages.error(request, "Cannot delete user as they have related records.")
+    
+    except IntegrityError:
+        messages.error(request, "Integrity constraint error while deleting user.")
+    
+    except DatabaseError as db_err:
+        messages.error(request, f"Database error: {db_err}")
+    
+    except Exception as e:
+        messages.error(request, f"Error: {e}")
+
+    return redirect('/admin/user-management/')  # Redirect to the user list
  
 @admin_required
 def drivers_list(request):
@@ -600,18 +676,28 @@ def create_driver(request):
 
 def update_driver(request, id):
     driver = get_object_or_404(Driver, id=id)  # Safely retrieve the Driver instance or return a 404 error
-    if request.method == 'POST':
-        form = DriverUpdateForm(request.POST, request.FILES, instance=driver)  # Populate the form with the instance data
-        if form.is_valid():
-            is_active = form.cleaned_data['is_active'] 
-            form.save()  # Save the updated driver instance
-            driver.user.is_active=is_active
-            driver.user.save()
-            messages.success(request, 'Driver Updated Successfully.')
-    else:
-        form = DriverUpdateForm(instance=driver)  # Populate the form with the existing driver data on GET request
-    
-    return render(request, 'admin_update_driver.html', {'form': form,'driver':driver})
+    try:
+        if request.method == 'POST':
+            form = DriverUpdateForm(request.POST, request.FILES, instance=driver)  # Populate the form with the instance data
+            if form.is_valid():
+                is_active = form.cleaned_data['is_active']
+                form.save()  # Save the updated driver instance
+                
+                # Update the related user object
+                driver.user.is_active = is_active
+                driver.user.save()
+
+                messages.success(request, 'Driver Updated Successfully.')
+        else:
+            form = DriverUpdateForm(instance=driver)  # Populate the form with the existing driver data on GET request
+    except IntegrityError:
+        messages.error(request, "Integrity error while updating the driver.")
+    except DatabaseError:
+        messages.error(request, "Database error occurred. Please try again.")
+    except Exception as e:
+        messages.error(request, f"An unexpected error occurred: {e}")
+
+    return render(request, 'admin_update_driver.html', {'form': form, 'driver': driver})
 
 
 def delete_driver(request, id):
@@ -762,16 +848,24 @@ def create_vehicle(request):
  
 
 def update_vehicle(request, id):
-    user = get_object_or_404(Vehicle, id=id)
-    if request.method == 'POST':
-        form = VehicleForm(request.POST, instance=user)  # Pre-populate the form with the user data
-        if form.is_valid():
-            form.save()  # Save the updated user data
-            messages.success(request, "Vehicle updated successfully.")
-    else:
-        form = VehicleForm(instance=user)  # Pre-populate the form with existing data for GET request
-    return render(request, 'admin_update_vehicle.html', {'form': form})
+    try:
+        vehicle = get_object_or_404(Vehicle, id=id)  # Safely retrieve the Vehicle instance or return a 404 error
 
+        if request.method == 'POST':
+            form = VehicleForm(request.POST, instance=vehicle)  # Populate the form with the instance data
+            if form.is_valid():
+                form.save()  # Save the updated vehicle instance
+                messages.success(request, "Vehicle updated successfully.")
+        else:
+            form = VehicleForm(instance=vehicle)  # Populate the form with existing vehicle data for GET request
+    except IntegrityError:
+        messages.error(request, "Integrity error while updating the vehicle.")
+    except DatabaseError:
+        messages.error(request, "Database error occurred. Please try again.")
+    except Exception as e:
+        messages.error(request, f"An unexpected error occurred: {e}")
+
+    return render(request, 'admin_update_vehicle.html', {'form': form})
 
 def import_vehicles(request):
     if request.method == "POST":
@@ -870,7 +964,7 @@ def create_technician(request):
 def update_technician(request, id):
     data = get_object_or_404(Technician, id=id)
     if request.method == 'POST':
-        form = TechnicianUpdateForm(request.POST, instance=data)  # Pre-populate the form with the user data
+        form = TechnicianUpdateForm(request.POST,request.FILES, instance=data)  # Pre-populate the form with the user data
         if form.is_valid():
             form.save()  # Save the updated user data
             messages.success(request, "Technician updated successfully.")
@@ -1093,34 +1187,30 @@ from datetime import date
 def finance_dashboard(request):
     today = date.today()
     thirty_days_date = today + timedelta(days=30)
-
+    active_vehicles_filter = Q(vehicle__status='active')
+    
     thirty_days_record = {
-        'policy_dues': Policy.objects.filter(due_date__range=[today, thirty_days_date], vehicle__status='active'),
-        'emi_dues': EMI.objects.filter(next_due_date__range=[today, thirty_days_date], status='pending', vehicle__status='active'),
-        'tax_dues': OtherDues.objects.filter(tax_due_date__range=[today, thirty_days_date], vehicle__status='active'),
-        'fitness_dues': OtherDues.objects.filter(fitness_due_date__range=[today, thirty_days_date], vehicle__status='active'),
-        'permit_dues': OtherDues.objects.filter(permit_due_date__range=[today, thirty_days_date], vehicle__status='active'),
-        'puc_dues': OtherDues.objects.filter(puc_due_date__range=[today, thirty_days_date], vehicle__status='active'),
+        'policy_dues': Policy.objects.filter(active_vehicles_filter, due_date__range=[today, thirty_days_date]),
+        'emi_dues': EMI.objects.filter(active_vehicles_filter, status='pending', next_due_date__range=[today, thirty_days_date]),
+        'tax_dues': OtherDues.objects.filter(active_vehicles_filter, tax_due_date__range=[today, thirty_days_date]),
+        'fitness_dues': OtherDues.objects.filter(active_vehicles_filter, fitness_due_date__range=[today, thirty_days_date]),
+        'permit_dues': OtherDues.objects.filter(active_vehicles_filter, permit_due_date__range=[today, thirty_days_date]),
+        'puc_dues': OtherDues.objects.filter(active_vehicles_filter, puc_due_date__range=[today, thirty_days_date]),
     }
- 
-    # Count the records
+
+    # Count the records efficiently using annotations
     thirty_days_counts = {
-        "policy_dues": thirty_days_record["policy_dues"].count(),
-        "emi_dues": thirty_days_record["emi_dues"].count(),
-        "tax_dues": thirty_days_record["tax_dues"].count(),
-        "fitness_dues": thirty_days_record["fitness_dues"].count(),
-        "permit_dues": thirty_days_record["permit_dues"].count(),
-        "puc_dues": thirty_days_record["puc_dues"].count(),
+        key: value.aggregate(count=Count('id'))['count'] for key, value in thirty_days_record.items()
     }
-  
-    # Count individual dues for upcoming and past
+
+    # Queries for past due dates using Q objects
     expire_dues_counts = Counter({
-        "policy_dues": Policy.objects.filter(due_date__lt=today,due_date__isnull=False,vehicle__status='active').count(),
-        "emi_dues": EMI.objects.filter(next_due_date__lt=today,next_due_date__isnull=False, status='pending', vehicle__status='active').count(),
-        "tax_dues": OtherDues.objects.filter(tax_due_date__lt=today,tax_due_date__isnull=False,vehicle__status='active').count(),
-        "fitness_dues": OtherDues.objects.filter(fitness_due_date__lt=today,fitness_due_date__isnull=False,vehicle__status='active').count(),
-        "permit_dues": OtherDues.objects.filter(permit_due_date__lt=today,permit_due_date__isnull=False,vehicle__status='active').count(),
-        "puc_dues": OtherDues.objects.filter(puc_due_date__lt=today,puc_due_date__isnull=False,vehicle__status='active').count(),
+        "policy_dues": Policy.objects.filter(active_vehicles_filter, due_date__lt=today).exclude(due_date__isnull=True).count(),
+        "emi_dues": EMI.objects.filter(active_vehicles_filter, status='pending', next_due_date__lt=today).exclude(next_due_date__isnull=True).count(),
+        "tax_dues": OtherDues.objects.filter(active_vehicles_filter, tax_due_date__lt=today).exclude(tax_due_date__isnull=True).count(),
+        "fitness_dues": OtherDues.objects.filter(active_vehicles_filter, fitness_due_date__lt=today).exclude(fitness_due_date__isnull=True).count(),
+        "permit_dues": OtherDues.objects.filter(active_vehicles_filter, permit_due_date__lt=today).exclude(permit_due_date__isnull=True).count(),
+        "puc_dues": OtherDues.objects.filter(active_vehicles_filter, puc_due_date__lt=today).exclude(puc_due_date__isnull=True).count(),
     })
 
     three_days_later = today + timedelta(days=3)
@@ -1263,7 +1353,7 @@ def finance_vehicle_dashboard(request,id):
     vehicle = Vehicle.objects.get(id=id)
     other_dues_data=OtherDues.objects.filter(vehicle=vehicle) 
 
-    other_dues=OtherDues.objects.filter(vehicle=vehicle).first() 
+    other_dues=OtherDues.objects.select_related('vehicle ').filter(vehicle=vehicle).first() 
     other_dues_id=0
     if other_dues:
         other_dues_id=other_dues.id 
@@ -1284,3 +1374,6 @@ def finance_vehicle_dashboard(request,id):
         'policy':policy, 
     }
     return render(request, 'admin_finance_vehicle_dashboard.html',context)
+
+
+

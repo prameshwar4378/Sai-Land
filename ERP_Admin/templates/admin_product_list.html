@@ -303,8 +303,8 @@ aria-hidden="true">
                 </button>
             </div>
             <div class="modal-body text-left">
-                <div class="alert alert-danger d-none" id="createVehicleError"></div>
-                <form id="createVehicleForm" method="POST" enctype="multipart/form-data" action="{% url 'workshop_create_product' %}">
+                <div class="alert alert-danger d-none" id="createProductError"></div>
+                <form id="createProductForm" method="POST" enctype="multipart/form-data" action="{% url 'workshop_create_product' %}">
                     {% csrf_token %}
                     <div class="row">
                          <div class="col-sm-6">
@@ -463,7 +463,7 @@ aria-hidden="true">
         e.preventDefault();
         const form = e.target;
         const formData = new FormData(form);
-        const errorAlert = document.getElementById('createVehicleError');
+        const errorAlert = document.getElementById('createProductError');
         
         fetch(form.action, {
             method: 'POST',

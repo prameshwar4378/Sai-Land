@@ -31,17 +31,24 @@ class AllocateDriverToVehicleSerializerWeb(serializers.ModelSerializer):
         fields = '__all__'
 
 class BreakdownSerializerWeb(serializers.ModelSerializer):
+    driver_name = serializers.CharField(source='driver.driver_name', read_only=True)
+    vehicle_number = serializers.CharField(source='vehicle.vehicle_number', read_only=True)
+
     class Meta:
         model = Breakdown
         fields = '__all__'
 
 
 class FuelRecordSerializerWeb(serializers.ModelSerializer):
+    driver_name = serializers.CharField(source='driver.driver_name', read_only=True)
+    vehicle_number = serializers.CharField(source='vehicle.vehicle_number', read_only=True)
+
     class Meta:
         model = FuelRecord
         fields = '__all__'
 
 class BreakdownTypeSerializerWeb(serializers.ModelSerializer):
+
     class Meta:
         model = BreakdownType
         fields = '__all__'
