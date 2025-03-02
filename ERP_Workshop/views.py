@@ -35,19 +35,87 @@ def dashboard(request):
     # Count of Completed Job Cards (Job cards where status is 'completed')
     completed_job_card_count = JobCard.objects.filter(status='completed').count()
 
+    breakdown=Breakdown.objects.filter(is_resolved=True)
     # Pass data to the template
     context = {
         'out_of_stock_count': out_of_stock_count,
         'running_job_cards_count': running_job_cards_count,
         'completed_job_card_count': completed_job_card_count,
         'total_products':total_products,
+        'breakdown':breakdown
     }
     return render(request, "workshop_dashboard.html", context)
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-def breakdown_alerts(request):
-    return render(request, "workshop_breakdown_alerts.html")
+def breakdown_list(request): 
+    queryset = Breakdown.objects.select_related('vehicle', 'driver', 'type').order_by('is_resolved') 
+    filter = BreakdownFilter(request.GET, queryset=queryset)
+    filtered_rec = filter.qs  # Filtered queryset
+    # Pagination setup
+    paginator = Paginator(filtered_rec, 20)  # Show 20 records per page
+    page_number = request.GET.get('page')  # Get the page number from the GET request
+    try:
+        page_obj = paginator.get_page(page_number)  # Get the corresponding page object
+    except PageNotAnInteger:
+        page_obj = paginator.get_page(1)  # Default to the first page
+    except EmptyPage:
+        page_obj = paginator.get_page(paginator.num_pages)  # If page is out of range, show last page
+    
+    # Include the filter parameters in the pagination context
+    filter_params = request.GET.copy()
+    if 'page' in filter_params:
+        del filter_params['page']  # Remove the page parameter if it exists
 
+    context = {
+        'breakdown': page_obj,  # Pass the paginated object to the template
+        'filter': filter,  # Pass the filter object for displaying the form
+        'filter_params': filter_params.urlencode(),  # Pass the filter parameters for pagination
+    }
+    return render(request, "workshop_breakdown_list.html", context)
+
+ 
+def delete_breakdown(request, id):
+    item = get_object_or_404(Breakdown, id=id)
+    if item:
+        item.delete()
+        messages.success(request, 'Record deleted successfully.')
+    return redirect(f'/workshop/breakdown_list')
+
+
+
+def update_breakdown_status(request, id):
+    item = get_object_or_404(Breakdown, id=id)
+    if item.is_resolved==True:
+        item.is_resolved=False
+        item.save()
+    else:
+        item.is_resolved=True
+        item.save()
+    return redirect(f'/workshop/breakdown_list')
+
+ 
+def get_breakdown_details(request):
+    id = request.GET.get('id')  
+    if id:
+        breakdown = get_object_or_404(Breakdown, id=id)
+        data = {        
+            'id': breakdown.id,
+            'vehicle': breakdown.vehicle.vehicle_number if breakdown.vehicle else None,
+            'driver': breakdown.driver.driver_name if breakdown.driver else None,
+            'type': breakdown.type.type if breakdown.type else None,
+            'description': breakdown.description,
+            'date_time': breakdown.date_time.strftime('%Y-%m-%d %H:%M:%S'),  # Format DateTime
+            'audio': breakdown.audio.url if breakdown.audio else None,
+            'image1': breakdown.image1.url if breakdown.image1 else None,
+            'image2': breakdown.image2.url if breakdown.image2 else None,
+            'image3': breakdown.image3.url if breakdown.image3 else None,
+            'image4': breakdown.image4.url if breakdown.image4 else None,
+            'is_resolved': breakdown.is_resolved,
+        } 
+        print(data)   
+        return JsonResponse(data, safe=False)
+    return JsonResponse({'error': 'Invalid Breakdown ID'}, status=400)
 
 
 @workshop_required
@@ -74,8 +142,6 @@ def job_card_list(request):
         'filter_params': filter_params.urlencode(),  # Pass the filter parameters for pagination
     })
 
-
- 
 def create_job_card(request):
     if request.method == 'POST':
         form = JobCardForm(request.POST, request.FILES)

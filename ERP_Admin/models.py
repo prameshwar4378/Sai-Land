@@ -452,11 +452,11 @@ class Breakdown(models.Model):
     image2=models.ImageField(upload_to="Breakdown_Images", max_length=None, null=True, blank=True)
     image3=models.ImageField(upload_to="Breakdown_Images", max_length=None, null=True, blank=True)
     image4=models.ImageField(upload_to="Breakdown_Images", max_length=None, null=True, blank=True)
+    is_resolved = models.BooleanField(default=False,db_index=True)
     
     def __str__(self):
         return f"{self.vehicle.vehicle_number} - {self.date_time}"
 
- 
 class FuelRecord(models.Model):
     vehicle = models.ForeignKey('Vehicle', on_delete=models.CASCADE)
     driver = models.ForeignKey('Driver', on_delete=models.CASCADE,null=True,blank=True)

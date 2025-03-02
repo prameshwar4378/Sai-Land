@@ -55,9 +55,9 @@ def login(request):
                     'vehicle_number':allocated_vehicle.vehicle.vehicle_number,
                     'vehicle_name':allocated_vehicle.vehicle.model_name.model_name,
                     'vehicle_id':allocated_vehicle.vehicle.id,
-                    "joining_date_time": allocated_vehicle.joining_date_time,
+                    "joining_date_time": timezone.localtime(allocated_vehicle.joining_date_time).strftime('%d-%m-%Y %I:%M %p'),
                  }
-        else:
+        else: 
             allocated_vehicle_data = None
                 
 
@@ -92,6 +92,25 @@ def login(request):
 
     }
     return Response(response_data, status=status.HTTP_200_OK)
+
+
+
+@api_view(['GET']) 
+def get_vehicle_numbers(request):
+    try:
+        vehicles = Vehicle.objects.only('vehicle_number')  # Query all vehicle numbers
+        vehicle_numbers = [vehicle.vehicle_number for vehicle in vehicles]  # Extract vehicle numbers into a list
+        
+        if not vehicle_numbers:
+            return Response({'error': 'No vehicle numbers found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        response_data = {
+            'vehicle_numbers': vehicle_numbers  # Returning the list of vehicle numbers
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({'error': 'An unexpected error occurred', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET'])
@@ -182,13 +201,55 @@ def allocate_driver_to_vehicle(request):
             "vehicle_id": vehicle.id,
             "vehicle_number": vehicle.vehicle_number,
             "vehicle_name": vehicle.model_name.model_name,
-            "joining_date_time": allocation.joining_date_time,
+            "joining_date_time": timezone.localtime(now()).strftime('%d-%m-%Y %I:%M %p'),
             "is_active": allocation.is_active
         }
         return Response(response_data, status=status.HTTP_201_CREATED)
     else:
         return Response({"detail": "Something Missing"}, status=status.HTTP_400_BAD_REQUEST)
     
+
+@api_view(['GET'])
+def get_driver_allocation_history(request):
+    # Fetch all active vehicle-driver allocations
+    
+    token = request.query_params.get('token')
+    user = get_object_or_404(Token, key=token)
+
+    if not token: 
+        return Response({"detail": "Token is required."}, status=status.HTTP_400_BAD_REQUEST)
+     
+    # Check if the user is a driver
+    if not user.user.is_driver: 
+        return Response({"detail": "Not Valid Token For Driver."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    allocations = AllocateDriverToVehicle.objects.filter(driver__user=user.user).order_by('-id')
+    
+    # Create a list to store the result
+    allocation_history = []
+
+    for allocation in allocations:
+        # Calculate working hours
+        if allocation.leaving_date_time:
+            working_hours = (allocation.leaving_date_time - allocation.joining_date_time).total_seconds() / 3600
+        else:
+            # If the leaving date is not set, use the current time for the working hour calculation
+            working_hours = (timezone.now() - allocation.joining_date_time).total_seconds() / 3600
+
+        if allocation.leaving_date_time:
+            leaving_date_time=timezone.localtime(allocation.leaving_date_time).strftime('%d-%m-%Y %I:%M %p')
+        else:
+            leaving_date_time=None
+        # Prepare the data for this allocation
+        allocation_history.append({
+            'vehicle_number': allocation.vehicle.vehicle_number,  # Assuming `vehicle_number` is a field in the `Vehicle` model
+            'joining_time':  timezone.localtime(allocation.joining_date_time).strftime('%d-%m-%Y %I:%M %p'),
+            'leaving_time': leaving_date_time or "Still Active",  # Set leaving time as 'Still Active' if None
+            'working_hours': round(working_hours, 2),  # Round the working hours to 2 decimal places
+        })
+        
+    return Response(allocation_history, status=status.HTTP_200_OK)
+
 
 
 @api_view(['GET'])
@@ -294,7 +355,7 @@ def create_breakdown(request):
                 'vehicle': breakdown_instance.vehicle,
                 'Breakdown_Type': breakdown_instance.type,
                 'Description': breakdown_instance.description,
-                'date_time': breakdown_instance.date_time,
+                'date_time': timezone.localtime(breakdown_instance.date_time).strftime('%d-%m-%Y %I:%M %p'),
                 'driver': breakdown_instance.driver, 
             })
             
@@ -331,44 +392,6 @@ def create_breakdown(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
-@api_view(['GET'])
-def get_driver_allocation_history(request):
-    # Fetch all active vehicle-driver allocations
-    
-    token = request.query_params.get('token')
-    user = get_object_or_404(Token, key=token)
-
-    if not token: 
-        return Response({"detail": "Token is required."}, status=status.HTTP_400_BAD_REQUEST)
-     
-    # Check if the user is a driver
-    if not user.user.is_driver: 
-        return Response({"detail": "Not Valid Token For Driver."}, status=status.HTTP_400_BAD_REQUEST)
-    
-    allocations = AllocateDriverToVehicle.objects.filter(driver__user=user.user).order_by('-id')
-    
-    # Create a list to store the result
-    allocation_history = []
-
-    for allocation in allocations:
-        # Calculate working hours
-        if allocation.leaving_date_time:
-            working_hours = (allocation.leaving_date_time - allocation.joining_date_time).total_seconds() / 3600
-        else:
-            # If the leaving date is not set, use the current time for the working hour calculation
-            working_hours = (timezone.now() - allocation.joining_date_time).total_seconds() / 3600
-        
-        # Prepare the data for this allocation
-        allocation_history.append({
-            'vehicle_number': allocation.vehicle.vehicle_number,  # Assuming `vehicle_number` is a field in the `Vehicle` model
-            'joining_time': allocation.joining_date_time,
-            'leaving_time': allocation.leaving_date_time or "Still Active",  # Set leaving time as 'Still Active' if None
-            'working_hours': round(working_hours, 2),  # Round the working hours to 2 decimal places
-        })
-
-    return Response(allocation_history, status=status.HTTP_200_OK)
-
-
 
 
 @api_view(['GET'])
@@ -395,7 +418,7 @@ def get_vehicle_or_fuel_details(request):
         if last_fuel_rec:
             last_fuel_data={
                 'last_km':last_fuel_rec.current_km,
-                'last_fuel_fill_date':last_fuel_rec.created_at,
+                'last_fuel_fill_date': timezone.localtime(last_fuel_rec.created_at).strftime('%d-%m-%Y %I:%M %p'),
             }
         else:
             last_fuel_data={}
@@ -455,16 +478,17 @@ def get_last_fuel_record(request):
 
     if not last_record:
         return Response({"detail": "No fuel records found for this vehicle."}, status=status.HTTP_404_NOT_FOUND)
+ 
+    formatted_date = timezone.localtime(last_record.created_at).strftime('%d-%m-%Y %I:%M %p')
 
+    # Prepare the response data
     data = {
-         'last_km': last_record.current_km,
-        'last_fuel_date': last_record.created_at,
-        'last_driver_name': last_record.driver.driver_name,
-        # 'emi_id':last_record.driver.user.emp_id.emp_id 
+        'last_km': last_record.current_km,
+        'last_fuel_date': formatted_date,
+        'last_driver_name': last_record.driver.driver_name if last_record.driver else 'N/A',
     }
 
     return Response(data, status=status.HTTP_200_OK)
-
 
  
 @api_view(['GET'])
@@ -484,7 +508,7 @@ def get_fuel_history(request):
                 # Prepare the data for this fuel record
                 fuel_data_history.append({
                     'vehicle_number': f.vehicle.vehicle_number if f.vehicle else "Unknown",
-                    'fuel_fill_date': f.created_at,
+                    'fuel_fill_date':  timezone.localtime(f.created_at).strftime('%d-%m-%Y %I:%M %p'),
                     'fuel_liters': f.fuel_liters,
                     'driver': f.driver.driver_name if f.driver else "Unknown",
                 })
@@ -492,7 +516,7 @@ def get_fuel_history(request):
                 # Handle missing vehicle or driver references
                 fuel_data_history.append({
                     'vehicle_number': "Unknown",
-                    'fuel_fill_date': f.created_at,
+                    'fuel_fill_date':  timezone.localtime(f.created_at).strftime('%d-%m-%Y %I:%M %p'),
                     'fuel_liters': f.fuel_liters,
                     'driver': "Unknown",
                     'error': str(e)
@@ -518,16 +542,16 @@ def get_fuel_history(request):
 def get_breakdown_list_for_workshop(request):
     try:
         # Get all breakdowns with related vehicle and driver
-        vehicles = Breakdown.objects.select_related('vehicle', 'driver').only('vehicle', 'driver', 'date_time').order_by('-id')
+        breakdown = Breakdown.objects.select_related('vehicle', 'driver').only('vehicle', 'driver', 'date_time').order_by('is_resolved')
         # Prepare the response data
         response_data = []
-        for vehicle in vehicles:
+        for breakdown in breakdown:
             breakdown_data = {
-                'id': vehicle.id,
-                'vehicle_number': vehicle.vehicle.vehicle_number,
-                'driver': vehicle.driver.driver_name,
-                'date_time': vehicle.date_time,
-                'is_resolved': True  # Assuming `is_resolved` is always True for now, modify as needed
+                'id': breakdown.id,
+                'vehicle_number': breakdown.vehicle.vehicle_number,
+                'driver': breakdown.driver.driver_name,
+                'date_time':  timezone.localtime(breakdown.date_time).strftime('%d-%m-%Y %I:%M %p'),
+                'is_resolved': breakdown.is_resolved  # Assuming `is_resolved` is always True for now, modify as needed
             }
             response_data.append(breakdown_data)
 
@@ -554,7 +578,7 @@ def get_breakdown_details_for_workshop(request, id):
             'vehicle_number': vehicle.vehicle.vehicle_number,
             'driver': vehicle.driver.driver_name,
             'type': vehicle.type.type,
-            'date_time': vehicle.date_time,
+            'date_time':  timezone.localtime(vehicle.date_time).strftime('%d-%m-%Y %I:%M %p'),
             'description': vehicle.description,
             'image1': vehicle.image1.url if vehicle.image1 else None,
             'image2': vehicle.image2.url if vehicle.image2 else None,

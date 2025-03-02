@@ -20,4 +20,8 @@ urlpatterns = [
     path('breakdown_types', breakdown_type_list_create, name='api-breakdown-type-list-create'),
     path('breakdown_types/<int:pk>', breakdown_type_detail, name='api-breakdown-type-detail'),
  
+    path('get_drivers', get_drivers, name='api-get-drivers'),
+    path('get_vehicles', get_vehicles, name='api-get-vehicles'),
+
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

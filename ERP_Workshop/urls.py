@@ -6,8 +6,11 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('dashboard/', views.dashboard, name='workshop_dashboard'),
-    path('breakdown-alerts/', views.breakdown_alerts, name='workshop_breakdown_alerts'),
-
+    path('breakdown_list/', views.breakdown_list, name='workshop_breakdown_list'),
+    path('update_breakdown_status/<int:id>', views.update_breakdown_status, name='workshop_update_breakdown_status'),
+    path('delete_breakdown/<int:id>', views.delete_breakdown, name='workshop_delete_breakdown'),
+    path('get_breakdown_details/', views.get_breakdown_details, name='workshop_get_breakdown_details'),
+ 
     path('job_card_list/', views.job_card_list, name='workshop_job_card_list'),
     path('create_job_card/', views.create_job_card, name='workshop_create_job_card'),
     path('update_job_card/<int:id>', views.update_job_card, name='workshop_update_job_card'),

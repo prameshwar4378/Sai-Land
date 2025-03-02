@@ -154,7 +154,7 @@
                         <select name="search_product" id="search_product" class="form-control" onchange="get_details()" required>
                             <option value="">Search Product...</option>
                             {% for r in product_data %}
-                            <option value="{{ r.product_code }}">{{ r.product_name }}</option>
+                            <option value="{{ r.product_code }}">{{ r.product_name }} - ({{ r.model.model_name }})</option>
                             {% endfor %}
                         </select> 
                     </form>

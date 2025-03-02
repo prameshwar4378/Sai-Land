@@ -98,7 +98,6 @@ class ProductFilter(django_filters.FilterSet):
     product_code = django_filters.CharFilter(field_name='product_code', lookup_expr='icontains', label='Product Code')
     product_name = django_filters.CharFilter(field_name='product_name', lookup_expr='icontains', label='Product Name')
     model = django_filters.ModelChoiceFilter(queryset=VehicleModel.objects.all(), label='Model')
-
     # For filtering stock
     minimum_stock_alert = django_filters.ChoiceFilter(
         choices=[('1', 'Less than Minimum Stock Alert'), ('2', 'Out of Stock'), ('3', 'Available Stock')], 
@@ -119,3 +118,20 @@ class ProductFilter(django_filters.FilterSet):
             return queryset.filter(available_stock__gt=models.F('minimum_stock_alert'))
         return queryset
 
+ 
+class BreakdownFilter(django_filters.FilterSet): 
+    start_date = django_filters.DateFilter(
+        field_name='bill_date',
+        lookup_expr='gte',
+        widget=DateInput(attrs={'type': 'date'}),
+        label='Start Date'
+    )
+    end_date = django_filters.DateFilter(
+        field_name='bill_date',
+        lookup_expr='lte',
+        widget=DateInput(attrs={'type': 'date'}),
+        label='End Date'
+    )
+    class Meta:
+        model = Breakdown
+        fields = ['start_date','end_date','is_resolved',] 

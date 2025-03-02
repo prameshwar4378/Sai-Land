@@ -5,6 +5,76 @@ from ERP_Admin.models import AllocateDriverToVehicle,Vehicle,Driver,Breakdown
 from .serializers import *
 from django.utils.timezone import now
 
+
+
+
+@api_view(['GET']) 
+def get_vehicle_numbers(request):
+    try:
+        vehicles = Vehicle.objects.only('vehicle_number')  # Query all vehicle numbers
+        vehicle_numbers = [vehicle.vehicle_number for vehicle in vehicles]  # Extract vehicle numbers into a list
+        
+        if not vehicle_numbers:
+            return Response({'error': 'No vehicle numbers found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        response_data = {
+            'vehicle_numbers': vehicle_numbers  # Returning the list of vehicle numbers
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({'error': 'An unexpected error occurred', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET']) 
+def get_drivers(request):
+    try:
+        # Query all drivers (you can filter fields if necessary, but we'll use all fields here)
+        drivers = Driver.objects.all()  # Retrieve all drivers
+        
+        # If no drivers are found, return an error
+        if not drivers.exists():
+            return Response({'error': 'No Drivers found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Prepare the response data with id and driver_name for each driver
+        response_data = [
+            {
+                'id': driver.id,
+                'driver_name': driver.driver_name
+            }
+            for driver in drivers
+        ]
+        
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({'error': 'An unexpected error occurred', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET']) 
+def get_vehicles(request):
+    try:
+        # Query all vehicles (you can filter fields if necessary)
+        vehicles = Vehicle.objects.all()  # Retrieve all vehicles
+        
+        # If no vehicles are found, return an error
+        if not vehicles.exists():
+            return Response({'error': 'No Vehicles found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Prepare the response data with id and vehicle_name for each vehicle
+        response_data = [
+            {
+                'id': vehicle.id,
+                'vehicle_number': vehicle.vehicle_number  # Assuming vehicle_name is the field you want
+            }
+            for vehicle in vehicles
+        ]
+        
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({'error': 'An unexpected error occurred', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 # ✅ CREATE & LIST Allocations
 @api_view(['GET', 'POST'])
 def allocate_driver_list_create(request):
@@ -163,34 +233,57 @@ def breakdown_detail(request, pk):
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
 # ✅ CREATE & LIST Fuel Records
 @api_view(['GET', 'POST'])
 def fuel_record_list_create(request):
     try:
         if request.method == 'GET':
-            fuel_records = FuelRecord.objects.all().order_by('-created_at')  # Fetch latest first
+            # Get query parameters for filtering
+            vehicle_id = request.query_params.get('vehicle', None)
+            driver_id = request.query_params.get('driver', None)
+            start_date = request.query_params.get('start_date', None)
+            end_date = request.query_params.get('end_date', None)
+
+            # Start with all fuel records
+            fuel_records = FuelRecord.objects.all()
+
+            # Apply filtering based on available query parameters
+            if vehicle_id:
+                fuel_records = fuel_records.filter(vehicle__id=vehicle_id)
+
+            if driver_id:
+                fuel_records = fuel_records.filter(driver__id=driver_id)
+
+            if start_date:
+                fuel_records = fuel_records.filter(created_at__gte=start_date)
+
+            if end_date:
+                fuel_records = fuel_records.filter(created_at__lte=end_date)
+
+            # Order by creation date descending
+            fuel_records = fuel_records.order_by('-created_at')
+
+            # Serialize the filtered data
             serializer = FuelRecordSerializerWeb(fuel_records, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         elif request.method == 'POST':
-            vehicle = request.data.get('vehicle') 
-            driver = request.data.get('driver') 
-            if not vehicle: 
+            vehicle = request.data.get('vehicle')
+            driver = request.data.get('driver')
+            if not vehicle:
                 return Response({"detail": "Vehicle is required."}, status=status.HTTP_400_BAD_REQUEST)
             else:
-                vehicle=Vehicle.objects.get(id=vehicle)
-            if driver:  
-                driver=Driver.objects.get(id=driver)
+                vehicle = Vehicle.objects.get(id=vehicle)
+            if driver:
+                driver = Driver.objects.get(id=driver)
             else:
-                driver=None
-
+                driver = None
 
             serializer = FuelRecordSerializerWeb(data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(
-                    {"message": "Fuel record added successfully", "data": serializer.data}, 
+                    {"message": "Fuel record added successfully", "data": serializer.data},
                     status=status.HTTP_201_CREATED
                 )
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

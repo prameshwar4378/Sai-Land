@@ -183,28 +183,21 @@ Dashboard
           <div class="col-sm-6 mt-3">
             <div class="card recent-sales overflow-auto" style="height: 100%; background-color: #f8f9fa;">
                 <div class="mt-2 p-3">
-                    <h3>Notifications and Alerts</h3>
+                    <h3>Breakdown Notifications</h3>
                 </div>
                 <div class="card-body">
-                    <!-- Example Alert Card -->
+                    
+                  {% for i in breakdown %}
                     <div class="alert alert-info d-flex justify-content-between align-items-center" role="alert" style="background-color: #e9f7fe;">
                         <div>
-                            <strong>Vehicle: </strong> ABC123 <br>
-                            <strong>Name: </strong> Ford Mustang <br>
+                            <strong>Vehicle: </strong> {{i.vehicle.vehicle_number}} <br>
+                            <strong>Name: </strong> {{i.vehicle.model_name.model_name}} <br>
                             <strong>Time: </strong> 10:30 AM
                         </div>
-                        <button class="btn btn-primary btn-sm" onclick="trackDetails('ABC123')">Track</button>
+                        <a href="{% url "workshop_breakdown_list" %}" class="btn btn-primary btn-sm">Track </a>
                     </div>
         
-                    <!-- Another Sample Alert -->
-                    <div class="alert alert-warning d-flex justify-content-between align-items-center" role="alert" style="background-color: #fff3cd;">
-                        <div>
-                            <strong>Vehicle: </strong> XYZ456 <br>
-                            <strong>Name: </strong> Toyota Corolla <br>
-                            <strong>Time: </strong> 12:15 PM
-                        </div>
-                        <button class="btn btn-warning btn-sm" onclick="trackDetails('XYZ456')">Track</button>
-                    </div>
+                    {% endfor %}
         
                     <!-- Add more alerts as needed -->
                 </div>

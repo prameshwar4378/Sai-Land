@@ -174,7 +174,7 @@ CACHES = {
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en-in'
 
 TIME_ZONE = 'Asia/Kolkata'  # Indian Standard Time
 USE_I18N = True

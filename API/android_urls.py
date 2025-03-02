@@ -8,6 +8,7 @@ from .android_api_views import *
   
 urlpatterns = [
     path('login', login, name='api_login'), 
+    path('get_vehicle_numbers', get_vehicle_numbers, name='api_get_vehicle_numbers'), 
     path('get_vehicle_details', get_vehicle_details, name='api_get_vehicle_details'), 
 
     path('allocate_driver_to_vehicle', allocate_driver_to_vehicle, name='api_allocate_driver_to_vehicle'), 

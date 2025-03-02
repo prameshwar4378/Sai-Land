@@ -22,3 +22,10 @@ http://127.0.0.1:8000/api/android/get_vehicle_or_fuel_details?vehicle_number=10
 }
 
 INSTEAD OF EMOPTY STING NEED TO SEND ENPLY OBJECT
+ 
+
+Only one driver should be able to login in one device
+
+
+need to store lattitude and longitude
+
