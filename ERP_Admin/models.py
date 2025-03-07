@@ -159,12 +159,7 @@ class Product(models.Model):
     minimum_stock_alert = models.PositiveIntegerField(default=0)
     available_stock = models.IntegerField(default=0, db_index=True, null=True, blank=True)
     product_image=models.ImageField(upload_to="Product Images", height_field=None, width_field=None, max_length=500, null=True, blank=True)
-
-    def save(self, *args, **kwargs):
-        if not self.product_image:
-            self.product_image = 'default_image.webp'  # Set default image if no image is uploaded
-        super(Product, self).save(*args, **kwargs)
-    
+ 
     def __str__(self):
         return f" #{self.product_code} on {self.product_name}"
 
@@ -459,7 +454,7 @@ class Breakdown(models.Model):
 
 class FuelRecord(models.Model):
     vehicle = models.ForeignKey('Vehicle', on_delete=models.CASCADE)
-    driver = models.ForeignKey('Driver', on_delete=models.CASCADE,null=True,blank=True)
+    driver = models.ForeignKey('Driver', on_delete=models.CASCADE, blank=True, null=True)
     fuel_amount = models.DecimalField(max_digits=10, decimal_places=2)  # Cost of fuel
     fuel_liters = models.DecimalField(max_digits=8, decimal_places=2)   # Quantity of fuel in liters
     current_km = models.PositiveIntegerField()                          # Current odometer reading

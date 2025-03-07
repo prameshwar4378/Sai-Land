@@ -412,7 +412,7 @@ def get_vehicle_or_fuel_details(request):
         if allocation:
             allocated_driver=allocation.driver.driver_name
         else:
-            allocated_driver={}
+            allocated_driver=""
 
         last_fuel_rec=FuelRecord.objects.filter(vehicle=vehicle).order_by('-id').first()
         if last_fuel_rec:
@@ -439,26 +439,41 @@ def get_vehicle_or_fuel_details(request):
 
  
 
-
 @api_view(['POST'])
-def create_fuel_record(request): 
-    if request.method == 'POST':
-        vehicle = request.data.get('vehicle_id')
-        # Check if the vehicle has an active driver allocation
-        allocation = AllocateDriverToVehicle.objects.filter(
-            vehicle=vehicle, is_active=True 
-        ).order_by('-id').first()
-        if not allocation:
-            return Response({"detail": "No driver allocated for this vehicle."}, status=status.HTTP_400_BAD_REQUEST)
-        # Serialize the data and validate it
+def create_fuel_record(request):
+    try:
+        vehicle_id = request.data.get('vehicle_id')
+        if not vehicle_id:
+            return Response({"detail": "Vehicle ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Fetch vehicle and check if it exists
+        try:
+            vehicle = Vehicle.objects.get(id=vehicle_id)
+        except Vehicle.DoesNotExist:
+            return Response({"detail": "Vehicle not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Get the latest active driver allocation if available
+        allocation = (
+            AllocateDriverToVehicle.objects
+            .filter(vehicle=vehicle, is_active=True)
+            .select_related('driver')  # Optimize query by prefetching driver
+            .order_by('-id')
+            .first()
+        )
+
+        # Serialize and validate the request data
         serializer = FuelRecordSerializerAndroid(data=request.data)
         if serializer.is_valid():
-            fuel_record = serializer.save(driver=allocation.driver, vehicle=allocation.vehicle)
-            fuel_record.save()
+            # Save with driver if allocation exists, else save without driver
+            fuel_record = serializer.save(driver=allocation.driver if allocation else None, vehicle=vehicle)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-
+    except Exception as e:
+        return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    
 @api_view(['GET'])
 def get_last_fuel_record(request):
     """

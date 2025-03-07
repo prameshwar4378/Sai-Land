@@ -1,3 +1,16 @@
+settings for Deploy code on server
+
+source venv/bin/activate
+git pull origin main
+git stash
+ps -ef | grep manage
+
+# root     2379485 2155661  1 15:24 ?        00:00:04 /root/ERP_Web/Sai-Land/venv/bin/python3 manage.py runserver 0.0.0.0:8081
+kill 2379485
+./start.sh
+ps -ef | grep manage
+ 
+
 
 Bouce Changes need to add in  
 Maintenance Schedule in Workshop
@@ -6,10 +19,7 @@ website footer links adding remain
 driver import need to check done hardcoded date formate
 
 Get Pass Feature Need to add 
-
-
-
-
+ 
 
 http://127.0.0.1:8000/api/android/get_vehicle_or_fuel_details?vehicle_number=10
 
@@ -27,5 +37,7 @@ INSTEAD OF EMOPTY STING NEED TO SEND ENPLY OBJECT
 Only one driver should be able to login in one device
 
 
-need to store lattitude and longitude
+need to store lattitude and longitude in breakdown while create
+
+
 
