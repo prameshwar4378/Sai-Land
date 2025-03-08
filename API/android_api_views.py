@@ -412,7 +412,7 @@ def get_vehicle_or_fuel_details(request):
         if allocation:
             allocated_driver=allocation.driver.driver_name
         else:
-            allocated_driver=""
+            allocated_driver="Unknow"
 
         last_fuel_rec=FuelRecord.objects.filter(vehicle=vehicle).order_by('-id').first()
         if last_fuel_rec:
