@@ -290,6 +290,8 @@ class Policy(models.Model):
 
     def __str__(self):
         return f"Policy for {self.vehicle.vehicle_number[:-5]} {self.vehicle.vehicle_number[-4:]} - {self.vehicle.model_name.model_name}"
+    
+    
 FREQUENCY_CHOICES = (
     ('yearly', 'Yearly'),
     ('quarterly', 'Quarterly'),

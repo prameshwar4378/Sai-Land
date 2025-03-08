@@ -25,75 +25,92 @@ def workshop_required(function):
 
 @workshop_required
 def dashboard(request): 
-    total_products = Product.objects.count()
+    try:
+        total_products = Product.objects.count()
 
-    out_of_stock_count = Product.objects.filter(available_stock__lt=F('minimum_stock_alert')).count()
+        out_of_stock_count = Product.objects.select_related('model').filter(available_stock__lt=F('minimum_stock_alert')).count()
 
-    # Count of Running Job Cards (Job cards where status is 'running')
-    running_job_cards_count = JobCard.objects.exclude(status='completed').count()
+        # Count of Running Job Cards (Job cards where status is 'running')
+        running_job_cards_count = JobCard.objects.exclude(status='completed').select_related('technician',).count()
 
-    # Count of Completed Job Cards (Job cards where status is 'completed')
-    completed_job_card_count = JobCard.objects.filter(status='completed').count()
+        # Count of Completed Job Cards (Job cards where status is 'completed')
+        completed_job_card_count = JobCard.objects.filter(status='completed').count()
 
-    breakdown=Breakdown.objects.filter(is_resolved=True)
-    # Pass data to the template
-    context = {
-        'out_of_stock_count': out_of_stock_count,
-        'running_job_cards_count': running_job_cards_count,
-        'completed_job_card_count': completed_job_card_count,
-        'total_products':total_products,
-        'breakdown':breakdown
-    }
-    return render(request, "workshop_dashboard.html", context)
+        breakdown=Breakdown.objects.filter(is_resolved=True)
+        # Pass data to the template
+        context = {
+            'out_of_stock_count': out_of_stock_count,
+            'running_job_cards_count': running_job_cards_count,
+            'completed_job_card_count': completed_job_card_count,
+            'total_products':total_products,
+            'breakdown':breakdown
+        }
+        return render(request, "workshop_dashboard.html", context)
+
+    except Exception as e:
+        return render(request, "404.html", {"error_message": str(e)})
+ 
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def breakdown_list(request): 
-    queryset = Breakdown.objects.select_related('vehicle', 'driver', 'type').order_by('is_resolved') 
-    filter = BreakdownFilter(request.GET, queryset=queryset)
-    filtered_rec = filter.qs  # Filtered queryset
-    # Pagination setup
-    paginator = Paginator(filtered_rec, 20)  # Show 20 records per page
-    page_number = request.GET.get('page')  # Get the page number from the GET request
     try:
-        page_obj = paginator.get_page(page_number)  # Get the corresponding page object
-    except PageNotAnInteger:
-        page_obj = paginator.get_page(1)  # Default to the first page
-    except EmptyPage:
-        page_obj = paginator.get_page(paginator.num_pages)  # If page is out of range, show last page
-    
-    # Include the filter parameters in the pagination context
-    filter_params = request.GET.copy()
-    if 'page' in filter_params:
-        del filter_params['page']  # Remove the page parameter if it exists
+        queryset = Breakdown.objects.select_related('vehicle', 'driver', 'type').order_by('is_resolved') 
+        filter = BreakdownFilter(request.GET, queryset=queryset)
+        filtered_rec = filter.qs  # Filtered queryset
+        # Pagination setup
+        paginator = Paginator(filtered_rec, 20)  # Show 20 records per page
+        page_number = request.GET.get('page')  # Get the page number from the GET request
+        try:
+            page_obj = paginator.get_page(page_number)  # Get the corresponding page object
+        except PageNotAnInteger:
+            page_obj = paginator.get_page(1)  # Default to the first page
+        except EmptyPage:
+            page_obj = paginator.get_page(paginator.num_pages)  # If page is out of range, show last page
+        
+        # Include the filter parameters in the pagination context
+        filter_params = request.GET.copy()
+        if 'page' in filter_params:
+            del filter_params['page']  # Remove the page parameter if it exists
 
-    context = {
-        'breakdown': page_obj,  # Pass the paginated object to the template
-        'filter': filter,  # Pass the filter object for displaying the form
-        'filter_params': filter_params.urlencode(),  # Pass the filter parameters for pagination
-    }
-    return render(request, "workshop_breakdown_list.html", context)
+        context = {
+            'breakdown': page_obj,  # Pass the paginated object to the template
+            'filter': filter,  # Pass the filter object for displaying the form
+            'filter_params': filter_params.urlencode(),  # Pass the filter parameters for pagination
+        }
+        return render(request, "workshop_breakdown_list.html", context)
 
+    except Exception as e:
+        return render(request, "404.html", {"error_message": str(e)})
+ 
  
 def delete_breakdown(request, id):
-    item = get_object_or_404(Breakdown, id=id)
-    if item:
-        item.delete()
-        messages.success(request, 'Record deleted successfully.')
-    return redirect(f'/workshop/breakdown_list')
+    try:
+        item = get_object_or_404(Breakdown, id=id)
+        if item:
+            item.delete()
+            messages.success(request, 'Record deleted successfully.')
+        return redirect(f'/workshop/breakdown_list')
 
+    except Exception as e:
+        return render(request, "404.html", {"error_message": str(e)})
+ 
 
 
 def update_breakdown_status(request, id):
-    item = get_object_or_404(Breakdown, id=id)
-    if item.is_resolved==True:
-        item.is_resolved=False
-        item.save()
-    else:
-        item.is_resolved=True
-        item.save()
-    return redirect(f'/workshop/breakdown_list')
+    try:
+        item = get_object_or_404(Breakdown, id=id)
+        if item.is_resolved==True:
+            item.is_resolved=False
+            item.save()
+        else:
+            item.is_resolved=True
+            item.save()
+        return redirect(f'/workshop/breakdown_list')
 
+    except Exception as e:
+        return render(request, "404.html", {"error_message": str(e)})
+ 
  
 def get_breakdown_details(request):
     id = request.GET.get('id')  
@@ -116,32 +133,36 @@ def get_breakdown_details(request):
         print(data)   
         return JsonResponse(data, safe=False)
     return JsonResponse({'error': 'Invalid Breakdown ID'}, status=400)
-
+ 
 
 @workshop_required
 def job_card_list(request):
-    form = JobCardForm()
-    queryset = JobCard.objects.all().order_by('-id') 
+    try:
+        form = JobCardForm()
+        queryset = JobCard.objects.select_related('technician','driver','party','vehicle').order_by('-id') 
 
-    filter = JobCardFilter(request.GET, queryset=queryset)
-    filtered_job_cards = filter.qs  # Filtered queryset
-    # Pagination
-    paginator = Paginator(filtered_job_cards, 10)  # Show 10 job cards per page.
-    page_number = request.GET.get('page')  # Get the page number from the GET request
-    page_obj = paginator.get_page(page_number)  # Get the corresponding page object
-    
-    # Include the filter parameters in the pagination context
-    filter_params = request.GET.copy()  # Copy the GET parameters
-    if 'page' in filter_params:
-        del filter_params['page']  # Remove the page parameter if it exists
-    
-    return render(request, "workshop_job_card_list.html", {
-        'form': form,
-        'job_card': page_obj,  # Pass the paginated object to the template
-        'filter': filter,  # Pass the filter object for displaying the form
-        'filter_params': filter_params.urlencode(),  # Pass the filter parameters for pagination
-    })
+        filter = JobCardFilter(request.GET, queryset=queryset)
+        filtered_job_cards = filter.qs  # Filtered queryset
+        # Pagination
+        paginator = Paginator(filtered_job_cards, 10)  # Show 10 job cards per page.
+        page_number = request.GET.get('page')  # Get the page number from the GET request
+        page_obj = paginator.get_page(page_number)  # Get the corresponding page object
+        
+        # Include the filter parameters in the pagination context
+        filter_params = request.GET.copy()  # Copy the GET parameters
+        if 'page' in filter_params:
+            del filter_params['page']  # Remove the page parameter if it exists
+        
+        return render(request, "workshop_job_card_list.html", {
+            'form': form,
+            'job_card': page_obj,  # Pass the paginated object to the template
+            'filter': filter,  # Pass the filter object for displaying the form
+            'filter_params': filter_params.urlencode(),  # Pass the filter parameters for pagination
+        })
 
+    except Exception as e:
+        return render(request, "404.html", {"error_message": str(e)})
+ 
 def create_job_card(request):
     if request.method == 'POST':
         form = JobCardForm(request.POST, request.FILES)
@@ -165,95 +186,109 @@ def create_job_card(request):
 
 
 def update_job_card(request, id):
-    job_card = JobCard.objects.get(id=id)  # Retrieve the JobCard instance
-    if request.method == 'POST':
-        form = JobCardForm(request.POST, instance=job_card)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Job Card Updated successfully.')
-            return redirect(f'/workshop/update_job_card/{id}')  # Redirect to a list view or other desired page
-    else:
-        form = JobCardForm(instance=job_card)
-    return render(request, 'workshop_update_job_card.html', {'form': form})
-
-def delete_job_card(request, id):
-    job_card = get_object_or_404(JobCard, id=id)
-    if job_card.items.exists():
-        messages.error(request, 'Job Card has associated items. Please remove all items before deleting it.')
-        return redirect('/workshop/job_card_list')
     try:
-        with transaction.atomic():
-            job_card.delete()
-            messages.success(request, 'Job Card deleted successfully.')
-    except Exception as e:
-        messages.error(request, f"Error deleting Job Card: {str(e)}")
-    return redirect('/workshop/job_card_list')
+        job_card = JobCard.objects.get(id=id)  # Retrieve the JobCard instance
+        if request.method == 'POST':
+            form = JobCardForm(request.POST, instance=job_card)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Job Card Updated successfully.')
+                return redirect(f'/workshop/update_job_card/{id}')  # Redirect to a list view or other desired page
+        else:
+            form = JobCardForm(instance=job_card)
+        return render(request, 'workshop_update_job_card.html', {'form': form})
 
+    except Exception as e:
+        return render(request, "404.html", {"error_message": str(e)})
+ 
+def delete_job_card(request, id):
+    try:
+        job_card = get_object_or_404(JobCard, id=id)
+        if job_card.items.exists():
+            messages.error(request, 'Job Card has associated items. Please remove all items before deleting it.')
+            return redirect('/workshop/job_card_list')
+        try:
+            with transaction.atomic():
+                job_card.delete()
+                messages.success(request, 'Job Card deleted successfully.')
+        except Exception as e:
+            messages.error(request, f"Error deleting Job Card: {str(e)}")
+        return redirect('/workshop/job_card_list')
+
+    except Exception as e:
+        return render(request, "404.html", {"error_message": str(e)})
+ 
 
 @workshop_required
 def job_card_item_list(request, id):
-    job_card = get_object_or_404(JobCard, id=id)
-    close_job_card_form=CloseJobCardForm(instance=job_card)
-    items = JobCardItem.objects.filter(job_card=job_card).order_by('-id')
-    total_cost = items.aggregate(Sum('cost'))['cost__sum']
-    total_cost = int(total_cost) if total_cost is not None else 0
+    try:
+        job_card = get_object_or_404(JobCard, id=id)
+        close_job_card_form=CloseJobCardForm(instance=job_card)
+        items = JobCardItem.objects.select_related('product','job_card').filter(job_card=job_card).order_by('-id')
+        total_cost = items.aggregate(Sum('cost'))['cost__sum']
+        total_cost = int(total_cost) if total_cost is not None else 0
 
-    total_cost=None
-    labour_cost=None
-    grand_total_cost=None
+        total_cost=None
+        labour_cost=None
+        grand_total_cost=None
 
-    product_data = cache.get('product_data')
-    if not product_data:
-        product_data = list(Product.objects.all())
-        cache.set('product_data', product_data, timeout=300)
+        product_data = cache.get('product_data')
+        if not product_data:
+            product_data = list(Product.objects.select_related('model'))
+            cache.set('product_data', product_data, timeout=300)
 
-    if request.method == 'POST':
-        form = JobCardItemForm(request.POST)
-        product_id = request.POST.get('product_id')
-        if form.is_valid():
-            item = form.save(commit=False)
-            item.job_card = job_card
-            item.product = Product.objects.get(id=product_id)
-            item.save()
-
-            items = JobCardItem.objects.filter(job_card=job_card).order_by('-id')
+        if request.method == 'POST':
+            form = JobCardItemForm(request.POST)
+            product_id = request.POST.get('product_id')
+            if form.is_valid():
+                item = form.save(commit=False)
+                item.job_card = job_card
+                item.product = Product.objects.get(id=product_id)
+                item.save() 
+                # items = JobCardItem.objects.select_related('product','job_card').filter(job_card=job_card).order_by('-id')
+                # total_cost = items.aggregate(Sum('total_cost'))['total_cost__sum']
+                # total_cost = int(total_cost) if total_cost is not None else 0
+                # labour_cost=int(job_card.labour_cost) if job_card.labour_cost is not None else 0
+                # grand_total_cost=int(total_cost+labour_cost)
+                return redirect(f"/workshop/job_card_item_list/{id}")
+            else:
+                print("Form errors:", form.errors)
+        else:
+            items = JobCardItem.objects.select_related('product','job_card').filter(job_card=job_card).order_by('-id')
             total_cost = items.aggregate(Sum('total_cost'))['total_cost__sum']
             total_cost = int(total_cost) if total_cost is not None else 0
             labour_cost=int(job_card.labour_cost) if job_card.labour_cost is not None else 0
             grand_total_cost=int(total_cost+labour_cost)
-            return redirect(f"/workshop/job_card_item_list/{id}")
 
-        else:
-            print("Form errors:", form.errors)
-    else:
-        items = JobCardItem.objects.filter(job_card=job_card).order_by('-id')
-        total_cost = items.aggregate(Sum('total_cost'))['total_cost__sum']
-        total_cost = int(total_cost) if total_cost is not None else 0
-        labour_cost=int(job_card.labour_cost) if job_card.labour_cost is not None else 0
-        grand_total_cost=int(total_cost+labour_cost)
+        form = JobCardItemForm()
 
-    form = JobCardItemForm()
+        return render(request, "workshop_job_card_item_list.html", {
+            'form': form,
+            'close_job_card_form':close_job_card_form,
+            'items': items,
+            'job_card': job_card,
+            'product_data': product_data,
+            'total_cost': total_cost,
+            'labour_cost':labour_cost,
+            'grand_total_cost':grand_total_cost
+        })
 
-    return render(request, "workshop_job_card_item_list.html", {
-        'form': form,
-        'close_job_card_form':close_job_card_form,
-        'items': items,
-        'job_card': job_card,
-        'product_data': product_data,
-        'total_cost': total_cost,
-        'labour_cost':labour_cost,
-        'grand_total_cost':grand_total_cost
-    })
-
+    except Exception as e:
+        return render(request, "404.html", {"error_message": str(e)})
+ 
 
 def delete_job_card_item(request, id):
-    item = get_object_or_404(JobCardItem, id=id)
-    job_card_id=item.job_card.id
-    if item:
-        item.delete()
-        messages.success(request, 'Item deleted successfully.')
-    return redirect(f'/workshop/job_card_item_list/{job_card_id}')
+    try:
+        item = get_object_or_404(JobCardItem, id=id)
+        job_card_id=item.job_card.id
+        if item:
+            item.delete()
+            messages.success(request, 'Item deleted successfully.')
+        return redirect(f'/workshop/job_card_item_list/{job_card_id}')
 
+    except Exception as e:
+        return render(request, "404.html", {"error_message": str(e)})
+ 
 from django.utils.timezone import now 
 
 # Get the current date (naive)

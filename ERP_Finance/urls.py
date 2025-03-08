@@ -28,7 +28,6 @@ urlpatterns = [
     path('update_policy/<int:id>', views.update_policy, name='finance_update_policy'),
 
     path('reports_list/', views.reports_list, name='finance_reports_list'),
-
      
     path('insurance_bank_list/', views.insurance_bank_list, name='finance_insurance_bank_list'),
     path('insurance_bank_update/<int:id>', views.insurance_bank_update, name='finance_insurance_bank_update'),
