@@ -129,6 +129,8 @@ def allocate_driver_list_create(request):
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+
 # ✅ RETRIEVE, UPDATE & DELETE a Single Allocation
 @api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
 def allocate_driver_detail(request, pk):

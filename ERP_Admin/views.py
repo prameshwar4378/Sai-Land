@@ -759,7 +759,7 @@ def import_drivers(request):
                         new_emp_id = EMP_ID.objects.create(emp_id="SLD-1")
 
                     # Create or update the user (CustomUser)
-                    username = adhaar_number or mobile_number
+                    username = mobile_number
                     user, created = CustomUser.objects.get_or_create(
                         username=username,
                         defaults={

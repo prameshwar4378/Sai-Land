@@ -306,7 +306,8 @@ def get_breakdown_type(request):
     serializer = BreakdownTypeSerializerAndroid(breakdown_types, many=True)  # Serialize the data
     return Response(serializer.data, status=status.HTTP_200_OK)
  
-
+from django.db import connection
+from datetime import datetime
 
 @api_view(['POST'])
 def create_breakdown(request):
@@ -358,36 +359,84 @@ def create_breakdown(request):
                 'date_time': timezone.localtime(breakdown_instance.date_time).strftime('%d-%m-%Y %I:%M %p'),
                 'driver': breakdown_instance.driver, 
             })
+            # vehicle_reg_no=breakdown_instance.vehicle.vehicle_number
+            # start_time= timezone.localtime(breakdown_instance.date_time).strftime('%d-%m-%Y %I:%M %p')
+            # current_time =  datetime.now()
+            # try:
+            #     with connection.cursor() as cursor:
+            #         # Fetch driver details
+            #         cursor.execute("""
+            #             SELECT d.driver_name, d.mobile_number, vm.model_name
+            #             FROM public."ERP_Admin_allocatedrivertovehicle" adv
+            #             INNER JOIN public."ERP_Admin_vehicle" v ON adv.vehicle_id = v.id
+            #             INNER JOIN public."ERP_Admin_vehiclemodel" vm ON v.model_name_id = vm.id
+            #             INNER JOIN public."ERP_Admin_driver" d ON adv.driver_id = d.id
+            #             WHERE v.vehicle_number = %s
+            #             AND adv.is_active = TRUE
+            #             AND (
+            #                 (adv.joining_date_time IS NULL OR adv.joining_date_time <= %s)
+            #                 AND (adv.leaving_date_time IS NULL OR adv.leaving_date_time >= %s)
+            #             )
+            #         """, [vehicle_reg_no, current_time, start_time])
+
+            #         drivers = cursor.fetchall()
+
+            #         # Default values if no driver is found
+            #         if not drivers:
+            #             driver_info, contact_info, model_name = "Unknown Driver", "No Contact", "Unknown Model"
+            #         else:
+            #             driver_info = ", ".join([d[0] for d in drivers])
+            #             contact_info = ", ".join([d[1] for d in drivers if d[1] is not None])
+            #             model_name = drivers[0][2]
+
+            #         # Insert alert into vehicle_alert table
+            #         cursor.execute("""
+            #             INSERT INTO vehicle_alert
+            #             (vehicle_reg_no, driver_name, driver_contact, model_name, alert_type, description, created_at, is_resolved, start_time, end_time)
+            #             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            #         """, [
+            #             vehicle_reg_no, driver_info, contact_info, model_name, 'FUEL_THEFT',
+            #             f'Breakdown Alert detected for {vehicle_reg_no}.',
+            #             current_time, False, start_time, current_time
+            #         ])
+
+            #     return Response({"message": "Fuel theft alert recorded successfully"}, status=201)
+
+            # except Exception as e: 
+            #     return Response({"error": "Internal Server Error", "details": str(e)}, status=500)
+
+
+
+
+            # # Configure the email
+            # email_message = EmailMessage(
+            #     subject="Notification - Breakdown Alert",
+            #     body=email_body,
+            #     from_email=settings.DEFAULT_FROM_EMAIL,
+            #     to=['prameshwar4378@gmail.com'],  # Replace with the appropriate recipient email
+            # )
+
+            # # Set the email content type to HTML
+            # email_message.content_subtype = 'html'
+
+            # # Attach images if they exist
+            # for image_field in ['image1', 'image2', 'image3', 'image4', 'audio']:
+            #     file = getattr(breakdown_instance, image_field)
+            #     if file:
+            #         email_message.attach(
+            #             os.path.basename(file.name),
+            #             file.read(),
+            #             file.url
+            #         )
             
-            # Configure the email
-            email_message = EmailMessage(
-                subject="Notification - Breakdown Alert",
-                body=email_body,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                to=['prameshwar4378@gmail.com'],  # Replace with the appropriate recipient email
-            )
+            # print("Email body prepared, attaching files...")
 
-            # Set the email content type to HTML
-            email_message.content_subtype = 'html'
+            # # Send the email in a background thread
+            # email_thread = threading.Thread(target=send_email_in_background, args=(email_message,))
+            # email_thread.start()
 
-            # Attach images if they exist
-            for image_field in ['image1', 'image2', 'image3', 'image4', 'audio']:
-                file = getattr(breakdown_instance, image_field)
-                if file:
-                    email_message.attach(
-                        os.path.basename(file.name),
-                        file.read(),
-                        file.url
-                    )
-            
-            print("Email body prepared, attaching files...")
+            # return Response({"message": "Breakdown alert sent!"}, status=status.HTTP_201_CREATED)
 
-            # Send the email in a background thread
-            email_thread = threading.Thread(target=send_email_in_background, args=(email_message,))
-            email_thread.start()
-
-            return Response({"message": "Breakdown alert sent!"}, status=status.HTTP_201_CREATED)
-        
         # **Fix: Return validation errors if serializer is not valid**
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
