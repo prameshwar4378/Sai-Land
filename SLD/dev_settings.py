@@ -27,12 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-INTERNAL_IPS = [
-    # ...
-    "127.0.0.1",
-    # ...
-]
-
+ 
 # Application definition
 
 INSTALLED_APPS = [
@@ -126,7 +121,21 @@ DATABASES = {
 #         'PORT': '5432'
 #     }
 # }
-# Using Postgresql
+ 
+
+
+# DATABASES = {
+#      'default': {
+#          'ENGINE': 'django.db.backends.postgresql',
+#          'NAME': 'sld',
+#          'USER': 'postgres',
+#          'PASSWORD': 'root',
+#          'HOST': 'localhost',
+#          'PORT': '5432',
+#      }
+#  }
+
+
 
 # DATABASES = {
 #     'default': {
@@ -138,7 +147,7 @@ DATABASES = {
 #         'PORT': '5432',                     # Default PostgreSQL port
 #     }
 # }
-
+ 
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
